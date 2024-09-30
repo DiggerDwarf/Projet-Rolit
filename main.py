@@ -49,6 +49,14 @@ def check_capture(grid, x, y) -> list[tuple[int]]:
     color = grid[y][x]
     captures = []
     directions = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
+    if x == 0: # remove directions that are out of bounds
+        directions = [d for d in directions if d[0] != -1]
+    if x == WIDTH - 1:
+        directions = [d for d in directions if d[0] != 1]
+    if y == 0:
+        directions = [d for d in directions if d[1] != -1]
+    if y == HEIGHT - 1:
+        directions = [d for d in directions if d[1] != 1]
     for dx, dy in directions:
         x_, y_ = x + dx, y + dy
         capture = []
@@ -57,7 +65,7 @@ def check_capture(grid, x, y) -> list[tuple[int]]:
                 break
             capture.append((x_, y_))
             x_, y_ = x_ + dx, y_ + dy
-        if grid[y_][x_] == color:
+        if (0 <= x_ < WIDTH) and (0 <= y_ < HEIGHT) and grid[y_][x_] == color:
             captures.extend(capture)
     return captures
 
@@ -74,6 +82,24 @@ def init_grid() -> list[list[str]]:
     return grid
 
 
+def test_adjacent(grid, x, y) -> bool:
+    """Test if there is any adjacent piece to (x, y) in the grid
+    
+    :param grid: the game grid
+    :param x: the x coordinate
+    :param y: the y coordinate
+    :return: True if there is an adjacent piece, False otherwise"""
+    for dx in (-1, 0, 1):
+        for dy in (-1, 0, 1):
+            if (dx, dy) == (0, 0):
+                continue
+            x_, y_ = x + dx, y + dy
+            if (0 <= x_ < WIDTH) and (0 <= y_ < HEIGHT):
+                if grid[y_][x_] != CLEAR:
+                    return True
+    return False
+
+
 def play(grid, x, y, color) -> bool:
     """Play a move at (x, y) for color player
     
@@ -82,7 +108,7 @@ def play(grid, x, y, color) -> bool:
     :param y: the y coordinate of the move
     :param color: the color of the player
     :return: True if the move is valid, False otherwise"""
-    if grid[y][x] != CLEAR:
+    if grid[y][x] != CLEAR or not test_adjacent(grid, x, y):
         return False
     grid[y][x] = color
     captures = check_capture(grid, x, y)
@@ -130,24 +156,30 @@ def mainloop() -> None:
     elif nb_players == 3:   print("rouge, jaune et vert.")
     else:                   print("rouge, jaune, vert et bleu.")
 
+    while True:
+        start = input("Voulez-vous commencer ? [O/n] : ").lower()
+        if start == "o":
+            break
+
     grid = init_grid()
-    
+
     clear()
     afficher_grille(grid)
 
     for turn in range(60):
         player = turn % nb_players + 1
-        coords=["", ""]
-        while coords[0] not in ("a","b","c","d","e","f","g","h") or coords[1] not in ("1","2","3","4","5","6","7","8") or len(coords) > 2:
+        played = False
+        while not played:
+            coords=["", ""]
             playerInput = input(f"Joueur {str(player)}, Emplacement de votre prochaine boule (ex: a1, A1) : ").lower()
-            if playerInput == "":
+            x_axis, y_axis = ("1","2","3","4","5","6","7","8"), ("a","b","c","d","e","f","g","h")
+            if len(playerInput) != 2 or playerInput[0] not in y_axis or playerInput[1] not in x_axis: #check if input is valid (ex: a1, A1)
                 continue
             coords = list(playerInput)
-        x, y = int(coords[1]) - 1, abcto123(coords[0])
-        played = play(grid, x, y, player)
-        if not played:
-            turn -= 1
-            continue
+            x, y = int(coords[1]) - 1, abcto123(coords[0])
+            played = play(grid, x, y, player)
+            if not played:
+                print("Coup invalide")
         afficher_grille(grid)
 
     score_rouge, score_jaune, score_vert, score_bleu = calc_score(grid)
