@@ -1,9 +1,10 @@
 # main file
 
 from random import randint
+from os import system
 
 WIDTH, HEIGHT = 8, 8
-CLEAR, RED, GREEN, YELLOW, BLUE = 0, 1, 2, 3, 4
+CLEAR, RED, GREEN, YELLOW, BLUE = "vide", "rouge", "vert", "jaune", "bleu"
 
 colors = {
     CLEAR: "\033[30;40m  \033[0m",
@@ -50,6 +51,12 @@ def main():
         nb_players = input("Combien de joueurs vont jouer ? [2-4] : ")
     nb_players = int(nb_players)
     
+    print("Mettez vous d'accord sur vos couleurs ! Choisissez entre ", end="")
+    if nb_players == 2:     print("rouge et vert.")
+    elif nb_players == 3:   print("rouge, jaune et vert.")
+    else:                   print("rouge, jeune, vert et bleu.")
+    system("pause")
+    
     grille = [[CLEAR for _ in range(WIDTH)] for _ in range(HEIGHT)]
     grille[3][3] = RED
     grille[3][4] = YELLOW
@@ -57,7 +64,22 @@ def main():
     grille[4][4] = GREEN
     
     afficher_grille(grille)
+
+    for tour in range(60):
+        player = 1
+        coords = list(input("Joueur " + str(player) + "Emplacement de votre prochaine boule (ex: a1, A1) : "))
+        print(coords[0])
+        grille[abcto123(coords[0])][int(coords[1]) - 1] = RED
+        afficher_grille(grille)
     
+    score_rouge = sum([[grille[i].count(RED   )] for i in range(HEIGHT)])
+    score_jaune = sum([[grille[i].count(YELLOW)] for i in range(HEIGHT)])
+    score_vert  = sum([[grille[i].count(GREEN )] for i in range(HEIGHT)])
+    score_bleu  = sum([[grille[i].count(BLUE  )] for i in range(HEIGHT)])
+
+def abcto123(letter):
+    number = int(ord(letter) - ord("a"))
+    return number
 
 if __name__ == "__main__":
     main()
