@@ -191,8 +191,7 @@ def mainloop() -> None:
                         i_row = (min(max(ev[1].y, 15), 815) - 15) // 100
                         
                         # if nothing's there, set the ball and advance to the next turn
-                        if grid[i_row][i_column] == CLEAR:
-                            grid[i_row][i_column] = player
+                        if play(grid, i_column, i_row, player):
                             tour += 1
                         
                 ev = fltk.donne_ev()
