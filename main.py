@@ -21,6 +21,28 @@ def afficher_grille(grille):
             print(colors[grille[i_row][i_elem]], end="")
         print()
 
+def check_capture(grid, x, y) -> list[tuple[int]]:
+    """Check if a move at (x, y) for color player will capture some opponent pieces
+    
+    :param grid: the game grid
+    :param x: the x coordinate of the move
+    :param y: the y coordinate of the move
+    :param color: the color of the player
+    :return: a list of coordinates of the captured pieces"""
+    color = grid[y][x]
+    captures = []
+    directions = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
+    for dx, dy in directions:
+        x_, y_ = x + dx, y + dy
+        capture = []
+        while (0 <= x_ < WIDTH) and (0 <= y_ < HEIGHT) and grid[y_][x_] not in (CLEAR, color):
+            capture.append((x_, y_))
+            x_, y_ = x_ + dx, y_ + dy
+        if grid[y_][x_] == color:
+            captures.extend(capture)
+    return captures
+
+
 def main():
     # setup number of player and initial game state
     nb_players = 0
