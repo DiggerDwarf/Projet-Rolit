@@ -44,11 +44,15 @@ def main():
     afficher_grille(grille)
 
     while True:
-        player=0
-        coords=list(input("Joueur " + str(player) + "Emplacement de votre prochaine boule (ex: a1, A1) : "))
-        grille[coords[0],coords[1]] 
+        player = 1
+        coords = list(input("Joueur " + str(player) + "Emplacement de votre prochaine boule (ex: a1, A1) : "))
+        print(coords[0])
+        grille[abcto123(coords[0])][int(coords[1]) - 1] = RED
+        afficher_grille(grille)
 
-
+def abcto123(letter):
+    number = int(ord(letter) - ord("a"))
+    return number
 
 if __name__ == "__main__":
     main()
