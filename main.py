@@ -35,7 +35,10 @@ def main():
     grille[4][4] = GREEN
     
     afficher_grille(grille)
-    
+
+    while True:
+        player=0
+        next_move=list(input("Joueur " + str(player) + "Emplacement de votre prochaine boule (ex: a1, A1) : "))    
 
 if __name__ == "__main__":
     main()
