@@ -132,10 +132,10 @@ def mainloop() -> None:
 
     grid = init_grid()
     
+    clear()
     afficher_grille(grid)
 
     for turn in range(60):
-        clear()
         player = turn % nb_players + 1
         coords=["", ""]
         while coords[0] not in ("a","b","c","d","e","f","g","h") or coords[1] not in ("1","2","3","4","5","6","7","8") or len(coords) > 2:
