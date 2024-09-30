@@ -65,7 +65,7 @@ def main():
     
     afficher_grille(grille)
 
-    for tour in range(4):
+    for tour in range(60):
         player = 1
         coords = list(input("Joueur " + str(player) + "Emplacement de votre prochaine boule (ex: a1, A1) : "))
         print(coords[0])
