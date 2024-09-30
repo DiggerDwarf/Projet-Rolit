@@ -23,7 +23,17 @@ def afficher_grille(grille):
         print()
 
 def main():
-    grille = [[randint(VIDE, BLEU) for _ in range(WIDTH)] for _ in range(HEIGHT)]
+    # setup number of player and initial game state
+    nb_joueurs = 0
+    while nb_joueurs not in ("2", "3", "4"):
+        nb_joueurs = input("Combien de joueurs vont jouer ? [2-4] : ")
+    nb_joueurs = int(nb_joueurs)
+    
+    grille = [[VIDE for _ in range(WIDTH)] for _ in range(HEIGHT)]
+    grille[3][3] = ROUGE
+    grille[3][4] = JAUNE
+    grille[4][3] = BLEU
+    grille[4][4] = VERT
     afficher_grille(grille)
     
     
