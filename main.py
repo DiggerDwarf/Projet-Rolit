@@ -1,18 +1,16 @@
 # main file
 
-import colorama
 from random import randint
 
 WIDTH, HEIGHT = 8, 8
-
 VIDE, ROUGE, VERT, JAUNE, BLEU = 0, 1, 2, 3, 4
 
 colors = {
-    VIDE: f"{colorama.Back.BLACK}  {colorama.Back.RESET}",
-    ROUGE: f"{colorama.Back.RED}  {colorama.Back.RESET}",
-    VERT: f"{colorama.Back.GREEN}  {colorama.Back.RESET}",
-    JAUNE: f"{colorama.Back.YELLOW}  {colorama.Back.RESET}",
-    BLEU: f"{colorama.Back.BLUE}  {colorama.Back.RESET}"
+    VIDE: "\033[30;40m  \033[0m",
+    ROUGE: "\033[31;41m  \033[0m",
+    VERT: "\033[32;42m  \033[0m",
+    JAUNE: "\033[33;43m  \033[0m",
+    BLEU: "\033[36;46m  \033[0m"
 }
 
 
