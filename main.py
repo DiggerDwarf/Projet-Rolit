@@ -43,17 +43,17 @@ def main():
     
     afficher_grille(grille)
 
-    for tour in range(60):
+    for tour in range(4):
         player = 1
         coords = list(input("Joueur " + str(player) + "Emplacement de votre prochaine boule (ex: a1, A1) : "))
         print(coords[0])
         grille[abcto123(coords[0])][int(coords[1]) - 1] = RED
         afficher_grille(grille)
     
-    score_rouge = sum([[grille[i].count(RED   )] for i in range(HEIGHT)])
-    score_jaune = sum([[grille[i].count(YELLOW)] for i in range(HEIGHT)])
-    score_vert  = sum([[grille[i].count(GREEN )] for i in range(HEIGHT)])
-    score_bleu  = sum([[grille[i].count(BLUE  )] for i in range(HEIGHT)])
+    score_rouge = sum([grille[i].count(RED   ) for i in range(HEIGHT)])
+    score_jaune = sum([grille[i].count(YELLOW) for i in range(HEIGHT)])
+    score_vert  = sum([grille[i].count(GREEN ) for i in range(HEIGHT)])
+    score_bleu  = sum([grille[i].count(BLUE  ) for i in range(HEIGHT)])
 
 def abcto123(letter):
     number = int(ord(letter) - ord("a"))
