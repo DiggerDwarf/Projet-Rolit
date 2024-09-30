@@ -6,20 +6,26 @@ import os
 WIDTH, HEIGHT = 8, 8
 CLEAR, RED, YELLOW, GREEN, BLUE = 0, 1, 2, 3, 4
 
-DISPLAY_MODE = "cmd" # or win
+DISPLAY_MODE = "win" # or cmd
+if DISPLAY_MODE == "win":
+    from modules import fltk
+    colors = {
+        CLEAR: "#FFFFFF",
+        RED: "#FF0000",
+        GREEN: "#00FF00",
+        YELLOW: "#FFFF00",
+        BLUE: "#0000FF"
+    }
+else:
+    colors = {
+        CLEAR: "\033[30;40m  \033[0m",
+        RED: "\033[31;41m  \033[0m",
+        GREEN: "\033[32;42m  \033[0m",
+        YELLOW: "\033[33;43m  \033[0m",
+        BLUE: "\033[36;46m  \033[0m"
+    }
 
-colors = {
-    CLEAR: "\033[30;40m  \033[0m",
-    RED: "\033[31;41m  \033[0m",
-    GREEN: "\033[32;42m  \033[0m",
-    YELLOW: "\033[33;43m  \033[0m",
-    BLUE: "\033[36;46m  \033[0m"
-}
-
-def afficher_grille(grille) -> None:
-    """Print the game grid
-    
-    :param grille: the game grid"""
+def afficher_grille(grille: list[list[int]], player: int | None = None) -> None:
     """Display the game grid
     
     Depending on the global variable DISPLAY_MODE, it will render in the console or in an fltk window
@@ -33,7 +39,11 @@ def afficher_grille(grille) -> None:
                 print(colors[grille[i_row][i_elem]], end="")
             print()
     elif DISPLAY_MODE == "win":
-        raise ValueError("Not implemented yet")
+        fltk.efface_tout()
+        fltk.rectangle(0,0,830,830, couleur=colors[player], remplissage="#000000", epaisseur=30)
+        for i_row in range(len(grille)):
+            for i_elem in range(len(grille[0])):
+                fltk.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, colors[grille[i_row][i_elem]], remplissage=colors[grille[i_row][i_elem]])
     else:
         raise ValueError("Incorrect display mode")
 
@@ -131,7 +141,7 @@ def calc_score(grid) -> tuple[int, int, int, int]:
 
 
 def abcto123(letter) -> int:
-    """Convert a letter to a number
+    """Convert a lowercase letter to a number
 
     :param letter: the letter to convert
     :return: the corresponding number"""
@@ -156,31 +166,63 @@ def mainloop() -> None:
     elif nb_players == 3:   print("rouge, jaune et vert.")
     else:                   print("rouge, jaune, vert et bleu.")
 
-    while True:
-        start = input("Voulez-vous commencer ? [O/n] : ").lower()
-        if start == "o":
-            break
 
     grid = init_grid()
 
-    clear()
-    afficher_grille(grid)
-
-    for turn in range(60):
-        player = turn % nb_players + 1
-        played = False
-        while not played:
-            coords=["", ""]
-            playerInput = input(f"Joueur {str(player)}, Emplacement de votre prochaine boule (ex: a1, A1) : ").lower()
-            x_axis, y_axis = ("1","2","3","4","5","6","7","8"), ("a","b","c","d","e","f","g","h")
-            if len(playerInput) != 2 or playerInput[0] not in y_axis or playerInput[1] not in x_axis: #check if input is valid (ex: a1, A1)
-                continue
-            coords = list(playerInput)
-            x, y = int(coords[1]) - 1, abcto123(coords[0])
-            played = play(grid, x, y, player)
-            if not played:
-                print("Coup invalide")
+    if DISPLAY_MODE == "win":
+        fltk.cree_fenetre("Rolit !", 830, 830, 60, False)
+        tour = 0
+        while True:
+            # simple formula to get player index based on the number of players and the index of the turn
+            player = tour % nb_players + 1
+            afficher_grille(grid, player)
+            
+            # loop over events
+            ev = fltk.donne_ev()
+            while ev != None:
+                match ev[0]:
+                    case "Quitte":
+                        # Pretty straightforward
+                        fltk.ferme_fenetre()
+                        return
+                    case "ClicGauche":
+                        # clamping the values to be in [0;800] then dividing by 100 (size of a spot) to get an index
+                        i_column = (min(max(ev[1].x, 15), 815) - 15) // 100
+                        i_row = (min(max(ev[1].y, 15), 815) - 15) // 100
+                        
+                        # if nothing's there, set the ball and advance to the next turn
+                        if grid[i_row][i_column] == CLEAR:
+                            grid[i_row][i_column] = player
+                            tour += 1
+                        
+                ev = fltk.donne_ev()
+            fltk.mise_a_jour()
+            
+        
+    elif DISPLAY_MODE == "cmd":
+        while True:
+            start = input("Voulez-vous commencer ? [O/n] : ").lower()
+            if start == "o":
+                break
+            
+        clear()
         afficher_grille(grid)
+
+        for turn in range(60):
+            player = turn % nb_players + 1
+            played = False
+            while not played:
+                coords=["", ""]
+                playerInput = input(f"Joueur {str(player)}, Emplacement de votre prochaine boule (ex: a1, A1) : ").lower()
+                x_axis, y_axis = ("1","2","3","4","5","6","7","8"), ("a","b","c","d","e","f","g","h")
+                if len(playerInput) != 2 or playerInput[0] not in y_axis or playerInput[1] not in x_axis: #check if input is valid (ex: a1, A1)
+                    continue
+                coords = list(playerInput)
+                x, y = int(coords[1]) - 1, abcto123(coords[0])
+                played = play(grid, x, y, player)
+                if not played:
+                    print("Coup invalide")
+            afficher_grille(grid)
 
     score_rouge, score_jaune, score_vert, score_bleu = calc_score(grid)
     print("Score final :")
