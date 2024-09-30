@@ -5,6 +5,9 @@ from os import system
 
 WIDTH, HEIGHT = 8, 8
 CLEAR, RED, GREEN, YELLOW, BLUE = 0, 1, 2, 3, 4
+
+DISPLAY_MODE = "win" # or cmd
+
 colors = {
     CLEAR: "\033[30;40m  \033[0m",
     RED: "\033[31;41m  \033[0m",
@@ -14,12 +17,22 @@ colors = {
 }
 
 def afficher_grille(grille):
-    print("  1 2 3 4 5 6 7 8")
-    for i_row in range(len(grille)):
-        print(chr(ord('a') + i_row), end=" ")
-        for i_elem in range(len(grille[0])):
-            print(colors[grille[i_row][i_elem]], end="")
-        print()
+    """Display the game grid
+    
+    Depending on the global variable DISPLAY_MODE, it will render in the console or in an fltk window
+    
+    :param grille: game grid"""
+    if DISPLAY_MODE == "cmd":
+        print("  1 2 3 4 5 6 7 8")
+        for i_row in range(len(grille)):
+            print(chr(ord('a') + i_row), end=" ")
+            for i_elem in range(len(grille[0])):
+                print(colors[grille[i_row][i_elem]], end="")
+            print()
+    elif DISPLAY_MODE == "win":
+        raise ValueError("Not implemented yet")
+    else:
+        raise ValueError("Incorrect display mode")
 
 def check_capture(grid, x, y) -> list[tuple[int]]:
     """Check if a move at (x, y) for color player will capture some opponent pieces
@@ -93,7 +106,7 @@ def main():
         while coords[0] not in ("a","b","c","d","e","f","g","h") or coords[1] not in ("1","2","3","4","5","6","7","8") or len(coords) > 2:
             coords = list(input("Joueur " + str(player) + "Emplacement de votre prochaine boule (ex: a1, A1) : "))
         print(coords[0])
-        x, y = abcto123(coords[0]), int(coords[1]) - 1
+        x, y = ord(coords[0]) - ord("a"), int(coords[1]) - 1
         play(grille, x, y, player)
         afficher_grille(grille)
     
@@ -101,10 +114,6 @@ def main():
     score_jaune = sum([grille[i].count(YELLOW) for i in range(HEIGHT)])
     score_vert  = sum([grille[i].count(GREEN ) for i in range(HEIGHT)])
     score_bleu  = sum([grille[i].count(BLUE  ) for i in range(HEIGHT)])
-
-def abcto123(letter):
-    number = int(ord(letter) - ord("a"))
-    return number
 
 if __name__ == "__main__":
     main()
