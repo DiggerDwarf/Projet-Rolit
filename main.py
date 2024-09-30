@@ -4,7 +4,7 @@ from random import randint
 from os import system
 
 WIDTH, HEIGHT = 8, 8
-CLEAR, RED, GREEN, YELLOW, BLUE = 0, 1, 2, 3, 4
+CLEAR, RED, GREEN, YELLOW, BLUE = "vide", "rouge", "vert", "jaune", "bleu"
 
 colors = {
     CLEAR: "\033[30;40m  \033[0m",
