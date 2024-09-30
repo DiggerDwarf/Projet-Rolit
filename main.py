@@ -89,16 +89,18 @@ def main():
 
     for tour in range(60):
         player = tour % nb_players + 1
-        coords = list(input("Joueur " + str(player) + "Emplacement de votre prochaine boule (ex: a1, A1) : "))
+        coords=["",""]
+        while coords[0] not in ("a","b","c","d","e","f","g","h") or coords[1] not in ("1","2","3","4","5","6","7","8") or len(coords) > 2:
+            coords = list(input("Joueur " + str(player) + "Emplacement de votre prochaine boule (ex: a1, A1) : "))
         print(coords[0])
         x, y = abcto123(coords[0]), int(coords[1]) - 1
         play(grille, x, y, player)
         afficher_grille(grille)
     
-    score_rouge = sum([[grille[i].count(RED   )] for i in range(HEIGHT)])
-    score_jaune = sum([[grille[i].count(YELLOW)] for i in range(HEIGHT)])
-    score_vert  = sum([[grille[i].count(GREEN )] for i in range(HEIGHT)])
-    score_bleu  = sum([[grille[i].count(BLUE  )] for i in range(HEIGHT)])
+    score_rouge = sum([grille[i].count(RED   ) for i in range(HEIGHT)])
+    score_jaune = sum([grille[i].count(YELLOW) for i in range(HEIGHT)])
+    score_vert  = sum([grille[i].count(GREEN ) for i in range(HEIGHT)])
+    score_bleu  = sum([grille[i].count(BLUE  ) for i in range(HEIGHT)])
 
 def abcto123(letter):
     number = int(ord(letter) - ord("a"))
