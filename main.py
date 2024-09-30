@@ -6,7 +6,7 @@ from os import system
 WIDTH, HEIGHT = 8, 8
 CLEAR, RED, GREEN, YELLOW, BLUE = 0, 1, 2, 3, 4
 
-DISPLAY_MODE = "win" # or cmd
+DISPLAY_MODE = "cmd" # or win
 
 colors = {
     CLEAR: "\033[30;40m  \033[0m",
