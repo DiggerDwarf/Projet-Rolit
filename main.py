@@ -172,7 +172,6 @@ def mainloop() -> None:
 
     if DISPLAY_MODE == "win":
         mainWindow.cree_fenetre("Rolit !", 830, 830, 60, False)
-        sideWindow.cree_fenetre("Rolit helper", 300, 300, 60, False)
         tour = 0
         while True:
             # simple formula to get player index based on the number of players and the index of the turn
