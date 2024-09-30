@@ -4,7 +4,7 @@ from random import randint
 import os
 
 WIDTH, HEIGHT = 8, 8
-CLEAR, RED, GREEN, YELLOW, BLUE = 0, 1, 2, 3, 4
+CLEAR, RED, YELLOW, GREEN, BLUE = 0, 1, 2, 3, 4
 
 DISPLAY_MODE = "cmd" # or win
 
@@ -126,9 +126,9 @@ def mainloop() -> None:
     nb_players = int(nb_players)
     
     print("Mettez vous d'accord sur vos couleurs ! Choisissez entre ", end="")
-    if nb_players == 2:     print("rouge et vert.")
+    if nb_players == 2:     print("rouge et jaune.")
     elif nb_players == 3:   print("rouge, jaune et vert.")
-    else:                   print("rouge, jeune, vert et bleu.")
+    else:                   print("rouge, jaune, vert et bleu.")
 
     grid = init_grid()
     
