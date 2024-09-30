@@ -45,7 +45,9 @@ def main():
 
     while True:
         player = 1
-        coords = list(input("Joueur " + str(player) + "Emplacement de votre prochaine boule (ex: a1, A1) : "))
+        coords=["",""]
+        while coords[0] not in ("a","b","c","d","e","f","g","h") or coords[1] not in ("1","2","3","4","5","6","7","8") or len(coords) > 2:
+            coords = list(input("Joueur " + str(player) + "Emplacement de votre prochaine boule (ex: a1, A1) : "))
         print(coords[0])
         grille[abcto123(coords[0])][int(coords[1]) - 1] = RED
         afficher_grille(grille)
