@@ -1,6 +1,7 @@
 # main file
 
 from random import randint
+from os import system
 
 WIDTH, HEIGHT = 8, 8
 CLEAR, RED, GREEN, YELLOW, BLUE = 0, 1, 2, 3, 4
@@ -27,6 +28,12 @@ def main():
     while nb_players not in ("2", "3", "4"):
         nb_players = input("Combien de joueurs vont jouer ? [2-4] : ")
     nb_players = int(nb_players)
+    
+    print("Mettez vous d'accord sur vos couleurs ! Choisissez entre ", end="")
+    if nb_players == 2:     print("rouge et vert.")
+    elif nb_players == 3:   print("rouge, jaune et vert.")
+    else:                   print("rouge, jeune, vert et bleu.")
+    system("pause")
     
     grille = [[CLEAR for _ in range(WIDTH)] for _ in range(HEIGHT)]
     grille[3][3] = RED
