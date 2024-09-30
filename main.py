@@ -38,7 +38,10 @@ def main():
 
     while True:
         player=0
-        next_move=list(input("Joueur " + str(player) + "Emplacement de votre prochaine boule (ex: a1, A1) : "))    
+        coords=list(input("Joueur " + str(player) + "Emplacement de votre prochaine boule (ex: a1, A1) : "))
+        grille[coords[0],coords[1]] 
+
+
 
 if __name__ == "__main__":
     main()
