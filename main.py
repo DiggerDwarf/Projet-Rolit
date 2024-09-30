@@ -8,7 +8,8 @@ CLEAR, RED, YELLOW, GREEN, BLUE = 0, 1, 2, 3, 4
 
 DISPLAY_MODE = "win" # or cmd
 if DISPLAY_MODE == "win":
-    from modules import fltk
+    from modules import fltk as mainWindow
+    from modules import fltk as sideWindow
     colors = {
         CLEAR: "#FFFFFF",
         RED: "#FF0000",
@@ -39,16 +40,16 @@ def afficher_grille(grille: list[list[int]], player: int | None = None) -> None:
                 print(colors[grille[i_row][i_elem]], end="")
             print()
     elif DISPLAY_MODE == "win":
-        fltk.efface_tout()
-        fltk.rectangle(0,0,830,830, couleur=colors[player], remplissage="#000000", epaisseur=30)
+        mainWindow.efface_tout()
+        mainWindow.rectangle(0,0,830,830, couleur=colors[player], remplissage="#000000", epaisseur=30)
         for i_row in range(len(grille)):
             for i_elem in range(len(grille[0])):
-                fltk.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, colors[grille[i_row][i_elem]], remplissage=colors[grille[i_row][i_elem]])
+                mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, colors[grille[i_row][i_elem]], remplissage=colors[grille[i_row][i_elem]])
     else:
         raise ValueError("Incorrect display mode")
 
 
-def check_capture(grid, x, y) -> list[tuple[int]]:
+def check_capture(grid: list[list[int]], x: int, y: int) -> list[tuple[int]]:
     """Check if a move at (x, y) for color player will capture some opponent pieces
     
     :param grid: the game grid
@@ -110,7 +111,7 @@ def test_adjacent(grid, x, y) -> bool:
     return False
 
 
-def play(grid, x, y, color) -> bool:
+def play(grid: list[list[int]], x: int, y: int, color: int) -> bool:
     """Play a move at (x, y) for color player
     
     :param grid: the game grid
@@ -128,7 +129,7 @@ def play(grid, x, y, color) -> bool:
     return True
 
 
-def calc_score(grid) -> tuple[int, int, int, int]:
+def calc_score(grid: list[list[int]]) -> tuple[int, int, int, int]:
     """Calculate the final score for each players
     
     :return: The scores, in the order RED, YELLOW, GREEN, BLUE"""
@@ -140,7 +141,7 @@ def calc_score(grid) -> tuple[int, int, int, int]:
     return score_rouge, score_jaune, score_vert, score_bleu
 
 
-def abcto123(letter) -> int:
+def abcto123(letter: str) -> int:
     """Convert a lowercase letter to a number
 
     :param letter: the letter to convert
@@ -170,7 +171,8 @@ def mainloop() -> None:
     grid = init_grid()
 
     if DISPLAY_MODE == "win":
-        fltk.cree_fenetre("Rolit !", 830, 830, 60, False)
+        mainWindow.cree_fenetre("Rolit !", 830, 830, 60, False)
+        sideWindow.cree_fenetre("Rolit helper", 300, 300, 60, False)
         tour = 0
         while True:
             # simple formula to get player index based on the number of players and the index of the turn
@@ -178,12 +180,12 @@ def mainloop() -> None:
             afficher_grille(grid, player)
             
             # loop over events
-            ev = fltk.donne_ev()
+            ev = mainWindow.donne_ev()
             while ev != None:
                 match ev[0]:
                     case "Quitte":
                         # Pretty straightforward
-                        fltk.ferme_fenetre()
+                        mainWindow.ferme_fenetre()
                         return
                     case "ClicGauche":
                         # clamping the values to be in [0;800] then dividing by 100 (size of a spot) to get an index
@@ -194,8 +196,10 @@ def mainloop() -> None:
                         if play(grid, i_column, i_row, player):
                             tour += 1
                         
-                ev = fltk.donne_ev()
-            fltk.mise_a_jour()
+                ev = mainWindow.donne_ev()
+            mainWindow.mise_a_jour()
+            if tour == 60:
+                break    
             
         
     elif DISPLAY_MODE == "cmd":
