@@ -4,8 +4,7 @@ from random import randint
 from os import system
 
 WIDTH, HEIGHT = 8, 8
-CLEAR, RED, GREEN, YELLOW, BLUE = "vide", "rouge", "vert", "jaune", "bleu"
-
+CLEAR, RED, GREEN, YELLOW, BLUE = 0, 1, 2, 3, 4
 colors = {
     CLEAR: "\033[30;40m  \033[0m",
     RED: "\033[31;41m  \033[0m",
@@ -43,6 +42,34 @@ def check_capture(grid, x, y) -> list[tuple[int]]:
             captures.extend(capture)
     return captures
 
+def init_grid() -> list[list[str]]:
+    """Initialize the game grid
+    
+    :return: the initialized game grid"""
+    grid = [[CLEAR for _ in range(WIDTH)] for _ in range(HEIGHT)]
+    grid[3][3] = RED
+    grid[3][4] = YELLOW
+    grid[4][3] = BLUE
+    grid[4][4] = GREEN
+    return grid
+
+
+def play(grid, x, y, color) -> bool:
+    """Play a move at (x, y) for color player
+    
+    :param grid: the game grid
+    :param x: the x coordinate of the move
+    :param y: the y coordinate of the move
+    :param color: the color of the player
+    :return: True if the move is valid, False otherwise"""
+    if grid[y][x] != CLEAR:
+        return False
+    captures = check_capture(grid, x, y)
+    grid[y][x] = color
+    for x_, y_ in captures:
+        grid[y_][x_] = color
+    return True
+
 
 def main():
     # setup number of player and initial game state
@@ -55,21 +82,17 @@ def main():
     if nb_players == 2:     print("rouge et vert.")
     elif nb_players == 3:   print("rouge, jaune et vert.")
     else:                   print("rouge, jeune, vert et bleu.")
-    system("pause")
-    
-    grille = [[CLEAR for _ in range(WIDTH)] for _ in range(HEIGHT)]
-    grille[3][3] = RED
-    grille[3][4] = YELLOW
-    grille[4][3] = BLUE
-    grille[4][4] = GREEN
+
+    grille = init_grid()
     
     afficher_grille(grille)
 
     for tour in range(60):
-        player = 1
+        player = tour % nb_players + 1
         coords = list(input("Joueur " + str(player) + "Emplacement de votre prochaine boule (ex: a1, A1) : "))
         print(coords[0])
-        grille[abcto123(coords[0])][int(coords[1]) - 1] = RED
+        x, y = abcto123(coords[0]), int(coords[1]) - 1
+        play(grille, x, y, player)
         afficher_grille(grille)
     
     score_rouge = sum([[grille[i].count(RED   )] for i in range(HEIGHT)])
