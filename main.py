@@ -1,7 +1,7 @@
 # main file
 
 from random import randint
-from os import system
+import os
 
 WIDTH, HEIGHT = 8, 8
 CLEAR, RED, GREEN, YELLOW, BLUE = 0, 1, 2, 3, 4
@@ -16,7 +16,10 @@ colors = {
     BLUE: "\033[36;46m  \033[0m"
 }
 
-def afficher_grille(grille):
+def afficher_grille(grille) -> None:
+    """Print the game grid
+    
+    :param grille: the game grid"""
     """Display the game grid
     
     Depending on the global variable DISPLAY_MODE, it will render in the console or in an fltk window
@@ -34,6 +37,7 @@ def afficher_grille(grille):
     else:
         raise ValueError("Incorrect display mode")
 
+
 def check_capture(grid, x, y) -> list[tuple[int]]:
     """Check if a move at (x, y) for color player will capture some opponent pieces
     
@@ -48,12 +52,15 @@ def check_capture(grid, x, y) -> list[tuple[int]]:
     for dx, dy in directions:
         x_, y_ = x + dx, y + dy
         capture = []
-        while (0 <= x_ < WIDTH) and (0 <= y_ < HEIGHT) and grid[y_][x_] not in (CLEAR, color):
+        while (0 <= x_ < WIDTH) and (0 <= y_ < HEIGHT):
+            if grid[y_][x_] in (CLEAR, color):
+                break
             capture.append((x_, y_))
             x_, y_ = x_ + dx, y_ + dy
         if grid[y_][x_] == color:
             captures.extend(capture)
     return captures
+
 
 def init_grid() -> list[list[str]]:
     """Initialize the game grid
@@ -77,14 +84,41 @@ def play(grid, x, y, color) -> bool:
     :return: True if the move is valid, False otherwise"""
     if grid[y][x] != CLEAR:
         return False
-    captures = check_capture(grid, x, y)
     grid[y][x] = color
-    for x_, y_ in captures:
-        grid[y_][x_] = color
+    captures = check_capture(grid, x, y)
+    if len(captures) != 0:
+        for x_, y_ in captures:
+            grid[y_][x_] = color
     return True
 
 
-def main():
+def calc_score(grid) -> tuple[int, int, int, int]:
+    """Calculate the final score for each players
+    
+    :return: The scores, in the order RED, YELLOW, GREEN, BLUE"""
+    score_rouge = sum([grid[i].count(RED   ) for i in range(HEIGHT)])
+    score_jaune = sum([grid[i].count(YELLOW) for i in range(HEIGHT)])
+    score_vert  = sum([grid[i].count(GREEN ) for i in range(HEIGHT)])
+    score_bleu  = sum([grid[i].count(BLUE  ) for i in range(HEIGHT)])
+
+    return score_rouge, score_jaune, score_vert, score_bleu
+
+
+def abcto123(letter) -> int:
+    """Convert a letter to a number
+
+    :param letter: the letter to convert
+    :return: the corresponding number"""
+    return int(ord(letter) - ord("a"))
+
+
+def clear() -> None:
+    """Clear the console"""
+    os.system("cls" if os.name == "nt" else "clear")
+
+
+def mainloop() -> None:
+    """Main game loop"""
     # setup number of player and initial game state
     nb_players = 0
     while nb_players not in ("2", "3", "4"):
@@ -96,24 +130,33 @@ def main():
     elif nb_players == 3:   print("rouge, jaune et vert.")
     else:                   print("rouge, jeune, vert et bleu.")
 
-    grille = init_grid()
+    grid = init_grid()
     
-    afficher_grille(grille)
+    afficher_grille(grid)
 
-    for tour in range(60):
-        player = tour % nb_players + 1
-        coords=["",""]
+    for turn in range(60):
+        clear()
+        player = turn % nb_players + 1
+        coords=["", ""]
         while coords[0] not in ("a","b","c","d","e","f","g","h") or coords[1] not in ("1","2","3","4","5","6","7","8") or len(coords) > 2:
-            coords = list(input("Joueur " + str(player) + "Emplacement de votre prochaine boule (ex: a1, A1) : "))
-        print(coords[0])
-        x, y = ord(coords[0]) - ord("a"), int(coords[1]) - 1
-        play(grille, x, y, player)
-        afficher_grille(grille)
-    
-    score_rouge = sum([grille[i].count(RED   ) for i in range(HEIGHT)])
-    score_jaune = sum([grille[i].count(YELLOW) for i in range(HEIGHT)])
-    score_vert  = sum([grille[i].count(GREEN ) for i in range(HEIGHT)])
-    score_bleu  = sum([grille[i].count(BLUE  ) for i in range(HEIGHT)])
+            playerInput = input(f"Joueur {str(player)}, Emplacement de votre prochaine boule (ex: a1, A1) : ").lower()
+            if playerInput == "":
+                continue
+            coords = list(playerInput)
+        x, y = int(coords[1]) - 1, abcto123(coords[0])
+        played = play(grid, x, y, player)
+        if not played:
+            turn -= 1
+            continue
+        afficher_grille(grid)
+
+    score_rouge, score_jaune, score_vert, score_bleu = calc_score(grid)
+    print("Score final :")
+    print("Rouge :", score_rouge)
+    print("Jaune :", score_jaune)
+    print("Vert :", score_vert)
+    print("Bleu :", score_bleu)
+
 
 if __name__ == "__main__":
-    main()
+    mainloop()
