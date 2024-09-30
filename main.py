@@ -13,11 +13,12 @@ colors = {
     BLUE: "\033[36;46m  \033[0m"
 }
 
-
-def draw_grid_term(grille):
-    for row in grille:
-        for elem in row:
-            print(colors[elem], end="")
+def afficher_grille(grille):
+    print("  1 2 3 4 5 6 7 8")
+    for i_row in range(len(grille)):
+        print(chr(ord('a') + i_row), end=" ")
+        for i_elem in range(len(grille[0])):
+            print(colors[grille[i_row][i_elem]], end="")
         print()
 
 def main():
@@ -27,12 +28,13 @@ def main():
         nb_players = input("Combien de joueurs vont jouer ? [2-4] : ")
     nb_players = int(nb_players)
     
-    grid = [[CLEAR for _ in range(WIDTH)] for _ in range(HEIGHT)]
-    grid[3][3] = RED
-    grid[3][4] = YELLOW
-    grid[4][3] = BLUE
-    grid[4][4] = GREEN
-    draw_grid_term(grid)
+    grille = [[CLEAR for _ in range(WIDTH)] for _ in range(HEIGHT)]
+    grille[3][3] = RED
+    grille[3][4] = YELLOW
+    grille[4][3] = BLUE
+    grille[4][4] = GREEN
+    
+    afficher_grille(grille)
     
 
 if __name__ == "__main__":
