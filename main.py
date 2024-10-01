@@ -1,30 +1,37 @@
 # main file
 
 from random import randint
-import os
+import os, argparse
 
 WIDTH, HEIGHT = 8, 8
 CLEAR, RED, YELLOW, GREEN, BLUE = 0, 1, 2, 3, 4
+colors = {}
+mainWindow = None
 
-DISPLAY_MODE = "win" # or cmd
-if DISPLAY_MODE == "win":
-    from modules import fltk as mainWindow
-    from modules import fltk as sideWindow
-    colors = {
-        CLEAR: "#FFFFFF",
-        RED: "#FF0000",
-        GREEN: "#00FF00",
-        YELLOW: "#FFFF00",
-        BLUE: "#0000FF"
+
+def init_display(mode: str) -> None:
+    """Initialize the display mode
+    
+    :param mode: the display mode (win/cmd)"""
+    global colors, mainWindow
+    if mode == "win":
+        from modules import fltk as mainWindow
+        colors = {
+            CLEAR: "#FFFFFF",
+            RED: "#FF0000",
+            GREEN: "#00FF00",
+            YELLOW: "#FFFF00",
+            BLUE: "#0000FF"
+        }
+    else:
+        colors = {
+            CLEAR: "\033[30;40m  \033[0m",
+            RED: "\033[31;41m  \033[0m",
+            GREEN: "\033[32;42m  \033[0m",
+            YELLOW: "\033[33;43m  \033[0m",
+            BLUE: "\033[36;46m  \033[0m"
     }
-else:
-    colors = {
-        CLEAR: "\033[30;40m  \033[0m",
-        RED: "\033[31;41m  \033[0m",
-        GREEN: "\033[32;42m  \033[0m",
-        YELLOW: "\033[33;43m  \033[0m",
-        BLUE: "\033[36;46m  \033[0m"
-    }
+
 
 def afficher_grille_window(grille: list[list[int]], player: int | None = None) -> None:
     """Display the game grid onto the fltk window
@@ -246,7 +253,11 @@ def mainloop_cmdline() -> None:
 
 
 if __name__ == "__main__":
-    if DISPLAY_MODE == "win":
+    parser = argparse.ArgumentParser(description="Jeu de Rolit")
+    parser.add_argument("-d", "--display", help="Mode d'affichage (win/cmd)", default="win")
+    args = parser.parse_args()
+    init_display(args.display)
+    if args.display == "win":
         mainloop_window()
-    elif DISPLAY_MODE == "cmd":
+    else:
         mainloop_cmdline()
