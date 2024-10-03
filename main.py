@@ -2,6 +2,7 @@
 
 from random import randint
 import os, argparse
+from copy import deepcopy
 
 WIDTH, HEIGHT = 8, 8
 CLEAR, RED, YELLOW, GREEN, BLUE = 0, 1, 2, 3, 4
@@ -194,9 +195,10 @@ def ai_play(grid: list[list[int]], color: int) -> tuple[int, int]:
     for i in range(HEIGHT):
         for j in range(WIDTH):
             if grid[i][j] == CLEAR and test_adjacent(grid, j, i):
-                print(check_capture(grid, j, i))
-                possible_moves[(j, i)] = len(check_capture(grid, j, i))
-    print(possible_moves)
+                test_grid = deepcopy(grid) # copy the grid to test the move
+                test_grid[i][j] = color # play the move
+                possible_moves[(j, i)] = len(check_capture(test_grid, j, i)) # calculate the amount of captures
+    # get the best move(s) based on the amount of captures
     max_captures = max(possible_moves.values())
     best_moves = [k for k, v in possible_moves.items() if v == max_captures]
     move = best_moves[randint(0, len(best_moves) - 1)]
@@ -264,9 +266,10 @@ def mainloop_cmdline(nb_players: int, ai: bool) -> None:
         while nb_players not in ("2", "3", "4"):
             nb_players = input("Combien de joueurs vont jouer ? [2-4] : ")
         nb_players = int(nb_players)
-    
-    if ai:
-        print("Vous êtes le joueur rouge.")
+
+    if ai: # if the player wants to play against the AI
+        print("Vous allez jouer contre l'IA")
+        print("Vous êtes rouge")
     else:
         # tell player color roles according to nb of players
         print("Mettez vous d'accord sur vos couleurs ! Choisissez entre ", end="")
@@ -292,7 +295,7 @@ def mainloop_cmdline(nb_players: int, ai: bool) -> None:
         # wait for correct input
         played = False
         while not played:
-            if (ai and player == RED) or not ai:
+            if (ai and player == RED) or not ai: # ai or player turn and if not against ai always ask for input
                 # ask player for ball placement location
                 playerInput = input(f"Joueur {str(player)}, Emplacement de votre prochaine boule (ex: a1, A1) : ").lower()
                 if len(playerInput) != 2 or playerInput[0] not in y_axis or playerInput[1] not in x_axis: #check if input is valid (ex: a1, A1)
@@ -330,6 +333,7 @@ if __name__ == "__main__":
     parser.add_argument("--graphical", help="Mode graphique", default=False, type=bool, action=argparse.BooleanOptionalAction)
     # choose number of players from cmdline argument
     parser.add_argument("-n", "--nb_players", help="Nombre de joueurs", default=0, type=int)
+    # choose if the player wants to play against the AI
     parser.add_argument("--ai", help="Jouer contre l'IA", default=False, type=bool, action=argparse.BooleanOptionalAction)
     args = parser.parse_args()
     init_display(args.graphical)
