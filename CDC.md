@@ -1,12 +1,76 @@
-Ci-dessous, "le client"             réfère au chargé de TP
-Ci-dessous, "l'équipe"              réfère à Nathan, Jeremy et Lilian
-Ci-dessous, "le chef de projet"     réfère à [CHEF DE PROJET]
+# Projet Rolit
 
-Le budget négocié est de 0€ (des tickets resto au moins ?)
+## Le contexte
 
-Le chef de projet engage l'équipe et lui-même à réaliser une recréation du jeu "Rolit" pour le client.
+Ci-dessous, ``"le client"`` réfère au chargé de TP.
 
-Le programme doit avoir une interface simple et agréable, accessible à n'importe qui.
+Le besoin exprimé par le client est de concevoir une version informatique du jeu ``"Rolit"``.
 
-Toutes les règles du jeu doivent être respectées, et le programme no doit pas s'arrêter brusquement autrement que si le client décide de le fermer
+## L'équipe
 
+Ci-dessous, ``"l'équipe"`` réfère à Nathan KUNTZ, Jeremy Li et Lilian Viste.
+
+Tous les membres de l'équipe appartiennent à l'organisation ``"Groupe de projet 12-6"``, filiale de l'entité ``"Université Gustave Eiffel"``.
+
+_``[insérer les rôles de chaque membre dans l'équipe]``_\
+_``ça peut être bien d'avoir un chef de projet apparemment``_
+
+## Le budget
+
+L'équipe se propose de ne pas être rémunérée pour son travail passionné en échange d'une bonne note sur "Linkedin". *hum hum*
+
+En raison de cette absence de budget, l'équipe n'aura pas recours à la sous-traitance.
+
+## Les technologies
+
+Sous la demande du client, Le programme sera écrit dans le langage de programmation python.\
+Sous la demande du client, l'interface graphiques sera réalisée en ayant recours à la librairie fltk.\
+Sous la demande du client, le code sera rédigé de façon à être compréhensible et réutilisable.
+
+Le code sera placé sous une license MIT standard:
+```
+Copyright (c) 2024 Nathan KUNTZ, Jeremy Li and Lilian Viste
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
+
+## Le planning
+
+### Premier point d'étape
+
+Date du rendez-vous : ``21 novembre 2024, 16:45``
+
+Ordre du rendez-vous : discuter du premier prototype et des besoins supplémentaires du client
+
+Livrable présenté : premier prototype, version console jouable du jeu ``Rolit``
+
+``Le bilan de ce point d'étape sera inséré ici après son déroulement.``
+
+## Le livrable
+
+### Première itération
+
+La première itération consiste en une version jouable à la console du jeu.
+
+Au lancement du programme, le joueur se voit demander combien de joueurs vont jouer, de ``2`` à ``4``.\
+Le programme indique ensuite les couleurs qui vont être données aux pions et laisse le temps aux joueurs de décider l'attribution des couleurs entre eux.
+
+Le plateau de jeu est affiché avec des couleurs, mais également avec des lettres représentant celles-ci, pour rendre la compréhension du jeu plus facile au personnes avec une déficience dans la perception des couleurs.
+
+Lors de l'affichage du plateau, à chaque colonne est associée un chiffre de ``1`` à ``8`` et à chaque ligne est associée une lettre de ``a`` à ``h``.\
+En se servant de ces identifiants, le joueur pourra indiquer dans quelle case il veut placer sa boule (ex: ``d3`` placera la boule dans la ligne ``3`` et la colonne ``d``)
+
+La capture des boules est faite automatiquement.
+
+Quand tout le plateau est rempli, le programme indique le score de chaque joueur, c'est-à-dire le nombre de boules de leur couleur sur le plateau.
+
+## Pistes d'améliorations
+
+* Implémenter une version par interface graphique (se référer aux maquettes)
+* Effets sonores
+* Adversaire virtuel
+* Couleurs variées selon les pions, plus "naturelles"
