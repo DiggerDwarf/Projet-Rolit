@@ -3,6 +3,7 @@
 from random import randint
 import os, argparse
 from copy import deepcopy
+from time import sleep
 
 WIDTH, HEIGHT = 8, 8
 CLEAR, RED, YELLOW, GREEN, BLUE = 0, 1, 2, 3, 4
@@ -206,15 +207,27 @@ def ai_play(grid: list[list[int]], color: int) -> tuple[int, int]:
     return move
 
 
-def mainloop_window(nb_players: int) -> None:
+def mainloop_window(nb_players: int, ai: bool) -> None:
     """Main game loop
 
-    :param nb_players: number of players"""
+    :param nb_players: number of players
+    :param ai: if the player wants to play against the AI"""
     # setup number of player and initial game state
     if nb_players == 0:
         while nb_players not in ("2", "3", "4"):
             nb_players = input("Combien de joueurs vont jouer ? [2-4] : ")
         nb_players = int(nb_players)
+
+    if ai: # if the player wants to play against the AI
+        print("Vous allez jouer contre l'IA")
+        print("Vous êtes rouge")
+    else:
+        # tell player color roles according to nb of players
+        print("Mettez vous d'accord sur vos couleurs ! Choisissez entre ", end="")
+        if nb_players == 2:     print("rouge et jaune.")
+        elif nb_players == 3:   print("rouge, jaune et vert.")
+        else:                   print("rouge, jaune, vert et bleu.")
+
     
     grid = init_grid()
 
@@ -242,6 +255,24 @@ def mainloop_window(nb_players: int) -> None:
                     # if nothing's there, set the ball and advance to the next turn
                     if play(grid, i_column, i_row, player):
                         tour += 1
+                        # AI mode is single-player
+                        # so after the player has played, if ai mode is enabled, make them play
+                        if ai:
+                            # display player move, update the window and wait before making the IAs play
+                            display_grid_window(grid, player)
+                            mainWindow.mise_a_jour()
+                            sleep(1)
+                            # there are `nb_players - 1` IAs knowing there's 1 real player
+                            for _ in range(nb_players-1):
+                                # get current IA player id
+                                player = tour % nb_players + 1
+                                # make them play
+                                ai_play(grid, player)
+                                tour += 1
+                                # between each IA turn, display and wait
+                                display_grid_window(grid, player)
+                                mainWindow.mise_a_jour()
+                                sleep(1)
             
             # grab next event
             ev = mainWindow.donne_ev()
