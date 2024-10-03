@@ -10,6 +10,13 @@ CLEAR, RED, YELLOW, GREEN, BLUE = 0, 1, 2, 3, 4
 colors = {}
 mainWindow = None
 
+color_names = {
+    RED:    "rouge",
+    YELLOW: "jaune",
+    GREEN:  "vert",
+    BLUE:   "bleu"
+}
+
 
 def init_display(graphical: bool) -> None:
     """Initialize the display mode
@@ -29,11 +36,11 @@ def init_display(graphical: bool) -> None:
     else:
         # define colors as letters and ANSI escape codes
         colors = {
-            CLEAR: "\033[30;40m  \033[0m",
-            RED: "\033[30;41mR \033[0m",
-            GREEN: "\033[30;42mG \033[0m",
-            YELLOW: "\033[30;43mY \033[0m",
-            BLUE: "\033[30;46mB \033[0m"
+            CLEAR: "\033[30;40m   \033[0m",
+            RED: "\033[30;41m R \033[0m",
+            GREEN: "\033[30;42m V \033[0m",
+            YELLOW: "\033[30;43m J \033[0m",
+            BLUE: "\033[30;46m B \033[0m"
     }
 
 
@@ -54,7 +61,7 @@ def display_grid_cmdline(grille: list[list[int]], player: int | None = None) -> 
     
     :param grille: game grid"""
     # print column indices
-    print("  1 2 3 4 5 6 7 8")
+    print("   1  2  3  4  5  6  7  8")
     for i_row in range(len(grille)):
         # print row indices
         print(chr(ord('a') + i_row), end=" ")
@@ -328,7 +335,7 @@ def mainloop_cmdline(nb_players: int, ai: bool) -> None:
         while not played:
             if (ai and player == RED) or not ai: # ai or player turn and if not against ai always ask for input
                 # ask player for ball placement location
-                playerInput = input(f"Joueur {str(player)}, Emplacement de votre prochaine boule (ex: a1, A1) : ").lower()
+                playerInput = input(f"Joueur {color_names[player]}, Emplacement de votre prochaine boule (ex: a1, A1) : ").lower()
                 if len(playerInput) != 2 or playerInput[0] not in y_axis or playerInput[1] not in x_axis: #check if input is valid (ex: a1, A1)
                     continue
                 # convert player input to coordinates
