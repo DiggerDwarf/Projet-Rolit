@@ -1,3 +1,9 @@
+to render the markdown document:
+ - paste its contents [here](https://md-to-pdf.fly.dev/)
+ - remove this header
+ - select the ``pdflatex`` render mode (consistency, i use it)
+ - press convert and download
+
 # Projet Rolit
 
 ## Le contexte
@@ -8,12 +14,11 @@ Le besoin exprimé par le client est de concevoir une version informatique du je
 
 ## L'équipe
 
-Ci-dessous, ``"l'équipe"`` réfère à Nathan KUNTZ, Jeremy Li et Lilian Viste.
+Ci-dessous, ``"l'équipe"`` réfère à Nathan KUNTZ, Jeremy LI et Lilian VISTE.
 
 Tous les membres de l'équipe appartiennent à l'organisation ``"Groupe de projet 12-6"``, filiale de l'entité ``"Université Gustave Eiffel"``.
 
 _``[insérer les rôles de chaque membre dans l'équipe]``_\
-_``ça peut être bien d'avoir un chef de projet apparemment``_
 
 ## Le budget
 
@@ -28,15 +33,14 @@ Sous la demande du client, l'interface graphiques sera réalisée en ayant recou
 Sous la demande du client, le code sera rédigé de façon à être compréhensible et réutilisable.
 
 Le code sera placé sous une license MIT standard:
-```
-Copyright (c) 2024 Nathan KUNTZ, Jeremy Li and Lilian Viste
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+``Copyright (c) 2024 Nathan KUNTZ, Jeremy LI and Lilian VISTE``
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+``Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:``
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-```
+``The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.``
+
+``THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.``
 
 ## Le planning
 
@@ -47,8 +51,6 @@ Date du rendez-vous : ``21 novembre 2024, 16:45``
 Ordre du rendez-vous : discuter du premier prototype et des besoins supplémentaires du client
 
 Livrable présenté : premier prototype, version console jouable du jeu ``Rolit``
-
-``Le bilan de ce point d'étape sera inséré ici après son déroulement.``
 
 ## Le livrable
 
