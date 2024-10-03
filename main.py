@@ -26,10 +26,10 @@ def init_display(graphical: bool) -> None:
     else:
         colors = {
             CLEAR: "\033[30;40m  \033[0m",
-            RED: "\033[31;41mR \033[0m",
-            GREEN: "\033[32;42mG \033[0m",
-            YELLOW: "\033[33;43mY \033[0m",
-            BLUE: "\033[36;46mB \033[0m"
+            RED: "\033[30;41mR \033[0m",
+            GREEN: "\033[30;42mG \033[0m",
+            YELLOW: "\033[30;43mY \033[0m",
+            BLUE: "\033[30;46mB \033[0m"
     }
 
 
