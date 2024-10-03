@@ -341,12 +341,12 @@ def mainloop_cmdline(nb_players: int, ai: bool) -> None:
                     print("Coup invalide")
             else:
                 move = ai_play(grid, player)
-                # clear()
+                clear()
                 display_grid_cmdline(grid)
                 print(f"L'IA a joué en {chr(ord('a') + move[1])}{move[0] + 1}")
                 os.system("pause")
                 played = True
-        # clear()
+        clear()
         display_grid_cmdline(grid)
 
     # after the game ends, calculate scores and print them
