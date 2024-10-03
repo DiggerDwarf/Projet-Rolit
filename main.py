@@ -317,6 +317,7 @@ def mainloop_cmdline(nb_players: int, ai: bool) -> None:
 
     grid = init_grid()
     
+    print("Pour information, vous pouvez quitter le jeu à tout moment en appuyant sur Ctrl + C.")
     # wait for players to choose a color before starting the game
     while True:
         start = input("Voulez-vous débuter la partie ? [O/n] : ").lower()
