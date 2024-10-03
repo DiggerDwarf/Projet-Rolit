@@ -197,7 +197,7 @@ def mainloop_window(nb_players: int) -> None:
     grid = init_grid()
 
     # create the game window
-    mainWindow.cree_fenetre("Rolit !", 830, 830, 60, False)
+    mainWindow.cree_fenetre(830, 830, 60, False)
     tour = 0
     while tour < 60:
         # simple formula to get player index based on the number of players and the index of the turn

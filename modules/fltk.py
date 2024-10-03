@@ -45,7 +45,6 @@ FltkEvent = Tuple[str, Optional[TkEvent]]
 __all__ = [
     # gestion de fenêtre
     "cree_fenetre",
-    "renomme_fenetre",
     "ferme_fenetre",
     "redimensionne_fenetre",
     "mise_a_jour",
@@ -65,8 +64,6 @@ __all__ = [
     "efface",
     # utilitaires
     "attente",
-    "creer_menu",
-    "creer_entree_menu",
     "capture_ecran",
     "touche_pressee",
     "abscisse_souris",
@@ -84,8 +81,6 @@ __all__ = [
     "touche",
 ]
 
-menu_bar = None
-menu_categories = {}
 
 class CustomCanvas:
     """
@@ -108,25 +103,19 @@ class CustomCanvas:
 
     def __init__(
             self,
-            title: str,
             width: int,
             height: int,
             refresh_rate: int = 100,
             events: Optional[List[str]] = None,
             resizing: bool = False,
-            fullscreen: bool = False
     ) -> None:
         # width and height of the canvas
         self.width = width
         self.height = height
         self.interval = 1 / refresh_rate
 
-        self.fullscreen = fullscreen
-
         # root Tk object
         self.root = tk.Tk()
-        self.root.title(title)
-        self.root.attributes("-fullscreen", self.fullscreen)
 
         # canvas attached to the root object
         self.canvas = tk.Canvas(
@@ -155,9 +144,6 @@ class CustomCanvas:
                    to set frontmost of process "Python" to true' """
             )
 
-    def rename(self, title: str) -> None:
-        self.root.title(title)
-
     def update(self) -> None:
         t = time()
         self.root.update()
@@ -172,16 +158,8 @@ class CustomCanvas:
         self.canvas.bind("<Configure>", self.event_resize)
         self.canvas.bind("<KeyPress>", self.register_key)
         self.canvas.bind("<KeyRelease>", self.release_key)
-        self.canvas.bind("<F11>", self.toggle_fullscreen)
         for name in self.events:
             self.bind_event(name)
-
-    def toggle_fullscreen(self, ev: TkEvent) -> None:
-        """
-        Alterne entre plein écran et fenêtre normale
-        """
-        self.fullscreen = not self.fullscreen
-        self.root.attributes("-fullscreen", self.fullscreen)
 
     # noinspection PyUnresolvedReferences
     def register_key(self, ev: TkEvent) -> None:
@@ -258,7 +236,7 @@ def _fenetre_creee(func: Callable[..., Ret]) -> Callable[..., Ret]:
 
 
 def cree_fenetre(
-        title: str, largeur: int, hauteur: int, frequence: int = 100,
+        largeur: int, hauteur: int, frequence: int = 100,
         redimension: bool = False
 ) -> None:
     """
@@ -270,16 +248,7 @@ def cree_fenetre(
         raise FenetreDejaCree(
             'La fenêtre a déjà été crée avec la fonction "cree_fenetre".'
         )
-    __canevas = CustomCanvas(title=title, width=largeur, height=hauteur, refresh_rate=frequence, resizing=redimension)
-
-
-@_fenetre_creee
-def renomme_fenetre(titre: str) -> None:
-    """
-    Change le titre de la fenêtre.
-    """
-    assert __canevas is not None
-    __canevas.rename(titre)
+    __canevas = CustomCanvas(largeur, hauteur, frequence, resizing=redimension)
 
 
 @_fenetre_creee
@@ -722,40 +691,6 @@ def attente(temps: float) -> None:
 
 
 @_fenetre_creee
-def creer_menu(nom: str, parent : str | None = None) -> None:
-    """
-    Crée un menu de nom ``nom``.
-    """
-    global menu_bar
-    assert __canevas is not None
-    if menu_bar is None:
-        menu_bar = tk.Menu(__canevas.root, tearoff=False)
-        __canevas.root.config(menu=menu_bar)
-    menu_categories[nom] = tk.Menu(menu_bar, tearoff=False)
-    if parent is not None and parent in menu_categories:
-        menu_categories[parent].add_cascade(label=nom, menu=menu_categories[nom])
-    else:
-        menu_bar.add_cascade(label=nom, menu=menu_categories[nom])
-
-
-@_fenetre_creee
-def creer_entree_menu(nom: str, categorie: str, action: Callable[[], None]) -> None:
-    """
-    Crée une entrée de menu de nom ``nom`` dans la catégorie ``categorie`` qui exécute ``action``.
-    """
-    assert __canevas is not None
-    menu_categories[categorie].add_command(label=nom, command=action)
-    
-@_fenetre_creee
-def creer_bouton_menu(nom: str, action: Callable[[], None]) -> None:
-    """
-    Crée un bonton de nom `nom` et d'action `action` dans la barre de menus
-    """
-    assert __canevas is not None
-    menu_bar.add_command(label=nom, command=action)
-
-
-@_fenetre_creee
 def capture_ecran(file: str) -> None:
     """
     Fait une capture d'écran sauvegardée dans ``file.png``.
@@ -807,14 +742,6 @@ def donne_ev() -> Optional[FltkEvent]:
     if not __canevas.ev_queue:
         return None
     return __canevas.ev_queue.popleft()
-
-
-def clear_events() -> None:
-    """
-    Vide la file d'événements.
-    """
-    assert __canevas is not None
-    __canevas.ev_queue.clear()
 
 
 def attend_ev() -> FltkEvent:
