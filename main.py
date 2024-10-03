@@ -160,6 +160,26 @@ def clear() -> None:
     os.system("cls" if os.name == "nt" else "clear")
 
 
+def ai_play(grid: list[list[int]], color: int) -> tuple[int, int]:
+    """Play a move for the AI
+    
+    :param grid: the game grid
+    :param color: the color of the AI
+    :return: the move played"""
+    possible_moves = {}
+    for i in range(HEIGHT):
+        for j in range(WIDTH):
+            if grid[i][j] == CLEAR and test_adjacent(grid, j, i):
+                print(check_capture(grid, j, i))
+                possible_moves[(j, i)] = len(check_capture(grid, j, i))
+    print(possible_moves)
+    max_captures = max(possible_moves.values())
+    best_moves = [k for k, v in possible_moves.items() if v == max_captures]
+    move = best_moves[randint(0, len(best_moves) - 1)]
+    play(grid, move[0], move[1], color)
+    return move
+
+
 def mainloop_window(nb_players: int) -> None:
     """Main game loop
 
@@ -206,26 +226,30 @@ def mainloop_window(nb_players: int) -> None:
     print("Vert :", score_vert)
     print("Bleu :", score_bleu)
 
-def mainloop_cmdline(nb_players: int) -> None:
+def mainloop_cmdline(nb_players: int, ai: bool) -> None:
     """Main game loop
 
-    :param nb_players: number of players"""
+    :param nb_players: number of players
+    :param ai: if the player wants to play against the AI"""
     # setup number of player and initial game state
     if nb_players == 0:
         while nb_players not in ("2", "3", "4"):
             nb_players = input("Combien de joueurs vont jouer ? [2-4] : ")
         nb_players = int(nb_players)
     
-    print("Mettez vous d'accord sur vos couleurs ! Choisissez entre ", end="")
-    if nb_players == 2:     print("rouge et jaune.")
-    elif nb_players == 3:   print("rouge, jaune et vert.")
-    else:                   print("rouge, jaune, vert et bleu.")
+    if ai:
+        print("Vous êtes le joueur rouge.")
+    else:
+        print("Mettez vous d'accord sur vos couleurs ! Choisissez entre ", end="")
+        if nb_players == 2:     print("rouge et jaune.")
+        elif nb_players == 3:   print("rouge, jaune et vert.")
+        else:                   print("rouge, jaune, vert et bleu.")
 
 
     grid = init_grid()
     
     while True:
-        start = input("Voulez-vous commencer ? [O/n] : ").lower()
+        start = input("Voulez-vous débuter la partie ? [O/n] : ").lower()
         if start == "o":
             break
         
@@ -236,16 +260,24 @@ def mainloop_cmdline(nb_players: int) -> None:
         player = turn % nb_players + 1
         played = False
         while not played:
-            coords=["", ""]
-            playerInput = input(f"Joueur {str(player)}, Emplacement de votre prochaine boule (ex: a1, A1) : ").lower()
-            x_axis, y_axis = ("1","2","3","4","5","6","7","8"), ("a","b","c","d","e","f","g","h")
-            if len(playerInput) != 2 or playerInput[0] not in y_axis or playerInput[1] not in x_axis: #check if input is valid (ex: a1, A1)
-                continue
-            coords = list(playerInput)
-            x, y = int(coords[1]) - 1, abcto123(coords[0])
-            played = play(grid, x, y, player)
-            if not played:
-                print("Coup invalide")
+            if (ai and player == RED) or not ai:
+                playerInput = input(f"Joueur {str(player)}, Emplacement de votre prochaine boule (ex: a1, A1) : ").lower()
+                x_axis, y_axis = ("1","2","3","4","5","6","7","8"), ("a","b","c","d","e","f","g","h")
+                if len(playerInput) != 2 or playerInput[0] not in y_axis or playerInput[1] not in x_axis: #check if input is valid (ex: a1, A1)
+                    continue
+                coords = list(playerInput)
+                x, y = int(coords[1]) - 1, abcto123(coords[0])
+                played = play(grid, x, y, player)
+                if not played:
+                    print("Coup invalide")
+            else:
+                move = ai_play(grid, player)
+                # clear()
+                display_grid_cmdline(grid)
+                print(f"L'IA a joué en {chr(ord('a') + move[1])}{move[0] + 1}")
+                os.system("pause")
+                played = True
+        # clear()
         display_grid_cmdline(grid)
 
     score_rouge, score_jaune, score_vert, score_bleu = calc_score(grid)
@@ -260,9 +292,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Jeu de Rolit")
     parser.add_argument("--graphical", help="Mode graphique", default=False, type=bool, action=argparse.BooleanOptionalAction)
     parser.add_argument("-n", "--nb_players", help="Nombre de joueurs", default=0, type=int)
+    parser.add_argument("--ai", help="Jouer contre l'IA", default=False, type=bool, action=argparse.BooleanOptionalAction)
     args = parser.parse_args()
     init_display(args.graphical)
     if args.graphical:
-        mainloop_window(args.nb_players)
+        mainloop_window(args.nb_players, args.ai)
     else:
-        mainloop_cmdline(args.nb_players)
+        mainloop_cmdline(args.nb_players, args.ai)
