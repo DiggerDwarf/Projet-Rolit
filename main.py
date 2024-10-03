@@ -9,12 +9,12 @@ colors = {}
 mainWindow = None
 
 
-def init_display(mode: str) -> None:
+def init_display(graphical: bool) -> None:
     """Initialize the display mode
     
-    :param mode: the display mode (win/cmd)"""
+    :param graphical: if the display is graphical or not"""
     global colors, mainWindow
-    if mode == "win":
+    if graphical:
         # import graphics module and define colors as HEX codes
         from modules import fltk as mainWindow
         colors = {
@@ -28,10 +28,10 @@ def init_display(mode: str) -> None:
         # define colors as letters and ANSI escape codes
         colors = {
             CLEAR: "\033[30;40m  \033[0m",
-            RED: "\033[31;41mR \033[0m",
-            GREEN: "\033[32;42mG \033[0m",
-            YELLOW: "\033[33;43mY \033[0m",
-            BLUE: "\033[36;46mB \033[0m"
+            RED: "\033[30;41mR \033[0m",
+            GREEN: "\033[30;42mG \033[0m",
+            YELLOW: "\033[30;43mY \033[0m",
+            BLUE: "\033[30;46mB \033[0m"
     }
 
 
@@ -47,7 +47,7 @@ def display_grid_window(grille: list[list[int]], player: int | None = None) -> N
             # for each element of the game grid, draw circle of according color
             mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, colors[grille[i_row][i_elem]], remplissage=colors[grille[i_row][i_elem]])
     
-def print_grid_cmdline(grille: list[list[int]], player: int | None = None) -> None:
+def display_grid_cmdline(grille: list[list[int]], player: int | None = None) -> None:
     """Display the game grid onto the terminal
     
     :param grille: game grid"""
@@ -184,13 +184,15 @@ def clear() -> None:
     os.system("cls" if os.name == "nt" else "clear")
 
 
-def mainloop_window() -> None:
-    """Main game loop"""
+def mainloop_window(nb_players: int) -> None:
+    """Main game loop
+
+    :param nb_players: number of players"""
     # setup number of player and initial game state
-    nb_players = 0
-    while nb_players not in ("2", "3", "4"):
-        nb_players = input("Combien de joueurs vont jouer ? [2-4] : ")
-    nb_players = int(nb_players)
+    if nb_players == 0:
+        while nb_players not in ("2", "3", "4"):
+            nb_players = input("Combien de joueurs vont jouer ? [2-4] : ")
+        nb_players = int(nb_players)
     
     grid = init_grid()
 
@@ -232,13 +234,15 @@ def mainloop_window() -> None:
     print("Vert :", score_vert)
     print("Bleu :", score_bleu)
 
-def mainloop_cmdline() -> None:
-    """Main game loop"""
+def mainloop_cmdline(nb_players: int) -> None:
+    """Main game loop
+
+    :param nb_players: number of players"""
     # setup number of player and initial game state
-    nb_players = 0
-    while nb_players not in ("2", "3", "4"):
-        nb_players = input("Combien de joueurs vont jouer ? [2-4] : ")
-    nb_players = int(nb_players)
+    if nb_players == 0:
+        while nb_players not in ("2", "3", "4"):
+            nb_players = input("Combien de joueurs vont jouer ? [2-4] : ")
+        nb_players = int(nb_players)
     
     # tell player color roles according to nb of players
     print("Mettez vous d'accord sur vos couleurs ! Choisissez entre ", end="")
@@ -255,7 +259,7 @@ def mainloop_cmdline() -> None:
             break
         
     clear()
-    print_grid_cmdline(grid)
+    display_grid_cmdline(grid)
 
     x_axis, y_axis = ("1","2","3","4","5","6","7","8"), ("a","b","c","d","e","f","g","h")
     for turn in range(60):
@@ -277,7 +281,7 @@ def mainloop_cmdline() -> None:
             # if it was evaluated to be an incorrect move, invalidate and try again
             if not played:
                 print("Coup invalide")
-        print_grid_cmdline(grid)
+        display_grid_cmdline(grid)
 
     # after the game ends, calculate scores and print them
     score_rouge, score_jaune, score_vert, score_bleu = calc_score(grid)
@@ -291,12 +295,14 @@ def mainloop_cmdline() -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Jeu de Rolit")
     # choose display mode from cmdline argument
-    parser.add_argument("-d", "--display", help="Mode d'affichage (win/cmd)", default="win")
+    parser.add_argument("--graphical", help="Mode graphique", default=False, type=bool, action=argparse.BooleanOptionalAction)
+    # choose number of players from cmdline argument
+    parser.add_argument("-n", "--nb_players", help="Nombre de joueurs", default=0, type=int)
     args = parser.parse_args()
-    init_display(args.display)
+    init_display(args.graphical)
     
     # enter correct game loop based on dislpay mode
-    if args.display == "win":
-        mainloop_window()
+    if args.graphical:
+        mainloop_window(args.nb_players)
     else:
-        mainloop_cmdline()
+        mainloop_cmdline(args.nb_players)
