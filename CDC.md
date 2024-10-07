@@ -32,15 +32,7 @@ Sous la demande du client, Le programme sera écrit dans le langage de programma
 Sous la demande du client, l'interface graphiques sera réalisée en ayant recours à la librairie fltk.\
 Sous la demande du client, le code sera rédigé de façon à être compréhensible et réutilisable.
 
-Le code sera placé sous une license MIT standard:
-
-``Copyright (c) 2024 Nathan KUNTZ, Jeremy LI and Lilian VISTE``
-
-``Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:``
-
-``The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.``
-
-``THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.``
+Le code sera placé sous une license MIT standard.
 
 ## Le planning
 
@@ -72,7 +64,7 @@ Quand tout le plateau est rempli, le programme indique le score de chaque joueur
 
 ## Pistes d'améliorations
 
-* Implémenter une version par interface graphique (se référer aux maquettes)
+* Implémenter une version par interface graphique (se référer aux maquettes) [GUI Game](./maquettes/GUI_Game.png) / [GUI Launch](./maquettes/GUI_Launch.png)
 * Effets sonores
 * Adversaire virtuel
 * Couleurs variées selon les pions, plus "naturelles"
