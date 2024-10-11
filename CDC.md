@@ -18,7 +18,7 @@ Ci-dessous, ``"l'équipe"`` réfère à Nathan KUNTZ, Jeremy LI et Lilian VISTE.
 
 Tous les membres de l'équipe appartiennent à l'organisation ``"Groupe de projet 12-6"``, filiale de l'entité ``"Université Gustave Eiffel"``.
 
-_``[insérer les rôles de chaque membre dans l'équipe]``_\
+Notre équipe se répartit uniformément les rôles de manière à ce que le projet avance avec l'accord de chaque membre pour chaque fonctionnalité ou améliorations ajoutée. Cela nous permet d'être synchrones quant aux modifications que le jeu subit au fil du temps et donc d'être plus efficaces.\
 
 ## Le budget
 
