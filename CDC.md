@@ -28,7 +28,7 @@ En raison de cette absence de budget, l'équipe n'aura pas recours à la sous-tr
 
 ## Les technologies
 
-Sous la demande du client, Le programme sera écrit dans le langage de programmation python.\
+Sous la demande du client, Le programme sera écrit dans le langage de programmation Python.\
 Sous la demande du client, l'interface graphiques sera réalisée en ayant recours à la librairie fltk.\
 Sous la demande du client, le code sera rédigé de façon à être compréhensible et réutilisable.
 
@@ -65,6 +65,5 @@ Quand tout le plateau est rempli, le programme indique le score de chaque joueur
 ## Pistes d'améliorations
 
 * Implémenter une version par interface graphique (se référer aux maquettes) [GUI Game](./maquettes/GUI_Game.png) / [GUI Launch](./maquettes/GUI_Launch.png)
-* Effets sonores
-* Adversaire virtuel
+* Adversaire virtuel, joueur contre ordinateur
 * Couleurs variées selon les pions, plus "naturelles"
