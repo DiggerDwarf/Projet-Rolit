@@ -22,7 +22,7 @@ Notre équipe se répartit uniformément les rôles de manière à ce que le pro
 
 ## Le budget
 
-L'équipe se propose de ne pas être rémunérée pour son travail passionné en échange d'une bonne note sur "Linkedin". *hum hum*
+L'équipe se propose de ne pas être rémunérée pour son travail passionné _en échange d'une bonne note sur "Linkedin". *hum hum*_
 
 En raison de cette absence de budget, l'équipe n'aura pas recours à la sous-traitance.
 
