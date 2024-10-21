@@ -9,9 +9,9 @@ to render the markdown document:
 
 ## Le contexte
 
-Ci-dessous, ``"le client"`` réfère au chargé de TP.
+Ci-dessous, `"le client"` réfère au chargé de TP.
 
-Le besoin exprimé par le client est de concevoir une version informatique du jeu ``"Rolit"``.
+Le besoin exprimé par le client est de concevoir une version informatique du jeu `"Rolit"`.
 
 ## L'équipe
 
