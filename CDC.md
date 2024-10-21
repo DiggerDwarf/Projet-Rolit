@@ -14,9 +14,9 @@ Le besoin exprimé par le client est de concevoir une version informatique du je
 
 ## L'équipe
 
-Ci-dessous, ``"l'équipe"`` réfère à Nathan KUNTZ, Jeremy LI et Lilian VISTE.
+Ci-dessous, `"l'équipe"` réfère à Nathan KUNTZ, Jeremy LI et Lilian VISTE.
 
-Tous les membres de l'équipe appartiennent à l'organisation ``"Groupe de projet 12-6"``, filiale de l'entité ``"Université Gustave Eiffel"``.
+Tous les membres de l'équipe appartiennent à l'organisation `"Groupe de projet 12-6"`, filiale de l'entité `"Université Gustave Eiffel"`.
 
 Notre équipe se répartit uniformément les rôles de manière à ce que le projet avance avec l'accord de chaque membre pour chaque fonctionnalité ou améliorations ajoutée. Cela nous permet d'être synchrones quant aux modifications que le jeu subit au fil du temps et donc d'être plus efficaces.
 
@@ -28,8 +28,8 @@ En raison de cette absence de budget, l'équipe n'aura pas recours à la sous-tr
 
 ## Les technologies
 
-Sous la demande du client, Le programme sera écrit dans le langage de programmation Python.\
-Sous la demande du client, l'interface graphiques sera réalisée en ayant recours à la librairie fltk.\
+Sous la demande du client, Le programme sera écrit dans le langage de programmation `Python`.\
+Sous la demande du client, l'interface graphiques sera réalisée en ayant recours à la librairie `fltk`.\
 Sous la demande du client, le code sera rédigé de façon à être compréhensible et réutilisable.
 
 Le code sera placé sous une license MIT standard.
@@ -38,11 +38,11 @@ Le code sera placé sous une license MIT standard.
 
 ### Premier point d'étape
 
-Date du rendez-vous : ``21 novembre 2024, 16:45``
+Date du rendez-vous : `21 novembre 2024, 16:45`
 
 Ordre du rendez-vous : discuter du premier prototype et des besoins supplémentaires du client
 
-Livrable présenté : premier prototype, version console jouable du jeu ``Rolit``
+Livrable présenté : premier prototype, version console jouable du jeu `Rolit`
 
 ## Le livrable
 
@@ -50,13 +50,13 @@ Livrable présenté : premier prototype, version console jouable du jeu ``Rolit`
 
 La première itération consiste en une version jouable à la console du jeu.
 
-Au lancement du programme, le joueur se voit demander combien de joueurs vont jouer, de ``2`` à ``4``.\
+Au lancement du programme, le joueur se voit demander combien de joueurs vont jouer, de `2` à `4`.\
 Le programme indique ensuite les couleurs qui vont être données aux pions et laisse le temps aux joueurs de décider l'attribution des couleurs entre eux.
 
 Le plateau de jeu est affiché avec des couleurs, mais également avec des lettres représentant celles-ci, pour rendre la compréhension du jeu plus facile au personnes avec une déficience dans la perception des couleurs.
 
-Lors de l'affichage du plateau, à chaque colonne est associée un chiffre de ``1`` à ``8`` et à chaque ligne est associée une lettre de ``a`` à ``h``.\
-En se servant de ces identifiants, le joueur pourra indiquer dans quelle case il veut placer sa boule (ex: ``d3`` placera la boule dans la ligne ``3`` et la colonne ``d``)
+Lors de l'affichage du plateau, à chaque colonne est associée un chiffre de `1` à `8` et à chaque ligne est associée une lettre de `a` à `h`.\
+En se servant de ces identifiants, le joueur pourra indiquer dans quelle case il veut placer sa boule (ex: `d3` placera la boule dans la ligne `3` et la colonne `d`)
 
 La capture des boules est faite automatiquement.
 
