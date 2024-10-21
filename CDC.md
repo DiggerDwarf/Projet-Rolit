@@ -1,9 +1,10 @@
+<!--
 to render the markdown document:
  - paste its contents [here](https://md-to-pdf.fly.dev/)
  - remove this header
  - select the ``pdflatex`` render mode (consistency, i use it)
  - press convert and download
-
+--->
 # Projet Rolit
 
 ## Le contexte
