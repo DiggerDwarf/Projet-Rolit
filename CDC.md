@@ -1,6 +1,6 @@
 <!--
 to render the markdown document:
- - paste its contents [here](https://md-to-pdf.fly.dev/)
+ - paste its contents on https://md-to-pdf.fly.dev/
  - remove this header
  - select the ``pdflatex`` render mode (consistency, i use it)
  - press convert and download
@@ -11,7 +11,7 @@ to render the markdown document:
 
 Ci-dessous, `"le client"` réfère au chargé de TP.
 
-Le besoin exprimé par le client est de concevoir une version informatique du jeu `"Rolit"`.
+Le besoin exprimé par le client est de concevoir une version informatique du jeu `"Rolit"`, un jeu de plateau pour 2 à 4 joueurs. Le jeu se joue sur un plateau de `8x8` cases, chaque joueur possède des boules de sa couleur et le but est de capturer le plus de boules adverses possible.
 
 ## L'équipe
 
