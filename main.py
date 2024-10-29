@@ -41,7 +41,7 @@ def init_display(graphical: bool) -> None:
             GREEN: "\033[30;42m V \033[0m",
             YELLOW: "\033[30;43m J \033[0m",
             BLUE: "\033[30;46m B \033[0m"
-    }
+        }
 
 
 def display_grid_window(grille: list[list[int]], player: int | None = None) -> None:
@@ -54,7 +54,10 @@ def display_grid_window(grille: list[list[int]], player: int | None = None) -> N
     for i_row in range(len(grille)):
         for i_elem in range(len(grille[0])):
             # for each element of the game grid, draw circle of according color
-            mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, colors[grille[i_row][i_elem]], remplissage=colors[grille[i_row][i_elem]])
+            if grille[i_row][i_elem] == CLEAR and not test_adjacent(grille, i_elem, i_row):
+                mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, "#AAAAAA", remplissage="#AAAAAA")
+            else:
+                mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, colors[grille[i_row][i_elem]], remplissage=colors[grille[i_row][i_elem]])
     
 def display_grid_cmdline(grille: list[list[int]], player: int | None = None) -> None:
     """Display the game grid onto the terminal
