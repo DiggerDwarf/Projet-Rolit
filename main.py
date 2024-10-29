@@ -54,12 +54,12 @@ def display_grid_window(grille: list[list[int]], player: int | None = None) -> N
     for i_row in range(len(grille)):
         for i_elem in range(len(grille[0])):
             # for each element of the game grid, draw circle of according color
-            if grille[i_row][i_elem] == CLEAR and not test_adjacent(grille, i_elem, i_row):
+            if grille[i_row][i_elem] == CLEAR and not test_adjacent(grille, i_elem, i_row): # If slot is unused and unreachable, fill in gray
                 mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, "#AAAAAA", remplissage="#AAAAAA")
-            else:
+            else: # Else, look in color lookup table
                 mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, colors[grille[i_row][i_elem]], remplissage=colors[grille[i_row][i_elem]])
     
-def display_grid_cmdline(grille: list[list[int]], player: int | None = None) -> None:
+def display_grid_cmdline(grille: list[list[int]]) -> None:
     """Display the game grid onto the terminal
     
     :param grille: game grid"""
