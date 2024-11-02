@@ -57,7 +57,7 @@ Le programme indique ensuite les couleurs qui vont être données aux pions et l
 Le plateau de jeu est affiché avec des couleurs, mais également avec des lettres représentant celles-ci, pour rendre la compréhension du jeu plus facile au personnes avec une déficience dans la perception des couleurs.
 
 Lors de l'affichage du plateau, à chaque colonne est associée un chiffre de `1` à `8` et à chaque ligne est associée une lettre de `a` à `h`.\
-En se servant de ces identifiants, le joueur pourra indiquer dans quelle case il veut placer sa boule (ex: `d3` placera la boule dans la ligne `3` et la colonne `d`)
+En se servant de ces identifiants, le joueur pourra indiquer dans quelle case il veut placer sa boule (ex: `d3` placera la boule dans la ligne `d` et la colonne `3`)
 
 La capture des boules est faite automatiquement.
 
