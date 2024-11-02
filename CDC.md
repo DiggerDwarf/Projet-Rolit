@@ -45,6 +45,22 @@ Ordre du rendez-vous : discuter du premier prototype et des besoins supplémenta
 
 Livrable présenté : premier prototype, version console jouable du jeu `Rolit`
 
+### Deuxième point d'étape
+
+Date du rendez-vous : *à fixer pendant le premier point d'étape*
+
+Ordre du rendez-vous : *à fixer pendant le premier point d'étape*
+
+Livrable présenté : *à fixer pendant le premier point d'étape*
+
+### Dernier point d'étape
+
+Date du rendez-vous : *à fixer pendant le deuxième point d'étape*
+
+Ordre du rendez-vous : *à fixer pendant le deuxième point d'étape*
+
+Livrable présenté : *à fixer pendant le deuxième point d'étape*
+
 ## Le livrable
 
 ### Première itération
