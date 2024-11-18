@@ -10,7 +10,7 @@ WIDTH, HEIGHT = 8, 8
 CLEAR, RED, YELLOW, GREEN, BLUE = 0, 1, 2, 3, 4
 
 colors = {
-    CLEAR: "\033[30;40m + \033[0m",
+    CLEAR: "\033[30;40m • \033[0m",
     RED: "\033[30;41m R \033[0m",
     GREEN: "\033[30;42m V \033[0m",
     YELLOW: "\033[30;43m J \033[0m",
@@ -163,7 +163,7 @@ def clear() -> None:
 
 
 
-def mainloop_cmdline(nb_players: int) -> None:
+def mainloop_cmdline(nb_players: int, nb_manches: int) -> None:
     """Main game loop
 
     :param nb_players: number of players
@@ -182,7 +182,7 @@ def mainloop_cmdline(nb_players: int) -> None:
 
     grid = init_grid()
     
-    print("Pour information, vous pouvez quitter le jeu à tout moment en appuyant sur Ctrl + C.")
+    print("Pour information, vous pouvez quitter le jeu à tout moment en écrivant 'q'.")
     # wait for players to choose a color before starting the game
     while True:
         start = input("Voulez-vous débuter la partie ? [O/n] : ").lower()
@@ -231,6 +231,7 @@ if __name__ == "__main__":
     
     # choose number of players from cmdline argument
     parser.add_argument("-n", "--nb_players", help="Nombre de joueurs", default=0, type=int)
+    parser.add_argument("-m", "--nb_manches", help="Nombre de manches", default=1, type=int)
     
     args = parser.parse_args()
     
@@ -241,4 +242,4 @@ if __name__ == "__main__":
         print("Cannot have more than 4 players, truncating to 4.")
         args.nb_players = 4
     
-    mainloop_cmdline(args.nb_players)
+    mainloop_cmdline(args.nb_players, args.nb_manches)
