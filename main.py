@@ -26,12 +26,19 @@ def init_display(graphical: bool) -> None:
     if graphical:
         # import graphics module and define colors as HEX codes
         from modules import fltk as mainWindow
+        # colors = {
+        #     CLEAR: "#FFFFFF",
+        #     RED: "#FF0000",
+        #     GREEN: "#00FF00",
+        #     YELLOW: "#FFFF00",
+        #     BLUE: "#0000FF"
+        # }
         colors = {
-            CLEAR: "#FFFFFF",
-            RED: "#FF0000",
-            GREEN: "#00FF00",
-            YELLOW: "#FFFF00",
-            BLUE: "#0000FF"
+            CLEAR: "#AED2FF",
+            RED: "#FF004D",
+            GREEN: "#00DFA2",
+            YELLOW: "#FAEF5D",
+            BLUE: "#0079FF"
         }
     else:
         # define colors as letters and ANSI escape codes
@@ -50,12 +57,12 @@ def display_grid_window(grille: list[list[int]], player: int | None = None) -> N
     :param grille: game grid"""
     mainWindow.efface_tout()
     # draw black background with an outline set as the current player's color
-    mainWindow.rectangle(0,0,830,830, couleur=colors[player], remplissage="#000000", epaisseur=30)
+    mainWindow.rectangle(0,0,830,830, couleur=colors[player], remplissage="#222831", epaisseur=30)
     for i_row in range(len(grille)):
         for i_elem in range(len(grille[0])):
             # for each element of the game grid, draw circle of according color
             if grille[i_row][i_elem] == CLEAR and not test_adjacent(grille, i_elem, i_row): # If slot is unused and unreachable, fill in gray
-                mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, "#AAAAAA", remplissage="#AAAAAA")
+                mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, "#393E46", remplissage="#393E46")
             else: # Else, look in color lookup table
                 mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, colors[grille[i_row][i_elem]], remplissage=colors[grille[i_row][i_elem]])
     
