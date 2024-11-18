@@ -43,7 +43,7 @@ def init_display(graphical: bool) -> None:
     else:
         # define colors as letters and ANSI escape codes
         colors = {
-            CLEAR: "\033[30;40m   \033[0m",
+            CLEAR: "\033[30;40m + \033[0m",
             RED: "\033[30;41m R \033[0m",
             GREEN: "\033[30;42m V \033[0m",
             YELLOW: "\033[30;43m J \033[0m",
@@ -207,15 +207,6 @@ def calc_score(grid: list[list[int]]) -> tuple[int, int, int, int]:
     return score_rouge, score_jaune, score_vert, score_bleu
 
 
-def abcto123(letter: str) -> int:
-    """Convert a lowercase letter to a number
-
-    :param letter: the letter to convert
-    :return: the corresponding number"""
-    # calculate offset to lowercase a in the ASCII table
-    return int(ord(letter) - ord("a"))
-
-
 def clear() -> None:
     """Clear the console"""
     # just checking the os version to send correct clear command
@@ -264,6 +255,7 @@ def mainloop_window(nb_players: int, ai: bool) -> None:
         elif nb_players == 3:   print("rouge, jaune et vert.")
         else:                   print("rouge, jaune, vert et bleu.")
 
+    player = randint(RED, BLUE)
     
     grid = init_grid()
 
@@ -401,7 +393,7 @@ def mainloop_cmdline(nb_players: int, nb_manches: int, ai: bool) -> None:
                         continue
                     # convert player input to coordinates
                     coords = list(playerInput)
-                    x, y = int(coords[1]) - 1, abcto123(coords[0])
+                    x, y = int(coords[1]) - 1, int(ord(coords[0]) - ord("a"))
                     # attempt to play
                     played = play(grid, x, y, player)
                     # if it was evaluated to be an incorrect move, invalidate and try again
