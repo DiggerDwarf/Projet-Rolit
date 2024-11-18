@@ -379,7 +379,7 @@ def mainloop_cmdline(nb_players: int, nb_manches: int, ai: bool) -> None:
         # wait for players to choose a color before starting the game
         while True:
             start = input("Voulez-vous débuter la partie ? [O/n] : ").lower()
-            if start == "o":
+            if start == "o" or start == "":
                 break
 
         grid = init_grid() #init grid for each rounds   
@@ -479,4 +479,4 @@ if __name__ == "__main__":
     if args.graphical:
         mainloop_window(args.nb_players, args.ai)
     else:
-        mainloop_cmdline(args.nb_players, args.ai)
+        mainloop_cmdline(args.nb_players, args.nb_manches, args.ai)
