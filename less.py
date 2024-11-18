@@ -1,10 +1,7 @@
 # file to present
 # Remove from this file all that is not needed for the first checkpoint
 
-from random import randint
 import os, argparse
-from copy import deepcopy
-from time import sleep
 
 WIDTH, HEIGHT = 8, 8
 CLEAR, RED, YELLOW, GREEN, BLUE = 0, 1, 2, 3, 4
