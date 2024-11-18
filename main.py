@@ -59,24 +59,52 @@ def display_grid_window(grille: list[list[int]], player: int | None = None) -> N
             else: # Else, look in color lookup table
                 mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, colors[grille[i_row][i_elem]], remplissage=colors[grille[i_row][i_elem]])
 
-def display_start_window() -> None:
+
+def menu_window_select() -> int:
     mainWindow.efface_tout()
-    mainWindow.rectangle(0,0)
+    mainWindow.rectangle(-5, -5, 415, 415, couleur="black", epaisseur=5, remplissage=colors[RED])
+    mainWindow.rectangle(415, -5, 835, 415, couleur="black", epaisseur=5, remplissage=colors[YELLOW])
+    mainWindow.rectangle(-5, 415, 415, 835, couleur="black", epaisseur=5, remplissage=colors[BLUE])
+    mainWindow.rectangle(415, 415, 835, 835, couleur="black", epaisseur=5, remplissage=colors[GREEN])
+    
+    mainWindow.texte(207, 207, str("QUITTER"),   ancrage="center", police="consolas", taille=48)
+    mainWindow.texte(622, 207, str("2 JOUEURS"), ancrage="center", police="consolas", taille=48)
+    mainWindow.texte(207, 622, str("3 JOUEURS"), ancrage="center", police="consolas", taille=48)
+    mainWindow.texte(622, 622, str("4 JOUEURS"), ancrage="center", police="consolas", taille=48)
+    
+    
+    ev = None
+    while True:
+        mainWindow.mise_a_jour()
+        ev = mainWindow.donne_ev()
+        if ev is None: continue
+        if ev[0] == "ClicGauche":
+            if ev[1].x <= 415 and ev[1].y <= 415:
+                return -1
+            elif ev[1].x >= 415 and ev[1].y <= 415:
+                return 2
+            elif ev[1].x <= 415 and ev[1].y >= 415:
+                return 3
+            elif ev[1].x >= 415 and ev[1].y >= 415:
+                return 4
+        elif ev[0] == "Quitte":
+            return -1
 
 
 def display_end_window(scores: list[int]) -> None:
     mainWindow.efface_tout()
-    mainWindow.rectangle(0, 0, 415, 415, couleur=colors[RED], remplissage=colors[RED])
-    mainWindow.rectangle(415, 0, 830, 415, couleur=colors[YELLOW], remplissage=colors[YELLOW])
-    mainWindow.rectangle(0, 415, 415, 830, couleur=colors[BLUE], remplissage=colors[BLUE])
-    mainWindow.rectangle(415, 415, 830, 830, couleur=colors[GREEN], remplissage=colors[GREEN])
+    mainWindow.rectangle(-5, -5, 415, 415, couleur="black", epaisseur=5, remplissage=colors[RED])
+    mainWindow.rectangle(415, -5, 835, 415, couleur="black", epaisseur=5, remplissage=colors[YELLOW])
+    mainWindow.rectangle(-5, 415, 415, 835, couleur="black", epaisseur=5, remplissage=colors[BLUE])
+    mainWindow.rectangle(415, 415, 835, 835, couleur="black", epaisseur=5, remplissage=colors[GREEN])
     
-    mainWindow.texte(207, 207, str(scores[0]), ancrage="center", police="consolas", taille=72)
-    mainWindow.texte(622, 207, str(scores[1]), ancrage="center", police="consolas", taille=72)
-    mainWindow.texte(207, 622, str(scores[2]), ancrage="center", police="consolas", taille=72)
-    mainWindow.texte(622, 622, str(scores[3]), ancrage="center", police="consolas", taille=72)
+    mainWindow.texte(207, 207, str(scores[0]), ancrage="center", police="consolas", taille=128)
+    mainWindow.texte(622, 207, str(scores[1]), ancrage="center", police="consolas", taille=128)
+    mainWindow.texte(207, 622, str(scores[2]), ancrage="center", police="consolas", taille=128)
+    mainWindow.texte(622, 622, str(scores[3]), ancrage="center", police="consolas", taille=128)
     
     mainWindow.attend_fermeture()
+
     
 def display_grid_cmdline(grille: list[list[int]]) -> None:
     """Display the game grid onto the terminal
@@ -232,28 +260,21 @@ def mainloop_window(nb_players: int, ai: bool) -> None:
 
     :param nb_players: number of players
     :param ai: if the player wants to play against the AI"""
-    # setup number of player and initial game state
-    if nb_players == 0:
-        while nb_players not in ("2", "3", "4"):
-            nb_players = input("Combien de joueurs vont jouer ? [2-4] : ")
-        nb_players = int(nb_players)
-
-    if ai: # if the player wants to play against the AI
-        print("Vous allez jouer contre l'IA")
-        print("Vous êtes rouge")
-    else:
-        # tell player color roles according to nb of players
-        print("Mettez vous d'accord sur vos couleurs ! Choisissez entre ", end="")
-        if nb_players == 2:     print("rouge et jaune.")
-        elif nb_players == 3:   print("rouge, jaune et vert.")
-        else:                   print("rouge, jaune, vert et bleu.")
-
-    player = randint(RED, BLUE)
     
+    player = randint(RED, BLUE)
+        
     grid = init_grid()
-
+    
     # create the game window
     mainWindow.cree_fenetre(830, 830, 60, False)
+
+    if nb_players == 0:
+        choice = menu_window_select()
+        if choice == -1:
+            return
+        else:
+            nb_players = choice
+        
     tour = 0
     while tour < 60:
         # simple formula to get player index based on the number of players and the index of the turn
@@ -306,11 +327,6 @@ def mainloop_window(nb_players: int, ai: bool) -> None:
 
     # after the game has ended, calculate the score and print it
     score_rouge, score_jaune, score_vert, score_bleu = calc_score(grid)
-    print("Score final :")
-    print("Rouge :", score_rouge)
-    print("Jaune :", score_jaune)
-    print("Vert :", score_vert)
-    print("Bleu :", score_bleu)
     
     display_end_window([score_rouge, score_jaune, score_bleu, score_vert])
 
