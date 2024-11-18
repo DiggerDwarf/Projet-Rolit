@@ -65,6 +65,25 @@ def display_grid_window(grille: list[list[int]], player: int | None = None) -> N
                 mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, "#393E46", remplissage="#393E46")
             else: # Else, look in color lookup table
                 mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, colors[grille[i_row][i_elem]], remplissage=colors[grille[i_row][i_elem]])
+
+def display_start_window() -> None:
+    mainWindow.efface_tout()
+    mainWindow.rectangle(0,0)
+
+
+def display_end_window(scores: list[int]) -> None:
+    mainWindow.efface_tout()
+    mainWindow.rectangle(0, 0, 415, 415, couleur=colors[RED], remplissage=colors[RED])
+    mainWindow.rectangle(415, 0, 830, 415, couleur=colors[YELLOW], remplissage=colors[YELLOW])
+    mainWindow.rectangle(0, 415, 415, 830, couleur=colors[BLUE], remplissage=colors[BLUE])
+    mainWindow.rectangle(415, 415, 830, 830, couleur=colors[GREEN], remplissage=colors[GREEN])
+    
+    mainWindow.texte(207, 207, str(scores[0]), ancrage="center", police="consolas", taille=72)
+    mainWindow.texte(622, 207, str(scores[1]), ancrage="center", police="consolas", taille=72)
+    mainWindow.texte(207, 622, str(scores[2]), ancrage="center", police="consolas", taille=72)
+    mainWindow.texte(622, 622, str(scores[3]), ancrage="center", police="consolas", taille=72)
+    
+    mainWindow.attend_fermeture()
     
 def display_grid_cmdline(grille: list[list[int]]) -> None:
     """Display the game grid onto the terminal
@@ -269,6 +288,10 @@ def mainloop_window(nb_players: int, ai: bool) -> None:
                     i_column = (min(max(ev[1].x, 15), 815) - 15) // 100
                     i_row = (min(max(ev[1].y, 15), 815) - 15) // 100
                     
+                    i_column = min(max(i_column, 0), 7)
+                    i_row = min(max(i_row, 0), 7)
+                    
+                    
                     # if nothing's there, set the ball and advance to the next turn
                     if play(grid, i_column, i_row, player):
                         tour += 1
@@ -303,6 +326,8 @@ def mainloop_window(nb_players: int, ai: bool) -> None:
     print("Jaune :", score_jaune)
     print("Vert :", score_vert)
     print("Bleu :", score_bleu)
+    
+    display_end_window([score_rouge, score_jaune, score_bleu, score_vert])
 
 def mainloop_cmdline(nb_players: int, nb_manches: int, ai: bool) -> None:
     """Main game loop
@@ -442,6 +467,13 @@ if __name__ == "__main__":
     parser.add_argument("--ai", help="Jouer contre l'IA", default=False, type=bool, action=argparse.BooleanOptionalAction)
     args = parser.parse_args()
     init_display(args.graphical)
+    
+    if args.nb_players < 2 and args.nb_players != 0:
+        print("Cannot have this little players, redirecting to choose prompt")
+        args.nb_players = 0
+    elif args.nb_players > 4:
+        print("Cannot have more than 4 players, truncating to 4.")
+        args.nb_players = 4
     
     # enter correct game loop based on dislpay mode
     if args.graphical:
