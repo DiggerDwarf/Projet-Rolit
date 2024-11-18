@@ -26,13 +26,6 @@ def init_display(graphical: bool) -> None:
     if graphical:
         # import graphics module and define colors as HEX codes
         from modules import fltk as mainWindow
-        # colors = {
-        #     CLEAR: "#FFFFFF",
-        #     RED: "#FF0000",
-        #     GREEN: "#00FF00",
-        #     YELLOW: "#FFFF00",
-        #     BLUE: "#0000FF"
-        # }
         colors = {
             CLEAR: "#AED2FF",
             RED: "#FF004D",
@@ -43,7 +36,7 @@ def init_display(graphical: bool) -> None:
     else:
         # define colors as letters and ANSI escape codes
         colors = {
-            CLEAR: "\033[30;40m + \033[0m",
+            CLEAR: "\033[40m • \033[0m",
             RED: "\033[30;41m R \033[0m",
             GREEN: "\033[30;42m V \033[0m",
             YELLOW: "\033[30;43m J \033[0m",
