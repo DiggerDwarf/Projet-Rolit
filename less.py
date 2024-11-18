@@ -201,6 +201,8 @@ def mainloop_cmdline(nb_players: int) -> None:
         while not played:
             # ask player for ball placement location
             playerInput = input(f"Joueur {color_names[player]}, Emplacement de votre prochaine boule (ex: a1, A1) : ").lower()
+            if playerInput == 'q':
+                return
             if len(playerInput) != 2 or playerInput[0] not in y_axis or playerInput[1] not in x_axis: #check if input is valid (ex: a1, A1)
                 continue
             # convert player input to coordinates
