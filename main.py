@@ -67,7 +67,7 @@ def menu_window_select() -> int:
     mainWindow.rectangle(-5, 415, 415, 835, couleur="black", epaisseur=5, remplissage=colors[BLUE])
     mainWindow.rectangle(415, 415, 835, 835, couleur="black", epaisseur=5, remplissage=colors[GREEN])
     
-    mainWindow.texte(207, 207, str("QUITTER"),   ancrage="center", police="consolas", taille=48)
+    mainWindow.texte(207, 207, str("1 JOUEUR"),   ancrage="center", police="consolas", taille=48)
     mainWindow.texte(622, 207, str("2 JOUEURS"), ancrage="center", police="consolas", taille=48)
     mainWindow.texte(207, 622, str("3 JOUEURS"), ancrage="center", police="consolas", taille=48)
     mainWindow.texte(622, 622, str("4 JOUEURS"), ancrage="center", police="consolas", taille=48)
@@ -80,7 +80,7 @@ def menu_window_select() -> int:
         if ev is None: continue
         if ev[0] == "ClicGauche":
             if ev[1].x <= 415 and ev[1].y <= 415:
-                return -1
+                return 1
             elif ev[1].x >= 415 and ev[1].y <= 415:
                 return 2
             elif ev[1].x <= 415 and ev[1].y >= 415:
@@ -255,13 +255,13 @@ def ai_play(grid: list[list[int]], color: int) -> tuple[int, int]:
     return move
 
 
-def mainloop_window(nb_players: int, ai: bool) -> None:
+def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
     """Main game loop
 
     :param nb_players: number of players
     :param ai: if the player wants to play against the AI"""
     
-    player = randint(RED, BLUE)
+    player_bias = randint(0, 4)
         
     grid = init_grid()
     
@@ -274,61 +274,62 @@ def mainloop_window(nb_players: int, ai: bool) -> None:
             return
         else:
             nb_players = choice
-        
-    tour = 0
-    while tour < 60:
-        # simple formula to get player index based on the number of players and the index of the turn
-        player = tour % nb_players + 1
-        display_grid_window(grid, player)
-        
-        # loop over events
-        ev = mainWindow.donne_ev()
-        while ev != None:
-            match ev[0]:
-                case "Quitte":
-                    # Pretty straightforward
-                    mainWindow.ferme_fenetre()
-                    return
-                case "ClicGauche":
-                    # clamping the values to be in [0;800] then dividing by 100 (size of a spot) to get an index
-                    i_column = (min(max(ev[1].x, 15), 815) - 15) // 100
-                    i_row = (min(max(ev[1].y, 15), 815) - 15) // 100
-                    
-                    i_column = min(max(i_column, 0), 7)
-                    i_row = min(max(i_row, 0), 7)
-                    
-                    
-                    # if nothing's there, set the ball and advance to the next turn
-                    if play(grid, i_column, i_row, player):
-                        tour += 1
-                        # AI mode is single-player
-                        # so after the player has played, if ai mode is enabled, make them play
-                        if ai:
-                            # display player move, update the window and wait before making the IAs play
-                            display_grid_window(grid, player)
-                            mainWindow.mise_a_jour()
-                            sleep(1)
-                            # there are `nb_players - 1` IAs knowing there's 1 real player
-                            for _ in range(nb_players-1):
-                                # get current IA player id
-                                player = tour % nb_players + 1
-                                # make them play
-                                ai_play(grid, player)
-                                tour += 1
-                                # between each IA turn, display and wait
+    
+    for _ in range(nb_manches):
+        tour = 0
+        while tour < 60:
+            # simple formula to get player index based on the number of players and the index of the turn
+            player = (tour + player_bias) % nb_players + 1
+            display_grid_window(grid, player)
+            
+            # loop over events
+            ev = mainWindow.donne_ev()
+            while ev != None:
+                match ev[0]:
+                    case "Quitte":
+                        # Pretty straightforward
+                        mainWindow.ferme_fenetre()
+                        return
+                    case "ClicGauche":
+                        # clamping the values to be in [0;800] then dividing by 100 (size of a spot) to get an index
+                        i_column = (min(max(ev[1].x, 15), 815) - 15) // 100
+                        i_row = (min(max(ev[1].y, 15), 815) - 15) // 100
+                        
+                        i_column = min(max(i_column, 0), 7)
+                        i_row = min(max(i_row, 0), 7)
+                        
+                        
+                        # if nothing's there, set the ball and advance to the next turn
+                        if play(grid, i_column, i_row, player):
+                            tour += 1
+                            # AI mode is single-player
+                            # so after the player has played, if ai mode is enabled, make them play
+                            if ai:
+                                # display player move, update the window and wait before making the IAs play
                                 display_grid_window(grid, player)
                                 mainWindow.mise_a_jour()
                                 sleep(1)
-            
-            # grab next event
-            ev = mainWindow.donne_ev()
-        # update the window after event handling
-        mainWindow.mise_a_jour()
+                                # there are `nb_players - 1` IAs knowing there's 1 real player
+                                for _ in range(nb_players-1):
+                                    # get current IA player id
+                                    player = tour % nb_players + 1
+                                    # make them play
+                                    ai_play(grid, player)
+                                    tour += 1
+                                    # between each IA turn, display and wait
+                                    display_grid_window(grid, player)
+                                    mainWindow.mise_a_jour()
+                                    sleep(1)
+                
+                # grab next event
+                ev = mainWindow.donne_ev()
+            # update the window after event handling
+            mainWindow.mise_a_jour()
 
-    # after the game has ended, calculate the score and print it
-    score_rouge, score_jaune, score_vert, score_bleu = calc_score(grid)
-    
-    display_end_window([score_rouge, score_jaune, score_bleu, score_vert])
+        # after the game has ended, calculate the score and print it
+        score_rouge, score_jaune, score_vert, score_bleu = calc_score(grid)
+        
+        display_end_window([score_rouge, score_jaune, score_bleu, score_vert])
 
 def mainloop_cmdline(nb_players: int, nb_manches: int, ai: bool) -> None:
     """Main game loop
@@ -478,6 +479,6 @@ if __name__ == "__main__":
     
     # enter correct game loop based on dislpay mode
     if args.graphical:
-        mainloop_window(args.nb_players, args.ai)
+        mainloop_window (args.nb_players, args.nb_manches, args.ai)
     else:
         mainloop_cmdline(args.nb_players, args.nb_manches, args.ai)
