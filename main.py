@@ -338,6 +338,8 @@ def mainloop_cmdline(nb_players: int, nb_manches: int, ai: bool) -> None:
     :param nb_manches: number of rounds
     :param ai: if the player wants to play against the AI"""
     # setup number of player and initial game state
+
+    clear()
     if nb_players == 0:
         while nb_players not in ("2", "3", "4"):
             nb_players = input("Combien de joueurs vont jouer ? [2-4] : ")
@@ -376,8 +378,8 @@ def mainloop_cmdline(nb_players: int, nb_manches: int, ai: bool) -> None:
     }
     
     for i in range(nb_manches):
-        print(f"--- MANCHE N°{i} ---")
-        print("Pour information, vous pouvez quitter le jeu à tout moment en appuyant sur Ctrl + C.")
+        print(f"--- MANCHE N°{i+1} ---")
+        print("Pour information, vous pouvez quitter le jeu à tout moment en écrivant 'q'.")
         # wait for players to choose a color before starting the game
         while True:
             start = input("Voulez-vous débuter la partie ? [O/n] : ").lower()
@@ -385,7 +387,7 @@ def mainloop_cmdline(nb_players: int, nb_manches: int, ai: bool) -> None:
                 break
 
         grid = init_grid() #init grid for each rounds   
-            
+
         clear()
         display_grid_cmdline(grid)
 
@@ -399,13 +401,14 @@ def mainloop_cmdline(nb_players: int, nb_manches: int, ai: bool) -> None:
                 if (ai and player == RED) or not ai: # ai or player turn and if not against ai always ask for input
                     # ask player for ball placement location
                     playerInput = input(f"Joueur {color_names[player]}, Emplacement de votre prochaine boule (ex: a1, A1) : ").lower()
-                    if len(playerInput) != 2 or playerInput[0] not in y_axis or playerInput[1] not in x_axis: #check if input is valid (ex: a1, A1)
-                        continue
-                    # convert player input to coordinates
-                    coords = list(playerInput)
-                    x, y = int(coords[1]) - 1, int(ord(coords[0]) - ord("a"))
-                    # attempt to play
-                    played = play(grid, x, y, player)
+                    if playerInput == "q":
+                        return
+                    if len(playerInput) == 2 and playerInput[0] in y_axis and playerInput[1] in x_axis: #check if input is valid (ex: a1, A1)
+                        # convert player input to coordinates
+                        coords = list(playerInput)
+                        x, y = int(coords[1]) - 1, int(ord(coords[0]) - ord("a"))
+                        # attempt to play
+                        played = play(grid, x, y, player)
                     # if it was evaluated to be an incorrect move, invalidate and try again
                     if not played:
                         print("Coup invalide")
