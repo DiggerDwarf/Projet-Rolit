@@ -463,7 +463,7 @@ def mainloop_cmdline(nb_players: int, nb_manches: int, ai: bool) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Jeu de Rolit")
     # choose display mode from cmdline argument
-    parser.add_argument("--graphical", help="Mode graphique", default=False, type=bool, action=argparse.BooleanOptionalAction)
+    parser.add_argument("--graphical", help="Mode graphique", default=True, type=bool, action=argparse.BooleanOptionalAction)
     # choose number of players from cmdline argument
     parser.add_argument("-n", "--nb_players", help="Nombre de joueurs", default=0, type=int)
     # choose number of rounds to play
