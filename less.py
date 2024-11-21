@@ -241,7 +241,7 @@ def mainloop_cmdline(nb_players: int, nb_manches: int) -> None:
 
         # after the game ends, calculate scores and print them
         score_round = calc_score(grid)
-        print("Score final :")
+        print("Score de la manche :")
         print("Rouge :", score_round[0])
         print("Jaune :", score_round[1])
         print("Vert :", score_round[2])
