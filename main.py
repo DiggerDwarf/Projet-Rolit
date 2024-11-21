@@ -33,6 +33,13 @@ def init_display(graphical: bool) -> None:
             YELLOW: "#FAEF5D",
             BLUE: "#0079FF"
         }
+        colors2 = {
+            CLEAR: "#F8F8F2",
+            RED: "#FF5555",
+            PURPLE: "#BD93F9",
+            YELLOW: "#F1FA8C",
+            PINK: "#FF79C6"
+        }
     else:
         # define colors as letters and ANSI escape codes
         colors = {
