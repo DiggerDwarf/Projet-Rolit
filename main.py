@@ -385,6 +385,8 @@ def mainloop_cmdline(nb_players: int, nb_manches: int, ai: bool) -> None:
             start = input("Voulez-vous débuter la partie ? [O/n] : ").lower()
             if start == "o" or start == "":
                 break
+            elif start == "q":
+                return
 
         grid = init_grid() #init grid for each rounds   
 
@@ -424,7 +426,7 @@ def mainloop_cmdline(nb_players: int, nb_manches: int, ai: bool) -> None:
 
         # after the game ends, calculate scores and print them
         score_round = calc_score(grid)
-        print("Score final :")
+        print("Score de la manche :")
         print("Rouge :", score_round[0])
         print("Jaune :", score_round[1])
         print("Vert :", score_round[2])
