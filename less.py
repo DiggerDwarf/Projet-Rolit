@@ -208,6 +208,8 @@ def mainloop_cmdline(nb_players: int, nb_manches: int) -> None:
             start = input("Voulez-vous débuter la manche ? [O/n] : ").lower()
             if start == "o" or start == "":
                 break
+            elif start == "q":
+                return
 
         grid = init_grid()
 
