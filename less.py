@@ -201,7 +201,7 @@ def mainloop_cmdline(nb_players: int, nb_manches: int) -> None:
     }
     
     for i in range(nb_manches):
-        print(f"--- MANCHE N°{i} ---")
+        print(f"--- MANCHE N°{i+1} ---")
         print("Pour information, vous pouvez quitter le jeu à tout moment en écrivant 'q'.")
         # wait for players to choose a color before starting the game
         while True:
@@ -225,13 +225,12 @@ def mainloop_cmdline(nb_players: int, nb_manches: int) -> None:
                 playerInput = input(f"Joueur {color_names[player]}, Emplacement de votre prochaine boule (ex: a1, A1) : ").lower()
                 if playerInput == 'q':
                     return
-                if len(playerInput) != 2 or playerInput[0] not in y_axis or playerInput[1] not in x_axis: #check if input is valid (ex: a1, A1)
-                    continue
-                # convert player input to coordinates
-                coords = list(playerInput)
-                x, y = int(coords[1]) - 1, abcto123(coords[0])
-                # attempt to play
-                played = play(grid, x, y, player)
+                if len(playerInput) == 2 and playerInput[0] in y_axis and playerInput[1] in x_axis: #check if input is valid (ex: a1, A1)
+                    # convert player input to coordinates
+                    coords = list(playerInput)
+                    x, y = int(coords[1]) - 1, abcto123(coords[0])
+                    # attempt to play
+                    played = play(grid, x, y, player)
                 # if it was evaluated to be an incorrect move, invalidate and try again
                 if not played:
                     print("Coup invalide")
