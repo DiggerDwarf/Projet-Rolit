@@ -344,8 +344,8 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
                                     # between each IA turn, display and wait
                                     display_grid_window(grid, player)
                                     mainWindow.mise_a_jour()
+                                    mainWindow.__canevas.ev_queue.clear()
                                     sleep(1)
-                
                 # grab next event
                 ev = mainWindow.donne_ev()
             # update the window after event handling
