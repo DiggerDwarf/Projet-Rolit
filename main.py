@@ -26,7 +26,7 @@ def init_display(graphical: bool) -> None:
     """Initialize the display mode
     
     :param graphical: if the display is graphical or not"""
-    global colors, mainWindow
+    global colors, mainWindow, colors_alt0, colors_alt1
     if graphical:
         # import graphics module and define colors as HEX codes
         from modules import fltk as mainWindow
@@ -37,13 +37,20 @@ def init_display(graphical: bool) -> None:
             YELLOW: "#FAEF5D",
             BLUE: "#0079FF"
         }
-        # colors = {
-        #     CLEAR: "#F8F8F2",
-        #     RED: "#FF5555",
-        #     GREEN: "#BD93F9", #Purple
-        #     YELLOW: "#F1FA8C",
-        #     BLUE: "#FF79C6" #Pink
-        # }
+        colors_alt0 = {
+            CLEAR: "#AED2FF",
+            RED: "#FF004D",
+            GREEN: "#00DFA2",
+            YELLOW: "#FAEF5D",
+            BLUE: "#0079FF"
+        }
+        colors_alt1 = {
+            CLEAR: "#F8F8F2",
+            RED: "#FF5555",
+            GREEN: "#BD93F9", #Purple
+            YELLOW: "#F1FA8C",
+            BLUE: "#FF79C6" #Pink
+        }
     else:
         # define colors as letters and ANSI escape codes
         colors = {
@@ -300,7 +307,7 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
 
     :param nb_players: number of players
     :param ai: if the player wants to play against the AI"""
-    
+    global colors, colors_alt0, colors_alt1
     # create the game window
     mainWindow.cree_fenetre(GRID+SIDE+SETTINGS, GRID, 60, False)
 
@@ -375,6 +382,12 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
                                     mainWindow.mise_a_jour()
                                     mainWindow.__canevas.ev_queue.clear()
                                     sleep(1)
+                    case "Touche":
+                        if colors == colors_alt0:
+                            colors = colors_alt1
+                        elif colors == colors_alt1:
+                            colors = colors_alt0
+                        
                 # grab next event
                 ev = mainWindow.donne_ev()
             # update the window after event handling
