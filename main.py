@@ -10,6 +10,10 @@ CLEAR, RED, YELLOW, GREEN, BLUE = 0, 1, 2, 3, 4
 colors = {}
 mainWindow = None
 
+GRID=830
+SIDE=330
+SETTINGS=80
+
 color_names = {
     RED:    "rouge",
     YELLOW: "jaune",
@@ -33,12 +37,12 @@ def init_display(graphical: bool) -> None:
             YELLOW: "#FAEF5D",
             BLUE: "#0079FF"
         }
-        # colors2 = {
+        # colors = {
         #     CLEAR: "#F8F8F2",
         #     RED: "#FF5555",
-        #     PURPLE: "#BD93F9",
+        #     GREEN: "#BD93F9", #Purple
         #     YELLOW: "#F1FA8C",
-        #     PINK: "#FF79C6"
+        #     BLUE: "#FF79C6" #Pink
         # }
     else:
         # define colors as letters and ANSI escape codes
@@ -65,7 +69,11 @@ def display_grid_window(grille: list[list[int]], player: int | None = None) -> N
                 mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, "#393E46", remplissage="#393E46")
             else: # Else, look in color lookup table
                 mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, colors[grille[i_row][i_elem]], remplissage=colors[grille[i_row][i_elem]])
-
+    #40 pixels après la grille, on a le rectangle des scores qui lui va jusqu'à x=1160 sur 1200 de base, ensuite 60 pixels de plus pour paramètres
+    mainWindow.rectangle(GRID+30,20,GRID+SIDE-30,80, couleur="#393E46", epaisseur=3) 
+    #Affichage du header "Scores"
+    mainWindow.texte((2*GRID+SIDE)/2,50,chaine="Scores", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25, tag="scores")
+    mainWindow.image(GRID+SIDE+SETTINGS/3,50, fichier="settings.png", largeur=55, hauteur=55, ancrage="center", tag="setting-icon")
 
 def menu_window_select(texts: tuple[str, str, str, str]) -> int:
     """Display a window with 4 choices and return the selected one
@@ -83,6 +91,7 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
     mainWindow.texte(207, 622, texts[2], ancrage="center", police="consolas", taille=48)
     mainWindow.texte(622, 622, texts[3], ancrage="center", police="consolas", taille=48)
     
+    mainWindow.texte(1060,50,chaine="<Règles ?> ", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25)
     
     ev = None
     while True:
@@ -123,6 +132,9 @@ def display_end_window(scores: list[int]) -> None:
     mainWindow.texte(207, 622, str(scores[2]), ancrage="center", police="consolas", taille=128)
     mainWindow.texte(622, 622, str(scores[3]), ancrage="center", police="consolas", taille=128)
     
+    mainWindow.texte(1060,50,chaine="<Félicitations ?> ", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25)
+    mainWindow.texte(1060,80,chaine="<Scores de manches ?>", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25)
+
     ev = None
     while True:
         mainWindow.mise_a_jour()
@@ -290,7 +302,7 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
     :param ai: if the player wants to play against the AI"""
     
     # create the game window
-    mainWindow.cree_fenetre(830, 830, 60, False)
+    mainWindow.cree_fenetre(GRID+SIDE+SETTINGS, GRID, 60, False)
 
     ok = False # if all choices are done
     while not ok:
