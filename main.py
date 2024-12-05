@@ -7,6 +7,8 @@ from time import sleep
 
 WIDTH, HEIGHT = 8, 8
 CLEAR, RED, YELLOW, GREEN, BLUE = 0, 1, 2, 3, 4
+all_colors = [{}]
+color_index = 0
 colors = {}
 mainWindow = None
 
@@ -26,31 +28,28 @@ def init_display(graphical: bool) -> None:
     """Initialize the display mode
     
     :param graphical: if the display is graphical or not"""
-    global colors, mainWindow, colors_alt0, colors_alt1
+    global mainWindow, all_colors, color_index, colors
     if graphical:
         # import graphics module and define colors as HEX codes
         from modules import fltk_dev as mainWindow
-        colors = {
-            CLEAR: "#AED2FF",
-            RED: "#FF004D",
-            GREEN: "#00DFA2",
-            YELLOW: "#FAEF5D",
-            BLUE: "#0079FF"
-        }
-        colors_alt0 = {
-            CLEAR: "#AED2FF",
-            RED: "#FF004D",
-            GREEN: "#00DFA2",
-            YELLOW: "#FAEF5D",
-            BLUE: "#0079FF"
-        }
-        colors_alt1 = {
-            CLEAR: "#F8F8F2",
-            RED: "#FF5555",
-            GREEN: "#BD93F9", #Purple
-            YELLOW: "#F1FA8C",
-            BLUE: "#FF79C6" #Pink
-        }
+        all_colors = [
+            {
+                CLEAR: "#AED2FF",
+                RED: "#FF004D",
+                GREEN: "#00DFA2",
+                YELLOW: "#FAEF5D",
+                BLUE: "#0079FF"
+            },
+            {
+                CLEAR: "#F8F8F2",
+                RED: "#FF5555",
+                GREEN: "#BD93F9", #Purple
+                YELLOW: "#F1FA8C",
+                BLUE: "#FF79C6" #Pink
+            }
+        ]
+        color_index = 0
+        colors = all_colors[color_index]
     else:
         # define colors as letters and ANSI escape codes
         colors = {
@@ -77,6 +76,10 @@ def display_grid_window(grid: list[list[int]], player: int | None = None, curren
             else: # Else, look in color lookup table
                 mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, colors[grid[i_row][i_elem]], remplissage=colors[grid[i_row][i_elem]])
     #40 pixels après la grille, on a le rectangle des scores qui lui va jusqu'à x=1160 sur 1200 de base, ensuite 60 pixels de plus pour paramètres
+    
+    # Re draw background for side view
+    mainWindow.rectangle(GRID, 0, GRID+SIDE, GRID, couleur="#F0F0F0", remplissage="#F0F0F0")
+    
     mainWindow.rectangle(GRID+30,20,GRID+SIDE-30,80, couleur="#393E46", epaisseur=3) 
     #Affichage du header "Scores"
     mainWindow.texte((2*GRID+SIDE)/2,50,chaine="Scores", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25, tag="scores")
@@ -91,7 +94,8 @@ def display_grid_window(grid: list[list[int]], player: int | None = None, curren
         max_score = max(current_scores)
         for i in range(max(len(current_scores), 4)):
             bar_y = BASE_Y + (BAR_HEIGHT + BAR_VERTICAL_SPACING) * i
-            mainWindow.rectangle(BASE_X, bar_y, BASE_X + (current_scores[i] / max_score)*MAX_BAR_WIDTH, bar_y + BAR_HEIGHT, remplissage=colors[i+1])
+            bar_width = (current_scores[i] / max_score)*MAX_BAR_WIDTH
+            mainWindow.rectangle(BASE_X, bar_y, BASE_X + bar_width, bar_y + BAR_HEIGHT, remplissage=colors[i+1])
 
 def menu_window_select(texts: tuple[str, str, str, str]) -> int:
     """Display a window with 4 choices and return the selected one
@@ -318,7 +322,7 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
 
     :param nb_players: number of players
     :param ai: if the player wants to play against the AI"""
-    global colors, colors_alt0, colors_alt1
+    global all_colors, color_index, colors
     # create the game window
     mainWindow.cree_fenetre(GRID+SIDE+SETTINGS, GRID, 60, False)
 
@@ -329,14 +333,13 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
             if choice == -1:
                 return
             nb_players = choice
-        if nb_players == 1: # if the player selected one player, enable AI mode
-            choice = menu_window_select(("RETOUR", "1 IA", "2 IAs", "3 IAs"))
+        if nb_players != 0: # when player number is selected, select ai number
+            choice = menu_window_select(("Aucune IA", "1 IA", "2 IA", "3 IA"))
             if choice == -1:
                 return
-            if choice == 1:
-                nb_players = 0
+            if (choice-1) + nb_players > 4:
                 continue
-            nb_players = choice
+            nb_ai = choice - 1
             ai = True
         if nb_manches == 0: # if the player didn't choose the number of rounds, select the number of rounds
             choice = menu_window_select(("1 MANCHE", "2 MANCHES", "3 MANCHES", "4 MANCHES"))
@@ -351,7 +354,7 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
         tour = 0
         while tour < 60:
             # simple formula to get player index based on the number of players and the index of the turn
-            player = (tour + player_bias) % nb_players + 1
+            player = (tour + player_bias) % (nb_players + nb_ai) + 1
             display_grid_window(grid, player, calc_score(grid))
             
             # loop over events
@@ -364,27 +367,23 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
                         return
                     case "ClicGauche":
                         # clamping the values to be in [0;800] then dividing by 100 (size of a spot) to get an index
-                        i_column = (min(max(ev[1].x, 15), 815) - 15) // 100
-                        i_row = (min(max(ev[1].y, 15), 815) - 15) // 100
-                        
-                        i_column = min(max(i_column, 0), 7)
-                        i_row = min(max(i_row, 0), 7)
-                        
+                        i_column = (ev[1].x - 15) // 100
+                        i_row = (ev[1].y - 15) // 100
                         
                         # if nothing's there, set the ball and advance to the next turn
-                        if play(grid, i_column, i_row, player):
+                        if 0 <= i_column <= 7 and 0 <= i_row <= 7 and play(grid, i_column, i_row, player):
                             tour += 1
                             # AI mode is single-player
                             # so after the player has played, if ai mode is enabled, make them play
-                            if ai:
+                            if ai and (tour % 4) == nb_players:
                                 # display player move, update the window and wait before making the IAs play
                                 display_grid_window(grid, player, calc_score(grid))
                                 mainWindow.mise_a_jour()
                                 sleep(1)
                                 # there are `nb_players - 1` IAs knowing there's 1 real player
-                                for _ in range(nb_players-1):
+                                for _ in range(nb_ai):
                                     # get current IA player id
-                                    player = (tour + player_bias) % nb_players + 1
+                                    player = (tour + player_bias) % (nb_players + nb_ai) + 1
                                     # make them play
                                     ai_play(grid, player)
                                     tour += 1
@@ -394,10 +393,8 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
                                     mainWindow.__canevas.ev_queue.clear()
                                     sleep(1)
                     case "Touche":
-                        if colors == colors_alt0:
-                            colors = colors_alt1
-                        elif colors == colors_alt1:
-                            colors = colors_alt0
+                        color_index = (color_index + 1) % len(all_colors)
+                        colors = all_colors[color_index]
                         
                 # grab next event
                 ev = mainWindow.donne_ev()
