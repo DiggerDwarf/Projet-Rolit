@@ -29,7 +29,7 @@ def init_display(graphical: bool) -> None:
     global colors, mainWindow, colors_alt0, colors_alt1
     if graphical:
         # import graphics module and define colors as HEX codes
-        from modules import fltk as mainWindow
+        from modules import fltk_dev as mainWindow
         colors = {
             CLEAR: "#AED2FF",
             RED: "#FF004D",
@@ -93,7 +93,7 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
     mainWindow.rectangle(-5, 415, 415, 835, couleur="black", epaisseur=5, remplissage=colors[BLUE])
     mainWindow.rectangle(415, 415, 835, 835, couleur="black", epaisseur=5, remplissage=colors[GREEN])
     
-    mainWindow.texte(207, 207, texts[0],   ancrage="center", police="consolas", taille=48)
+    mainWindow.texte(207, 207, texts[0], ancrage="center", police="consolas", taille=48)
     mainWindow.texte(622, 207, texts[1], ancrage="center", police="consolas", taille=48)
     mainWindow.texte(207, 622, texts[2], ancrage="center", police="consolas", taille=48)
     mainWindow.texte(622, 622, texts[3], ancrage="center", police="consolas", taille=48)
