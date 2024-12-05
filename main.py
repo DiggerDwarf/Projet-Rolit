@@ -62,25 +62,36 @@ def init_display(graphical: bool) -> None:
         }
 
 
-def display_grid_window(grille: list[list[int]], player: int | None = None) -> None:
+def display_grid_window(grid: list[list[int]], player: int | None = None, current_scores: list[int] | None = None) -> None:
     """Display the game grid onto the fltk window
     
     :param grille: game grid"""
     mainWindow.efface_tout()
     # draw black background with an outline set as the current player's color
     mainWindow.rectangle(0,0,830,830, couleur=colors[player], remplissage="#222831", epaisseur=30)
-    for i_row in range(len(grille)):
-        for i_elem in range(len(grille[0])):
+    for i_row in range(len(grid)):
+        for i_elem in range(len(grid[0])):
             # for each element of the game grid, draw circle of according color
-            if grille[i_row][i_elem] == CLEAR and not test_adjacent(grille, i_elem, i_row): # If slot is unused and unreachable, fill in gray
+            if grid[i_row][i_elem] == CLEAR and not test_adjacent(grid, i_elem, i_row): # If slot is unused and unreachable, fill in gray
                 mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, "#393E46", remplissage="#393E46")
             else: # Else, look in color lookup table
-                mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, colors[grille[i_row][i_elem]], remplissage=colors[grille[i_row][i_elem]])
+                mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, colors[grid[i_row][i_elem]], remplissage=colors[grid[i_row][i_elem]])
     #40 pixels après la grille, on a le rectangle des scores qui lui va jusqu'à x=1160 sur 1200 de base, ensuite 60 pixels de plus pour paramètres
     mainWindow.rectangle(GRID+30,20,GRID+SIDE-30,80, couleur="#393E46", epaisseur=3) 
     #Affichage du header "Scores"
     mainWindow.texte((2*GRID+SIDE)/2,50,chaine="Scores", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25, tag="scores")
     mainWindow.image(GRID+SIDE+SETTINGS/3,50, fichier="settings.png", largeur=55, hauteur=55, ancrage="center", tag="setting-icon")
+    
+    if current_scores:
+        BASE_X = 900
+        BASE_Y = 400
+        MAX_BAR_WIDTH = 300
+        BAR_HEIGHT = 50
+        BAR_VERTICAL_SPACING = 10
+        max_score = max(current_scores)
+        for i in range(max(len(current_scores), 4)):
+            bar_y = BASE_Y + (BAR_HEIGHT + BAR_VERTICAL_SPACING) * i
+            mainWindow.rectangle(BASE_X, bar_y, BASE_X + (current_scores[i] / max_score)*MAX_BAR_WIDTH, bar_y + BAR_HEIGHT, remplissage=colors[i+1])
 
 def menu_window_select(texts: tuple[str, str, str, str]) -> int:
     """Display a window with 4 choices and return the selected one
@@ -341,7 +352,7 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
         while tour < 60:
             # simple formula to get player index based on the number of players and the index of the turn
             player = (tour + player_bias) % nb_players + 1
-            display_grid_window(grid, player)
+            display_grid_window(grid, player, calc_score(grid))
             
             # loop over events
             ev = mainWindow.donne_ev()
@@ -367,7 +378,7 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
                             # so after the player has played, if ai mode is enabled, make them play
                             if ai:
                                 # display player move, update the window and wait before making the IAs play
-                                display_grid_window(grid, player)
+                                display_grid_window(grid, player, calc_score(grid))
                                 mainWindow.mise_a_jour()
                                 sleep(1)
                                 # there are `nb_players - 1` IAs knowing there's 1 real player
@@ -378,7 +389,7 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
                                     ai_play(grid, player)
                                     tour += 1
                                     # between each IA turn, display and wait
-                                    display_grid_window(grid, player)
+                                    display_grid_window(grid, player, calc_score(grid))
                                     mainWindow.mise_a_jour()
                                     mainWindow.__canevas.ev_queue.clear()
                                     sleep(1)
