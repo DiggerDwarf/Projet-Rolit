@@ -68,6 +68,10 @@ def display_grid_window(grille: list[list[int]], player: int | None = None) -> N
 
 
 def menu_window_select(texts: tuple[str, str, str, str]) -> int:
+    """Display a window with 4 choices and return the selected one
+    
+    :param texts: the texts to display on the window
+    :return: the selected choice (1-4)"""
     mainWindow.efface_tout()
     mainWindow.rectangle(-5, -5, 415, 415, couleur="black", epaisseur=5, remplissage=colors[RED])
     mainWindow.rectangle(415, -5, 835, 415, couleur="black", epaisseur=5, remplissage=colors[YELLOW])
@@ -99,6 +103,9 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
 
 
 def display_end_window(scores: list[int]) -> None:
+    """Display the end window with the final scores
+    
+    :param scores: the final scores of each player"""
     mainWindow.efface_tout()
     mainWindow.rectangle(-5, -5, 415, 415, couleur="black", epaisseur=5, remplissage=colors[RED])
     mainWindow.rectangle(415, -5, 835, 415, couleur="black", epaisseur=5, remplissage=colors[YELLOW])
@@ -285,18 +292,28 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
     # create the game window
     mainWindow.cree_fenetre(830, 830, 60, False)
 
-    if nb_players == 0:
-        choice = menu_window_select(("1 JOUEUR", "2 JOUEURS", "3 JOUEURS", "4 JOUEURS"))
-        if choice == -1:
-            return
-        else:
+    ok = False # if all choices are done
+    while not ok:
+        if nb_players == 0: # if the player didn't choose the number of players, select the number of players
+            choice = menu_window_select(("1 JOUEUR", "2 JOUEURS", "3 JOUEURS", "4 JOUEURS"))
+            if choice == -1:
+                return
             nb_players = choice
-    if nb_manches == 0:
-        choice = menu_window_select(("1 MANCHE", "2 MACHES", "3 MANCHES", "4 MANCHES"))
-        if choice == -1:
-            return
-        else:
+        if nb_players == 1: # if the player selected one player, enable AI mode
+            choice = menu_window_select(("RETOUR", "1 IA", "2 IAs", "3 IAs"))
+            if choice == -1:
+                return
+            if choice == 1:
+                nb_players = 0
+                continue
+            nb_players = choice
+            ai = True
+        if nb_manches == 0: # if the player didn't choose the number of rounds, select the number of rounds
+            choice = menu_window_select(("1 MANCHE", "2 MANCHES", "3 MANCHES", "4 MANCHES"))
+            if choice == -1:
+                return
             nb_manches = choice
+        ok = True
     
     for _ in range(nb_manches):
         player_bias = randint(0, 4)
