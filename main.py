@@ -427,7 +427,6 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
                                     mainWindow.__canevas.ev_queue.clear()
                                     sleep(1)
                         elif GRID+SIDE<ev[1].x<GRID+SIDE+SETTINGS and 10<ev[1].y<80:
-                            print("caca")
                             paramenu()
 
                     case "Touche":
