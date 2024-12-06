@@ -330,25 +330,32 @@ def paramenu():
     titleborder(QUARTER+PADDING, 60, 2*QUARTER-PADDING, 120,)
     titleborder(2*QUARTER+PADDING, 60, 3*QUARTER-PADDING, 120)
     titleborder(3*QUARTER+PADDING, 60, 4*QUARTER-PADDING, 120)
-    themes()
-    print((2*QUARTER-2*PADDING) - (QUARTER+2*PADDING))
-    mainWindow.attend_ev()
+    theme_boxes = themes()
+    while True:
+        evName, evData = mainWindow.attend_ev()
+        match evName:
+            case "Quitte":
+                return ("quit", -1)
+            case "ClicGauche":
+                for i in range(len(theme_boxes)):
+                    if mainWindow.est_objet_survole(theme_boxes[i]):
+                        return ("theme", i)
 
 def titleborder(x1,y1,x2,y2):
     mainWindow.rectangle(x1, y1, x2, y2, couleur="#393E46", epaisseur=3)
 
 def themes():
-    mainWindow.rectangle(QUARTER+2*PADDING,200,2*QUARTER-2*PADDING,240, couleur="#393E46", epaisseur=2)
-    mainWindow.rectangle(QUARTER+2*PADDING,300,2*QUARTER-2*PADDING,340, couleur="#393E46", epaisseur=2)
-    mainWindow.rectangle(QUARTER+2*PADDING,400,2*QUARTER-2*PADDING,440, couleur="#393E46", epaisseur=2)
-
+    out = []
     for i in range(len(ALL_COLORS)):
-        couleur(i)
+        out.append(couleur(i))
+    return out
 
 def couleur(i: int):
+    out = mainWindow.rectangle(QUARTER+2*PADDING,200+i*100,2*QUARTER-2*PADDING,240+i*100, couleur="#393E46", epaisseur=2, remplissage="#123456")
     mainWindow.rectangle(QUARTER+2*PADDING+1, 200+i*100+1, QUARTER+2*PADDING-2+30, 200+i*100+40-2, couleur=ALL_COLORS[i][0], remplissage=ALL_COLORS[i][0], epaisseur=1)
     for j in range(1,5):
         mainWindow.rectangle(QUARTER+2*PADDING-2+j*30, 200+i*100+1, QUARTER+2*PADDING-2+(j+1)*30, 200+i*100+40-2, couleur=ALL_COLORS[i][j], remplissage=ALL_COLORS[i][j], epaisseur=1)
+    return out
 
 def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
     """Main game loop
@@ -422,7 +429,14 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
                                     mainWindow.__canevas.ev_queue.clear()
                                     sleep(1)
                         elif GRID+SIDE<ev[1].x<GRID+SIDE+SETTINGS and 10<ev[1].y<80:
-                            paramenu()
+                            param_out = paramenu()
+                            match param_out[0]:
+                                case "quit":
+                                    mainWindow.ferme_fenetre()
+                                    return
+                                case "theme":
+                                    COLOR_INDEX = param_out[1]
+                                    SELECTED_COLORS = ALL_COLORS[COLOR_INDEX]
 
                     case "Touche":
                         COLOR_INDEX = (COLOR_INDEX + 1) % len(ALL_COLORS)
