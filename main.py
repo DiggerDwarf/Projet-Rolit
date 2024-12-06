@@ -375,7 +375,7 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
                         # if nothing's there, set the ball and advance to the next turn
                         if 0 <= i_column <= 7 and 0 <= i_row <= 7 and play(grid, i_column, i_row, player):
                             tour += 1
-                            if ai and (tour % 4) == nb_players:
+                            if ai and (tour % (nb_players + nb_ai)) == nb_players:
                                 # display player move, update the window and wait before making the IAs play
                                 display_grid_window(grid, player, calc_score(grid))
                                 mainWindow.mise_a_jour()
