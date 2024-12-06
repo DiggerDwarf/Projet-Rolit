@@ -7,9 +7,6 @@ from time import sleep
 
 WIDTH, HEIGHT = 8, 8
 CLEAR, RED, YELLOW, GREEN, BLUE = 0, 1, 2, 3, 4
-all_colors = [{}]
-color_index = 0
-colors = {}
 mainWindow = None
 
 WIDTH, HEIGHT = 8, 8 # grid size
@@ -346,14 +343,14 @@ def themes():
     mainWindow.rectangle(QUARTER+2*PADDING,300,2*QUARTER-2*PADDING,340, couleur="#393E46", epaisseur=2)
     mainWindow.rectangle(QUARTER+2*PADDING,400,2*QUARTER-2*PADDING,440, couleur="#393E46", epaisseur=2)
 
-    for i in range(len(all_colors)):
-        mainWindow.rectangle(QUARTER+2*PADDING+1, 200+i*100+1, QUARTER+2*PADDING-2+30, 200+i*100+40-2, couleur=all_colors[i][CLEAR], remplissage=all_colors[i][CLEAR], epaisseur=1)
-        mainWindow.rectangle(QUARTER+2*PADDING-2+30, 200+i*100+1, QUARTER+2*PADDING-2+2*30, 200+i*100+40-2, couleur=all_colors[i][RED], remplissage=all_colors[i][RED], epaisseur=1)
-        mainWindow.rectangle(QUARTER+2*PADDING-2+2*30, 200+i*100+1, QUARTER+2*PADDING-2+3*30, 200+i*100+40-2, couleur=all_colors[i][GREEN], remplissage=all_colors[i][GREEN], epaisseur=1)
-        mainWindow.rectangle(QUARTER+2*PADDING-2+3*30, 200+i*100+1, QUARTER+2*PADDING-2+4*30, 200+i*100+40-2, couleur=all_colors[i][YELLOW], remplissage=all_colors[i][YELLOW], epaisseur=1)
-        mainWindow.rectangle(QUARTER+2*PADDING-2+4*30, 200+i*100+1, QUARTER+2*PADDING-2+5*30, 200+i*100+40-2, couleur=all_colors[i][BLUE], remplissage=all_colors[i][BLUE], epaisseur=1)
+    for i in range(len(ALL_COLORS)):
+        mainWindow.rectangle(QUARTER+2*PADDING+1, 200+i*100+1, QUARTER+2*PADDING-2+30, 200+i*100+40-2, couleur=ALL_COLORS[i][CLEAR], remplissage=ALL_COLORS[i][CLEAR], epaisseur=1)
+        mainWindow.rectangle(QUARTER+2*PADDING-2+30, 200+i*100+1, QUARTER+2*PADDING-2+2*30, 200+i*100+40-2, couleur=ALL_COLORS[i][RED], remplissage=ALL_COLORS[i][RED], epaisseur=1)
+        mainWindow.rectangle(QUARTER+2*PADDING-2+2*30, 200+i*100+1, QUARTER+2*PADDING-2+3*30, 200+i*100+40-2, couleur=ALL_COLORS[i][GREEN], remplissage=ALL_COLORS[i][GREEN], epaisseur=1)
+        mainWindow.rectangle(QUARTER+2*PADDING-2+3*30, 200+i*100+1, QUARTER+2*PADDING-2+4*30, 200+i*100+40-2, couleur=ALL_COLORS[i][YELLOW], remplissage=ALL_COLORS[i][YELLOW], epaisseur=1)
+        mainWindow.rectangle(QUARTER+2*PADDING-2+4*30, 200+i*100+1, QUARTER+2*PADDING-2+5*30, 200+i*100+40-2, couleur=ALL_COLORS[i][BLUE], remplissage=ALL_COLORS[i][BLUE], epaisseur=1)
 def couleur(i: int, COLOR: str):
-    mainWindow.rectangle(QUARTER+2*PADDING+1, 200+i*100+1, QUARTER+2*PADDING-2+30, 200+i*100+40-2, couleur=all_colors[i][COLOR], remplissage=all_colors[i][COLOR], epaisseur=1)
+    mainWindow.rectangle(QUARTER+2*PADDING+1, 200+i*100+1, QUARTER+2*PADDING-2+30, 200+i*100+40-2, couleur=ALL_COLORS[i][COLOR], remplissage=ALL_COLORS[i][COLOR], epaisseur=1)
 
 def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
     """Main game loop
