@@ -5,16 +5,24 @@ import os, argparse
 from copy import deepcopy
 from time import sleep
 
-WIDTH, HEIGHT = 8, 8
-CLEAR, RED, YELLOW, GREEN, BLUE = 0, 1, 2, 3, 4
-all_colors = [{}]
-color_index = 0
-colors = {}
-mainWindow = None
+WIDTH, HEIGHT = 8, 8 # grid size
+CLEAR, RED, YELLOW, GREEN, BLUE = 0, 1, 2, 3, 4 # macros for colors
 
-GRID=830
-SIDE=330
-SETTINGS=80
+# graphical display variables
+GRID = 830 # ui elements width
+SIDE = 330
+SETTINGS = 80
+BASE_X = 860 # base coordinates for the score bars
+BASE_Y = 200
+BAR_HEIGHT = 50 # height of the score bars
+BAR_VERTICAL_SPACING = 10 # spacing between score bars
+MAX_BAR_WIDTH = SIDE-40
+
+ALL_COLORS = [{}]
+COLOR_INDEX = 0
+SELECTED_COLORS = {}
+
+mainWindow = None # fltk window object
 
 color_names = {
     RED:    "rouge",
@@ -28,11 +36,11 @@ def init_display(graphical: bool) -> None:
     """Initialize the display mode
     
     :param graphical: if the display is graphical or not"""
-    global mainWindow, all_colors, color_index, colors
+    global mainWindow, ALL_COLORS, COLOR_INDEX, SELECTED_COLORS
     if graphical:
         # import graphics module and define colors as HEX codes
         from modules import fltk_dev as mainWindow
-        all_colors = [
+        ALL_COLORS = [
             {
                 CLEAR: "#AED2FF",
                 RED: "#FF004D",
@@ -48,11 +56,11 @@ def init_display(graphical: bool) -> None:
                 BLUE: "#FF79C6" #Pink
             }
         ]
-        color_index = 0
-        colors = all_colors[color_index]
+        COLOR_INDEX = 0
+        SELECTED_COLORS = ALL_COLORS[COLOR_INDEX]
     else:
         # define colors as letters and ANSI escape codes
-        colors = {
+        SELECTED_COLORS = {
             CLEAR: "\033[40m • \033[0m",
             RED: "\033[30;41m R \033[0m",
             GREEN: "\033[30;42m V \033[0m",
@@ -62,40 +70,35 @@ def init_display(graphical: bool) -> None:
 
 
 def display_grid_window(grid: list[list[int]], player: int | None = None, current_scores: list[int] | None = None) -> None:
-    """Display the game grid onto the fltk window
-    
+    """Display the game grid onto the fltk window and side informations
+
     :param grille: game grid"""
     mainWindow.efface_tout()
     # draw black background with an outline set as the current player's color
-    mainWindow.rectangle(0,0,830,830, couleur=colors[player], remplissage="#222831", epaisseur=30)
+    mainWindow.rectangle(0,0,830,830, couleur=SELECTED_COLORS[player], remplissage="#222831", epaisseur=30)
     for i_row in range(len(grid)):
         for i_elem in range(len(grid[0])):
             # for each element of the game grid, draw circle of according color
             if grid[i_row][i_elem] == CLEAR and not test_adjacent(grid, i_elem, i_row): # If slot is unused and unreachable, fill in gray
                 mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, "#393E46", remplissage="#393E46")
             else: # Else, look in color lookup table
-                mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, colors[grid[i_row][i_elem]], remplissage=colors[grid[i_row][i_elem]])
-    #40 pixels après la grille, on a le rectangle des scores qui lui va jusqu'à x=1160 sur 1200 de base, ensuite 60 pixels de plus pour paramètres
-    
+                mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, SELECTED_COLORS[grid[i_row][i_elem]], remplissage=SELECTED_COLORS[grid[i_row][i_elem]])
     # Re draw background for side view
     mainWindow.rectangle(GRID, 0, GRID+SIDE, GRID, couleur="#F0F0F0", remplissage="#F0F0F0")
-    
-    mainWindow.rectangle(GRID+30,20,GRID+SIDE-30,80, couleur="#393E46", epaisseur=3) 
-    #Affichage du header "Scores"
+
+    # Draw the score header outline
+    mainWindow.rectangle(BASE_X-10, 20, BASE_X+MAX_BAR_WIDTH+10, 810, couleur="#393E46", epaisseur=3)
+    # Affichage du header "Scores"
     mainWindow.texte((2*GRID+SIDE)/2,50,chaine="Scores", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25, tag="scores")
     mainWindow.image(GRID+SIDE+SETTINGS/3,50, fichier="settings.png", largeur=55, hauteur=55, ancrage="center", tag="setting-icon")
-    
+
     if current_scores:
-        BASE_X = 900
-        BASE_Y = 400
-        MAX_BAR_WIDTH = 300
-        BAR_HEIGHT = 50
-        BAR_VERTICAL_SPACING = 10
         max_score = max(current_scores)
         for i in range(max(len(current_scores), 4)):
             bar_y = BASE_Y + (BAR_HEIGHT + BAR_VERTICAL_SPACING) * i
             bar_width = (current_scores[i] / max_score)*MAX_BAR_WIDTH
-            mainWindow.rectangle(BASE_X, bar_y, BASE_X + bar_width, bar_y + BAR_HEIGHT, remplissage=colors[i+1])
+            mainWindow.rectangle(BASE_X, bar_y, BASE_X + bar_width, bar_y + BAR_HEIGHT, remplissage=SELECTED_COLORS[i+1])
+
 
 def menu_window_select(texts: tuple[str, str, str, str]) -> int:
     """Display a window with 4 choices and return the selected one
@@ -103,18 +106,18 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
     :param texts: the texts to display on the window
     :return: the selected choice (1-4)"""
     mainWindow.efface_tout()
-    mainWindow.rectangle(-5, -5, 415, 415, couleur="black", epaisseur=5, remplissage=colors[RED])
-    mainWindow.rectangle(415, -5, 835, 415, couleur="black", epaisseur=5, remplissage=colors[YELLOW])
-    mainWindow.rectangle(-5, 415, 415, 835, couleur="black", epaisseur=5, remplissage=colors[BLUE])
-    mainWindow.rectangle(415, 415, 835, 835, couleur="black", epaisseur=5, remplissage=colors[GREEN])
-    
-    mainWindow.texte(207, 207, texts[0], ancrage="center", police="consolas", taille=48)
-    mainWindow.texte(622, 207, texts[1], ancrage="center", police="consolas", taille=48)
-    mainWindow.texte(207, 622, texts[2], ancrage="center", police="consolas", taille=48)
-    mainWindow.texte(622, 622, texts[3], ancrage="center", police="consolas", taille=48)
-    
+    mainWindow.rectangle(-5, -5, 415, 415, couleur="black", epaisseur=5, remplissage=SELECTED_COLORS[RED])
+    mainWindow.rectangle(415, -5, 835, 415, couleur="black", epaisseur=5, remplissage=SELECTED_COLORS[YELLOW])
+    mainWindow.rectangle(-5, 415, 415, 835, couleur="black", epaisseur=5, remplissage=SELECTED_COLORS[BLUE])
+    mainWindow.rectangle(415, 415, 835, 835, couleur="black", epaisseur=5, remplissage=SELECTED_COLORS[GREEN])
+
+    mainWindow.texte(207, 207, texts[0], ancrage="center", police="Cascadia Code", taille=48)
+    mainWindow.texte(622, 207, texts[1], ancrage="center", police="Cascadia Code", taille=48)
+    mainWindow.texte(207, 622, texts[2], ancrage="center", police="Cascadia Code", taille=48)
+    mainWindow.texte(622, 622, texts[3], ancrage="center", police="Cascadia Code", taille=48)
+
     mainWindow.texte(1060,50,chaine="<Règles ?> ", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25)
-    
+
     ev = None
     while True:
         mainWindow.mise_a_jour()
@@ -135,25 +138,25 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
 
 def display_end_window(scores: list[int]) -> None:
     """Display the end window with the final scores
-    
+
     :param scores: the final scores of each player"""
     mainWindow.efface_tout()
-    mainWindow.rectangle(-5, -5, 415, 415, couleur="black", epaisseur=5, remplissage=colors[RED])
-    mainWindow.rectangle(415, -5, 835, 415, couleur="black", epaisseur=5, remplissage=colors[YELLOW])
-    mainWindow.rectangle(-5, 415, 415, 835, couleur="black", epaisseur=5, remplissage=colors[BLUE])
-    mainWindow.rectangle(415, 415, 835, 835, couleur="black", epaisseur=5, remplissage=colors[GREEN])
-    
+    mainWindow.rectangle(-5, -5, 415, 415, couleur="black", epaisseur=5, remplissage=SELECTED_COLORS[RED])
+    mainWindow.rectangle(415, -5, 835, 415, couleur="black", epaisseur=5, remplissage=SELECTED_COLORS[YELLOW])
+    mainWindow.rectangle(-5, 415, 415, 835, couleur="black", epaisseur=5, remplissage=SELECTED_COLORS[BLUE])
+    mainWindow.rectangle(415, 415, 835, 835, couleur="black", epaisseur=5, remplissage=SELECTED_COLORS[GREEN])
+
     crown_x = 415 * (max(scores) == scores[1] or max(scores) == scores[3])
     crown_y = 415 * (max(scores) == scores[2] or max(scores) == scores[3])
-    
+
     mainWindow.PIL_AVAILABLE = False
     mainWindow.image(crown_x, crown_y, "crown_perfect_size.png", largeur=415, hauteur=415, ancrage="nw")
-    
-    mainWindow.texte(207, 207, str(scores[0]), ancrage="center", police="consolas", taille=128)
-    mainWindow.texte(622, 207, str(scores[1]), ancrage="center", police="consolas", taille=128)
-    mainWindow.texte(207, 622, str(scores[2]), ancrage="center", police="consolas", taille=128)
-    mainWindow.texte(622, 622, str(scores[3]), ancrage="center", police="consolas", taille=128)
-    
+
+    mainWindow.texte(207, 207, str(scores[0]), ancrage="center", police="Cascadia Code", taille=128)
+    mainWindow.texte(622, 207, str(scores[1]), ancrage="center", police="Cascadia Code", taille=128)
+    mainWindow.texte(207, 622, str(scores[2]), ancrage="center", police="Cascadia Code", taille=128)
+    mainWindow.texte(622, 622, str(scores[3]), ancrage="center", police="Cascadia Code", taille=128)
+
     mainWindow.texte(1060,50,chaine="<Félicitations ?> ", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25)
     mainWindow.texte(1060,80,chaine="<Scores de manches ?>", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25)
 
@@ -170,7 +173,7 @@ def display_end_window(scores: list[int]) -> None:
     
 def display_grid_cmdline(grille: list[list[int]]) -> None:
     """Display the game grid onto the terminal
-    
+
     :param grille: game grid"""
     # print column indices
     print("   1  2  3  4  5  6  7  8")
@@ -179,14 +182,14 @@ def display_grid_cmdline(grille: list[list[int]]) -> None:
         print(chr(ord('a') + i_row), end=" ")
         # print ball colors according to lookup table `colors`
         for i_elem in range(len(grille[0])):
-            print(colors[grille[i_row][i_elem]], end="")
+            print(SELECTED_COLORS[grille[i_row][i_elem]], end="")
         # print new line
         print()
 
 
 def check_capture(grid: list[list[int]], x: int, y: int) -> list[tuple[int]]:
     """Check if a move at (x, y) for color player will capture some opponent pieces
-    
+
     :param grid: the game grid
     :param x: the x coordinate of the move
     :param y: the y coordinate of the move
@@ -219,7 +222,7 @@ def check_capture(grid: list[list[int]], x: int, y: int) -> list[tuple[int]]:
 
 def init_grid() -> list[list[str]]:
     """Initialize the game grid
-    
+
     :return: the initialized game grid"""
     # create empty grid of correct size
     grid = [[CLEAR for _ in range(WIDTH)] for _ in range(HEIGHT)]
@@ -233,7 +236,7 @@ def init_grid() -> list[list[str]]:
 
 def test_adjacent(grid, x, y) -> bool:
     """Test if there is any adjacent piece to (x, y) in the grid
-    
+
     :param grid: the game grid
     :param x: the x coordinate
     :param y: the y coordinate
@@ -257,7 +260,7 @@ def test_adjacent(grid, x, y) -> bool:
 
 def play(grid: list[list[int]], x: int, y: int, color: int) -> bool:
     """Play a move at (x, y) for color player
-    
+
     :param grid: the game grid
     :param x: the x coordinate of the move
     :param y: the y coordinate of the move
@@ -279,7 +282,7 @@ def play(grid: list[list[int]], x: int, y: int, color: int) -> bool:
 
 def calc_score(grid: list[list[int]]) -> tuple[int, int, int, int]:
     """Calculate the final score for each players
-    
+
     :return: The scores, in the order RED, YELLOW, GREEN, BLUE"""
     # here we just sum up the amount of a color in each row, for each color.
     score_rouge = sum([grid[i].count(RED   ) for i in range(HEIGHT)])
@@ -298,7 +301,7 @@ def clear() -> None:
 
 def ai_play(grid: list[list[int]], color: int) -> tuple[int, int]:
     """Play a move for the AI
-    
+
     :param grid: the game grid
     :param color: the color of the AI
     :return: the move played"""
@@ -322,14 +325,14 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
 
     :param nb_players: number of players
     :param ai: if the player wants to play against the AI"""
-    global all_colors, color_index, colors
+    global ALL_COLORS, COLOR_INDEX, SELECTED_COLORS
     # create the game window
     mainWindow.cree_fenetre(GRID+SIDE+SETTINGS, GRID, 60, False)
 
     ok = False # if all choices are done
     while not ok:
         if nb_players == 0: # if the player didn't choose the number of players, select the number of players
-            choice = menu_window_select(("1 JOUEUR", "2 JOUEURS", "3 JOUEURS", "4 JOUEURS"))
+            choice = menu_window_select(("1 Joueur", "2 Joueurs", "3 Joueurs", "4 Joueurs"))
             if choice == -1:
                 return
             nb_players = choice
@@ -342,12 +345,12 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
             nb_ai = choice - 1
             ai = True
         if nb_manches == 0: # if the player didn't choose the number of rounds, select the number of rounds
-            choice = menu_window_select(("1 MANCHE", "2 MANCHES", "3 MANCHES", "4 MANCHES"))
+            choice = menu_window_select(("1 Manche", "2 Manches", "3 Manches", "4 Manches"))
             if choice == -1:
                 return
             nb_manches = choice
         ok = True
-    
+
     for _ in range(nb_manches):
         player_bias = randint(0, 4)
         grid = init_grid()
@@ -356,7 +359,6 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
             # simple formula to get player index based on the number of players and the index of the turn
             player = (tour + player_bias) % (nb_players + nb_ai) + 1
             display_grid_window(grid, player, calc_score(grid))
-            
             # loop over events
             ev = mainWindow.donne_ev()
             while ev != None:
@@ -369,18 +371,15 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
                         # clamping the values to be in [0;800] then dividing by 100 (size of a spot) to get an index
                         i_column = (ev[1].x - 15) // 100
                         i_row = (ev[1].y - 15) // 100
-                        
+
                         # if nothing's there, set the ball and advance to the next turn
                         if 0 <= i_column <= 7 and 0 <= i_row <= 7 and play(grid, i_column, i_row, player):
                             tour += 1
-                            # AI mode is single-player
-                            # so after the player has played, if ai mode is enabled, make them play
                             if ai and (tour % 4) == nb_players:
                                 # display player move, update the window and wait before making the IAs play
                                 display_grid_window(grid, player, calc_score(grid))
                                 mainWindow.mise_a_jour()
                                 sleep(1)
-                                # there are `nb_players - 1` IAs knowing there's 1 real player
                                 for _ in range(nb_ai):
                                     # get current IA player id
                                     player = (tour + player_bias) % (nb_players + nb_ai) + 1
@@ -393,9 +392,9 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
                                     mainWindow.__canevas.ev_queue.clear()
                                     sleep(1)
                     case "Touche":
-                        color_index = (color_index + 1) % len(all_colors)
-                        colors = all_colors[color_index]
-                        
+                        COLOR_INDEX = (COLOR_INDEX + 1) % len(ALL_COLORS)
+                        SELECTED_COLORS = ALL_COLORS[COLOR_INDEX]
+
                 # grab next event
                 ev = mainWindow.donne_ev()
             # update the window after event handling
@@ -408,6 +407,7 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
             mainWindow.ferme_fenetre()
             return
 
+
 def mainloop_cmdline(nb_players: int, nb_manches: int, ai: bool) -> None:
     """Main game loop
 
@@ -415,7 +415,6 @@ def mainloop_cmdline(nb_players: int, nb_manches: int, ai: bool) -> None:
     :param nb_manches: number of rounds
     :param ai: if the player wants to play against the AI"""
     # setup number of player and initial game state
-
     clear()
     if nb_players == 0:
         while nb_players not in ("2", "3", "4"):
@@ -428,7 +427,6 @@ def mainloop_cmdline(nb_players: int, nb_manches: int, ai: bool) -> None:
             nb_manches = int(nb_manches)
         else:
             nb_manches = 1
-
 
     if ai: # if the player wants to play against the AI
         print("Vous allez jouer contre l'IA")
@@ -551,14 +549,14 @@ if __name__ == "__main__":
     parser.add_argument("--ai", help="Jouer contre l'IA", default=False, type=bool, action=argparse.BooleanOptionalAction)
     args = parser.parse_args()
     init_display(args.graphical)
-    
+
     if args.nb_players < 2 and args.nb_players != 0:
         print("Cannot have this little players, redirecting to choose prompt")
         args.nb_players = 0
     elif args.nb_players > 4:
         print("Cannot have more than 4 players, truncating to 4.")
         args.nb_players = 4
-    
+
     # enter correct game loop based on dislpay mode
     if args.graphical:
         mainloop_window (args.nb_players, args.nb_manches, args.ai)
