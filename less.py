@@ -116,7 +116,7 @@ def display_end_window(scores: list[int]) -> None:
     crown_y = 415 * (max(scores) == scores[2] or max(scores) == scores[3])
     
     mainWindow.PIL_AVAILABLE = False
-    mainWindow.image(crown_x, crown_y, "crown_perfect_size.png", largeur=415, hauteur=415, ancrage="nw")
+    mainWindow.image(crown_x, crown_y, "assets/crown_perfect_size.png", largeur=415, hauteur=415, ancrage="nw")
     
     mainWindow.texte(207, 207, str(scores[0]), ancrage="center", police="consolas", taille=128)
     mainWindow.texte(622, 207, str(scores[1]), ancrage="center", police="consolas", taille=128)
