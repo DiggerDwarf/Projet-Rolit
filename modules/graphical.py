@@ -205,6 +205,7 @@ def settings_menu() -> tuple[str, int]:
             case "ClicGauche":
                 for i in range(len(theme_boxes)):
                     if mainWindow.est_objet_survole(theme_boxes[i]):
+                        mainWindow.rectangle(QUARTER+PADDING, 150 + i*70, 2*QUARTER-PADDING, 200 + i*70, epaisseur=8, couleur=ALL_COLORS[i][GREEN])
                         return ("theme", i)
 
 
