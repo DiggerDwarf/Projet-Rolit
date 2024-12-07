@@ -3,8 +3,6 @@
 from modules.rollit import *
 import os
 
-__all__ = ["mainloop"]
-
 # define colors as letters and ANSI escape codes
 SELECTED_COLORS = {
     CLEAR: "\033[40m • \033[0m",

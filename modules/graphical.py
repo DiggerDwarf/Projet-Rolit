@@ -4,8 +4,6 @@ from modules.rollit import *
 from time import sleep
 import modules.fltk_dev as mainWindow
 
-__all__ = ["mainloop"]
-
 # graphical display variables
 GRID = 830 # ui elements width
 SIDE = 330
