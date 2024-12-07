@@ -22,6 +22,6 @@ if __name__ == "__main__":
 
     # enter correct game loop based on dislpay mode
     if args.graphical:
-        graphical.mainloop_window (args.nb_players, args.nb_manches, args.ai)
+        graphical.mainloop(args.nb_players, args.nb_manches, args.ai)
     else:
-        cmd.mainloop_cmdline(args.nb_players, args.nb_manches, args.ai)
+        cmd.mainloop(args.nb_players, args.nb_manches, args.ai)

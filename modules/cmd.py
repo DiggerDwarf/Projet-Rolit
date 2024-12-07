@@ -3,6 +3,8 @@
 from modules.rollit import *
 import os
 
+__all__ = ["mainloop"]
+
 # define colors as letters and ANSI escape codes
 SELECTED_COLORS = {
     CLEAR: "\033[40m • \033[0m",
@@ -34,7 +36,7 @@ def display_grid_cmdline(grid: list[list[int]]) -> None:
         print()
 
 
-def mainloop_cmdline(nb_players: int, nb_rounds: int, ai: bool) -> None:
+def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
     """Main game loop
 
     :param nb_players: number of players
