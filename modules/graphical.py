@@ -3,6 +3,7 @@
 from modules.rollit import *
 from time import sleep
 import modules.fltk_dev as mainWindow
+import modules.saver as saver
 
 # graphical display variables
 GRID = 830 # ui elements width
@@ -291,8 +292,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                     SELECTED_COLORS = ALL_COLORS[COLOR_INDEX]
 
                     case "Touche":
-                        COLOR_INDEX = (COLOR_INDEX + 1) % len(ALL_COLORS)
-                        SELECTED_COLORS = ALL_COLORS[COLOR_INDEX]
+                        print(saver.unpack_grid(saver.pack_grid(grid)) == grid)
 
                 # grab next event
                 ev = mainWindow.donne_ev()
