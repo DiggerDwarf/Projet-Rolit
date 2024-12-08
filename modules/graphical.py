@@ -68,7 +68,7 @@ def display_grid_window(grid: list[list[int]], player: int | None = None, curren
         max_score = max(current_scores)
         for i in range(max(len(current_scores), 4)):
             bar_y = BASE_BAR_Y + (BAR_HEIGHT + BAR_VERTICAL_SPACING) * i # calculate the y coordinate of the bar
-            bar_width = (current_scores[i] / max_score)*MAX_BAR_WIDTH # calculate the width of the bar
+            bar_width = max((current_scores[i] / max_score)*MAX_BAR_WIDTH, 40) # calculate the width of the bar
             mainWindow.rectangle(BASE_BAR_X, bar_y, BASE_BAR_X + bar_width, bar_y + BAR_HEIGHT, epaisseur=5, remplissage=SELECTED_COLORS[i+1])
             mainWindow.texte(BASE_BAR_X+10, bar_y, str(current_scores[i]), ancrage="nw", police="Cascadia Code", taille=25)
             if current_scores[i] == max_score:
