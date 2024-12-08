@@ -4,6 +4,7 @@ from modules.rolit import *
 from time import sleep
 import modules.fltk_dev as mainWindow
 import modules.saver as saver
+from os.path import isfile
 
 # graphical display variables
 GRID = 830 # ui elements width
@@ -131,20 +132,26 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
 
     mainWindow.texte(1060,50,chaine="<Règles ?> ", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25)
 
+    mainWindow.rectangle(880, 680, 1190, 780, epaisseur=5, remplissage="#F0F0F0", tag="recall")
+    mainWindow.texte(1035, 730, "Reprendre", ancrage="center", police="Cascadia Code", taille=30, tag="recall")
+
     ev = None
     while True:
         mainWindow.mise_a_jour()
         ev = mainWindow.donne_ev()
         if ev is None: continue
         if ev[0] == "ClicGauche":
-            if ev[1].x <= 415 and ev[1].y <= 415:
-                return 1
-            elif ev[1].x >= 415 and ev[1].y <= 415:
-                return 2
-            elif ev[1].x <= 415 and ev[1].y >= 415:
-                return 3
-            elif ev[1].x >= 415 and ev[1].y >= 415:
-                return 4
+            if ev[1].x <= 830:
+                if ev[1].x <= 415 and ev[1].y <= 415:
+                    return 1
+                if ev[1].x >= 415 and ev[1].y <= 415:
+                    return 2
+                if ev[1].x <= 415 and ev[1].y >= 415:
+                    return 3
+                if ev[1].x >= 415 and ev[1].y >= 415:
+                    return 4
+            elif mainWindow.est_objet_survole("recall"):
+                return 5
         elif ev[0] == "Quitte":
             return -1
 
@@ -246,16 +253,23 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
     mainWindow.cree_fenetre(GRID+SIDE+SETTINGS, GRID, 60, False)
 
     ok = False # if all choices are done
+    skip = False # wether to skip round initialization (only to be set to True when recalling a game)
     while not ok:
         if nb_players == 0: # if the player didn't choose the number of players, select the number of players
             choice = menu_window_select(("1 Joueur", "2 Joueurs", "3 Joueurs", "4 Joueurs"))
             if choice == -1:
                 return
+            if choice == 5 and isfile("rolit.save"):
+                skip = True
+                break
             nb_players = choice
         if nb_players != 0: # when player number is selected, select ai number
             choice = menu_window_select(("Aucune IA", "1 IA", "2 IA", "3 IA"))
             if choice == -1:
                 return
+            if choice == 5 and isfile("rolit.save"):
+                skip = True
+                break
             if (choice-1) + nb_players > 4:
                 continue
             nb_ai = choice - 1
@@ -264,13 +278,23 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             choice = menu_window_select(("1 Manche", "2 Manches", "3 Manches", "4 Manches"))
             if choice == -1:
                 return
+            if choice == 5 and isfile("rolit.save"):
+                skip = True
+                break
             nb_rounds = choice
         ok = True
 
+    if skip:
+        gameState = saver.recall("rolit.save")
+        grid, player_bias, tour, nb_players, nb_ai = gameState
+        nb_rounds = 1
+
     for _ in range(nb_rounds):
-        player_bias = randint(0, 4)
-        grid = init_grid()
-        tour = 0
+        if not skip:
+            player_bias = randint(0, 4)
+            grid = init_grid()
+            tour = 0
+        skip = False
         while tour < 60:
             # simple formula to get player index based on the number of players and the index of the turn
             player = (tour + player_bias) % (nb_players + nb_ai) + 1
@@ -319,11 +343,9 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                 case "save":
                                     saver.save("rolit.save", grid, player_bias, nb_players, nb_ai)
                                 case "recall":
-                                    try:
+                                    if isfile("rolit.save"):
                                         gameState = saver.recall("rolit.save")
                                         grid, player_bias, tour, nb_players, nb_ai = gameState
-                                    except FileNotFoundError:
-                                        pass
 
                     case "Touche":
                         pass
