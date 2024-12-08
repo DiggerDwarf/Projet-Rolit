@@ -191,6 +191,7 @@ def themes() -> list[int]:
         out.append(theme_btn(i))
     return out
 
+
 def draw_save_btns() -> None:
     start_x = 3*QUARTER + PADDING
     end_x = 4*QUARTER - PADDING
@@ -198,6 +199,7 @@ def draw_save_btns() -> None:
     mainWindow.texte((start_x+end_x)//2, 175, "Sauvegarder", ancrage="center", police="Cascadia Code", taille=17, tag="save")
     mainWindow.rectangle(start_x, 220, end_x, 270, epaisseur=5, remplissage="#F0F0F0", tag="recall")
     mainWindow.texte((start_x+end_x)//2, 245, "Charger sauvegarde", ancrage="center", police="Cascadia Code", taille=17, tag="recall")
+
 
 def settings_menu() -> tuple[str, int]:
     """Display the settings menu
@@ -210,7 +212,9 @@ def settings_menu() -> tuple[str, int]:
     submenu_title(3*QUARTER+PADDING-10, 40, 4*QUARTER-PADDING+10, 100, "Sauvegarde")
     theme_boxes = themes()
     
-    draw_save_btns()
+    draw_save_btns() # save btns
+    # back button
+    mainWindow.texte(GRID+SIDE+(SETTINGS-55)/2+25, 750, "🔙", ancrage="n", police="Cascadia Code", taille=40, tag="back")
     
     while True:
         evName, evData = mainWindow.attend_ev()
@@ -226,6 +230,8 @@ def settings_menu() -> tuple[str, int]:
                     return ("save", None)
                 if mainWindow.est_objet_survole("recall"):
                     return ("recall", None)
+                if mainWindow.est_objet_survole("back"):
+                    return ("back", None)
 
 
 def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
