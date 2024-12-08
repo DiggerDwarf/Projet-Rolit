@@ -33,7 +33,7 @@ ALL_COLORS = [
         BLUE: "#FF79C6" #Pink
     }
 ]
-COLORS_LIST = ["CLEAR","RED","GREEN","YELLOW","BLUE"]
+COLORS_LIST = ["CLEAR","RED","YELLOW","GREEN","BLUE"]
 COLOR_INDEX = 0
 SELECTED_COLORS = ALL_COLORS[COLOR_INDEX]
 
@@ -186,6 +186,13 @@ def themes() -> list[int]:
         out.append(theme_btn(i))
     return out
 
+def draw_save_btns() -> None:
+    start_x = 3*QUARTER + PADDING
+    end_x = 4*QUARTER - PADDING
+    mainWindow.rectangle(start_x, 150, end_x, 200, epaisseur=5, remplissage="#F0F0F0", tag="save")
+    mainWindow.texte((start_x+end_x)//2, 175, "Sauvegarder", ancrage="center", police="Cascadia Code", taille=17, tag="save")
+    mainWindow.rectangle(start_x, 220, end_x, 270, epaisseur=5, remplissage="#F0F0F0", tag="recall")
+    mainWindow.texte((start_x+end_x)//2, 245, "Charger sauvegarde", ancrage="center", police="Cascadia Code", taille=17, tag="recall")
 
 def settings_menu() -> tuple[str, int]:
     """Display the settings menu
@@ -197,6 +204,9 @@ def settings_menu() -> tuple[str, int]:
     submenu_title(2*QUARTER+PADDING-10, 40, 3*QUARTER-PADDING+10, 100, "Accessibilité")
     submenu_title(3*QUARTER+PADDING-10, 40, 4*QUARTER-PADDING+10, 100, "Sauvegarde")
     theme_boxes = themes()
+    
+    draw_save_btns()
+    
     while True:
         evName, evData = mainWindow.attend_ev()
         match evName:
@@ -207,6 +217,10 @@ def settings_menu() -> tuple[str, int]:
                     if mainWindow.est_objet_survole(theme_boxes[i]):
                         mainWindow.rectangle(QUARTER+PADDING, 150 + i*70, 2*QUARTER-PADDING, 200 + i*70, epaisseur=8, couleur=ALL_COLORS[i][GREEN])
                         return ("theme", i)
+                if mainWindow.est_objet_survole("save"):
+                    return ("save", None)
+                if mainWindow.est_objet_survole("recall"):
+                    return ("recall", None)
 
 
 def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
@@ -282,7 +296,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                     mainWindow.mise_a_jour()
                                     mainWindow.__canevas.ev_queue.clear()
                                     sleep(1)
-                        elif GRID+SIDE<ev[1].x<GRID+SIDE+SETTINGS and 10<ev[1].y<80:
+                        elif mainWindow.est_objet_survole("setting-icon"):
                             param_out = settings_menu()
                             match param_out[0]:
                                 case "quit":
@@ -291,9 +305,18 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                 case "theme":
                                     COLOR_INDEX = param_out[1]
                                     SELECTED_COLORS = ALL_COLORS[COLOR_INDEX]
+                                case "save":
+                                    saver.save("rolit.save", grid, player_bias, nb_players, nb_ai)
+                                case "recall":
+                                    try:
+                                        gameState = saver.recall("rolit.save")
+                                        grid, player_bias, tour, nb_players, nb_ai = gameState
+                                    except FileNotFoundError:
+                                        pass
 
                     case "Touche":
-                        print(saver.unpack_grid(saver.pack_grid(grid)) == grid)
+                        pass
+                        # Do whatever debug shit here
 
                 # grab next event
                 ev = mainWindow.donne_ev()
