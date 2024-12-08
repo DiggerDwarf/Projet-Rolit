@@ -1,6 +1,6 @@
 """Graphical game"""
 
-from modules.rollit import *
+from modules.rolit import *
 from time import sleep
 import modules.fltk_dev as mainWindow
 import modules.saver as saver

@@ -1,4 +1,4 @@
-"""All the functions needed for the Rollit game are here."""
+"""All the functions needed for the Rolit game are here."""
 
 from random import randint
 from copy import deepcopy

@@ -1,6 +1,6 @@
 """Cmd game"""
 
-from modules.rollit import *
+from modules.rolit import *
 import os
 
 # define colors as letters and ANSI escape codes
