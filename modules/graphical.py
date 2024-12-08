@@ -132,8 +132,9 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
 
     mainWindow.texte(1060,50,chaine="<Règles ?> ", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25)
 
-    mainWindow.rectangle(880, 680, 1190, 780, epaisseur=5, remplissage="#F0F0F0", tag="recall")
-    mainWindow.texte(1035, 730, "Reprendre", ancrage="center", police="Cascadia Code", taille=30, tag="recall")
+    if isfile("rolit.save"):
+        mainWindow.rectangle(880, 680, 1190, 780, epaisseur=5, remplissage="#F0F0F0", tag="recall")
+        mainWindow.texte(1035, 730, "Reprendre", ancrage="center", police="Cascadia Code", taille=30, tag="recall")
 
     ev = None
     while True:
@@ -204,8 +205,9 @@ def draw_save_btns() -> None:
     end_x = 4*QUARTER - PADDING
     mainWindow.rectangle(start_x, 150, end_x, 200, epaisseur=5, remplissage="#F0F0F0", tag="save")
     mainWindow.texte((start_x+end_x)//2, 175, "Sauvegarder", ancrage="center", police="Cascadia Code", taille=17, tag="save")
-    mainWindow.rectangle(start_x, 220, end_x, 270, epaisseur=5, remplissage="#F0F0F0", tag="recall")
-    mainWindow.texte((start_x+end_x)//2, 245, "Charger sauvegarde", ancrage="center", police="Cascadia Code", taille=17, tag="recall")
+    if isfile("rolit.save"):
+        mainWindow.rectangle(start_x, 220, end_x, 270, epaisseur=5, remplissage="#F0F0F0", tag="recall")
+        mainWindow.texte((start_x+end_x)//2, 245, "Charger sauvegarde", ancrage="center", police="Cascadia Code", taille=17, tag="recall")
 
 
 def settings_menu() -> tuple[str, int]:
@@ -259,7 +261,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             choice = menu_window_select(("1 Joueur", "2 Joueurs", "3 Joueurs", "4 Joueurs"))
             if choice == -1:
                 return
-            if choice == 5 and isfile("rolit.save"):
+            if choice == 5:
                 skip = True
                 break
             nb_players = choice
@@ -267,7 +269,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             choice = menu_window_select(("Aucune IA", "1 IA", "2 IA", "3 IA"))
             if choice == -1:
                 return
-            if choice == 5 and isfile("rolit.save"):
+            if choice == 5:
                 skip = True
                 break
             if (choice-1) + nb_players > 4:
@@ -278,7 +280,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             choice = menu_window_select(("1 Manche", "2 Manches", "3 Manches", "4 Manches"))
             if choice == -1:
                 return
-            if choice == 5 and isfile("rolit.save"):
+            if choice == 5:
                 skip = True
                 break
             nb_rounds = choice
@@ -343,9 +345,8 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                 case "save":
                                     saver.save("rolit.save", grid, player_bias, nb_players, nb_ai)
                                 case "recall":
-                                    if isfile("rolit.save"):
-                                        gameState = saver.recall("rolit.save")
-                                        grid, player_bias, tour, nb_players, nb_ai = gameState
+                                    gameState = saver.recall("rolit.save")
+                                    grid, player_bias, tour, nb_players, nb_ai = gameState
 
                     case "Touche":
                         pass
