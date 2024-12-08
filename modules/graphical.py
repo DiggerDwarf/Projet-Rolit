@@ -60,7 +60,8 @@ def display_grid_window(grid: list[list[int]], player: int | None = None, curren
     mainWindow.rectangle(BASE_BAR_X-10, 20, BASE_BAR_X+MAX_BAR_WIDTH+10, 810, epaisseur=5)
     # Affichage du header "Scores"
     mainWindow.texte(GRID+SIDE/2+10,50,chaine="Scores", ancrage="center", police="Cascadia Code", taille=25)
-    mainWindow.image(GRID+SIDE+(SETTINGS-55)/2, 20, fichier="assets/settings.png", largeur=55, hauteur=55, ancrage="nw", tag="setting-icon")
+    mainWindow.texte(GRID+SIDE+(SETTINGS-55)/2+25, 20, chaine="⚙️", taille=40, ancrage="n", tag="setting-icon")
+    # mainWindow.image(GRID+SIDE+(SETTINGS-55)/2, 20, fichier="assets/settings.png", largeur=55, hauteur=55, ancrage="nw", tag="setting-icon")
 
     if current_scores:
         max_score = max(current_scores)
@@ -70,7 +71,8 @@ def display_grid_window(grid: list[list[int]], player: int | None = None, curren
             mainWindow.rectangle(BASE_BAR_X, bar_y, BASE_BAR_X + bar_width, bar_y + BAR_HEIGHT, epaisseur=5, remplissage=SELECTED_COLORS[i+1])
             mainWindow.texte(BASE_BAR_X+10, bar_y, str(current_scores[i]), ancrage="nw", police="Cascadia Code", taille=25)
             if current_scores[i] == max_score:
-                mainWindow.image(BASE_BAR_X+MAX_BAR_WIDTH-60, bar_y, "assets/crown_perfect_size.png", largeur=50, hauteur=50, ancrage="nw") # add a crown for the leading player
+                mainWindow.texte(BASE_BAR_X+MAX_BAR_WIDTH-60, bar_y, "👑", couleur="#FFAF4D", ancrage="nw", police="Cascadia Code", taille=25) # add a crown for the leading player
+                # mainWindow.image(BASE_BAR_X+MAX_BAR_WIDTH-60, bar_y, "assets/crown_perfect_size.png", largeur=50, hauteur=50, ancrage="nw") # add a crown for the leading player
 
 
 def display_end_window(scores: list[int]) -> None:
@@ -83,11 +85,14 @@ def display_end_window(scores: list[int]) -> None:
     mainWindow.rectangle(-5, 415, 415, 835, couleur="black", epaisseur=5, remplissage=SELECTED_COLORS[BLUE])
     mainWindow.rectangle(415, 415, 835, 835, couleur="black", epaisseur=5, remplissage=SELECTED_COLORS[GREEN])
 
-    crown_x = 415 * (max(scores) == scores[1] or max(scores) == scores[3])
-    crown_y = 415 * (max(scores) == scores[2] or max(scores) == scores[3])
+    crown_x = 415/2 + 415 * (max(scores) == scores[1] or max(scores) == scores[3]) # calculate the coordinates of the crown
+    crown_y = 415/2 - 50 + 415 * (max(scores) == scores[2] or max(scores) == scores[3])
+    # crown_x = 415 * (max(scores) == scores[1] or max(scores) == scores[3]) # crown coordinates (image)
+    # crown_y = 415 * (max(scores) == scores[2] or max(scores) == scores[3])
 
     mainWindow.PIL_AVAILABLE = False
-    mainWindow.image(crown_x, crown_y, "assets/crown_perfect_size.png", largeur=415, hauteur=415, ancrage="nw")
+    mainWindow.texte(crown_x, crown_y, "👑", couleur="#FFAF4D", ancrage="center", police="Cascadia Code", taille=200)
+    # mainWindow.image(crown_x, crown_y, "assets/crown_perfect_size.png", largeur=415, hauteur=415, ancrage="nw")
 
     mainWindow.texte(207, 207, str(scores[0]), ancrage="center", police="Cascadia Code", taille=128)
     mainWindow.texte(622, 207, str(scores[1]), ancrage="center", police="Cascadia Code", taille=128)
