@@ -230,6 +230,9 @@ def settings_menu() -> tuple[str, int]:
         match evName:
             case "Quitte":
                 return ("quit", -1)
+            case "Escape":
+                print("damn")
+                return ("back", None)
             case "ClicGauche":
                 for i in range(len(theme_boxes)):
                     if mainWindow.est_objet_survole(theme_boxes[i]):
