@@ -61,8 +61,8 @@ def display_grid_window(grid: list[list[int]], player: int | None = None, curren
     mainWindow.rectangle(BASE_BAR_X-10, 20, BASE_BAR_X+MAX_BAR_WIDTH+10, 810, epaisseur=5)
     # Affichage du header "Scores"
     mainWindow.texte(GRID+SIDE/2+10,50,chaine="Scores", ancrage="center", police="Cascadia Code", taille=25)
-    mainWindow.texte(GRID+SIDE+(SETTINGS-55)/2+25, 20, chaine="⚙️", taille=40, ancrage="n", tag="setting-icon")
-    # mainWindow.image(GRID+SIDE+(SETTINGS-55)/2, 20, fichier="assets/settings.png", largeur=55, hauteur=55, ancrage="nw", tag="setting-icon")
+    mainWindow.texte(GRID+SIDE+(SETTINGS-55)/2+25, 20, chaine="⚙️", taille=40, ancrage="n", tag="settings-icon")
+    # mainWindow.image(GRID+SIDE+(SETTINGS-55)/2, 20, fichier="assets/settings.png", largeur=55, hauteur=55, ancrage="nw", tag="settings-icon")
 
     if current_scores:
         max_score = max(current_scores)
@@ -306,6 +306,9 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             display_grid_window(grid, player, calc_score(grid))
             # loop over events
             ev = mainWindow.donne_ev()
+            if mainWindow.est_objet_survole("settings-icon"):
+                mainWindow.cercle(GRID+SIDE+(SETTINGS-55)/2+25, 48, 32, couleur="black", epaisseur=2)
+                
             while ev != None:
                 match ev[0]:
                     case "Quitte":
@@ -336,7 +339,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                     mainWindow.mise_a_jour()
                                     mainWindow.__canevas.ev_queue.clear()
                                     sleep(1)
-                        elif mainWindow.est_objet_survole("setting-icon"):
+                        elif mainWindow.est_objet_survole("settings-icon"):
                             param_out = settings_menu()
                             match param_out[0]:
                                 case "quit":
