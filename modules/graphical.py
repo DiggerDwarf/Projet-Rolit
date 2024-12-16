@@ -226,24 +226,30 @@ def settings_menu() -> tuple[str, int]:
     mainWindow.texte(GRID+SIDE+(SETTINGS-55)/2+25, 750, "🔙", ancrage="n", police="Cascadia Code", taille=40, tag="back")
     
     while True:
-        evName, evData = mainWindow.attend_ev()
-        match evName:
-            case "Quitte":
-                return ("quit", -1)
-            case "Touche":
-                if evData.keysym == "Escape":
-                    return ("back", None)
-            case "ClicGauche":
-                for i in range(len(theme_boxes)):
-                    if mainWindow.est_objet_survole(theme_boxes[i]):
-                        mainWindow.rectangle(QUARTER+PADDING, 150 + i*70, 2*QUARTER-PADDING, 200 + i*70, epaisseur=8, couleur=ALL_COLORS[i][GREEN])
-                        return ("theme", i)
-                if mainWindow.est_objet_survole("save"):
-                    return ("save", None)
-                if mainWindow.est_objet_survole("recall"):
-                    return ("recall", None)
-                if mainWindow.est_objet_survole("back"):
-                    return ("back", None)
+        ev = mainWindow.donne_ev()
+        if mainWindow.est_objet_survole("back"):
+            mainWindow.cercle(GRID+SIDE+(SETTINGS-55)/2+25, 790, 38, couleur="black", epaisseur=2)
+        
+        if ev != None:
+            match ev[0]:
+                case "Quitte":
+                    return ("quit", -1)
+                case "Touche":
+                    if ev[1].keysym == "Escape":
+                        return ("back", None)
+                case "ClicGauche":
+                    for i in range(len(theme_boxes)):
+                        if mainWindow.est_objet_survole(theme_boxes[i]):
+                            mainWindow.rectangle(QUARTER+PADDING, 150 + i*70, 2*QUARTER-PADDING, 200 + i*70, epaisseur=8, couleur=ALL_COLORS[i][GREEN])
+                            return ("theme", i)
+                    if mainWindow.est_objet_survole("save"):
+                        return ("save", None)
+                    if mainWindow.est_objet_survole("recall"):
+                        return ("recall", None)
+                    if mainWindow.est_objet_survole("back"):
+                        return ("back", None)
+            ev = mainWindow.donne_ev()
+        mainWindow.mise_a_jour()
 
 
 def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
