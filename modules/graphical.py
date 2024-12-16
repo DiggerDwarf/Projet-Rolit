@@ -293,8 +293,10 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
         gameState = saver.recall("rolit.save")
         grid, player_bias, tour, nb_players, nb_ai = gameState
         nb_rounds = 1
+        
+    scores = [[None] * 4 for _ in range(nb_rounds)]
 
-    for _ in range(nb_rounds):
+    for round_i in range(nb_rounds):
         if not skip:
             player_bias = randint(0, 4)
             grid = init_grid()
@@ -361,8 +363,12 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             mainWindow.mise_a_jour()
 
         # after the game has ended, calculate the score and print it
-        score_rouge, score_jaune, score_vert, score_bleu = calc_score(grid)
+        scores[round_i] = calc_score(grid)
 
-        if display_end_window([score_rouge, score_jaune, score_bleu, score_vert]) == -1:
+        if display_end_window(scores[round_i]) == -1:
             mainWindow.ferme_fenetre()
             return
+    
+    scores_finaux = [sum([scores[i][j] for j in range(4)]) for i in range(nb_rounds)]
+    
+    display_end_window(scores_finaux)
