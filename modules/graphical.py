@@ -369,6 +369,6 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             mainWindow.ferme_fenetre()
             return
     
-    scores_finaux = [sum([scores[i][j] for j in range(4)]) for i in range(nb_rounds)]
+    scores_finaux = [sum(scores[round_id][player_id] for round_id in range(nb_rounds)) for player_id in range(4)]
     
     display_end_window(scores_finaux)
