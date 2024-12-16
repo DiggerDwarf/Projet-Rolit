@@ -2,7 +2,7 @@
 
 from modules.rolit import *
 from time import sleep
-import modules.fltk_dev as mainWindow
+import modules.fltk as mainWindow
 import modules.saver as saver
 from os.path import isfile
 
