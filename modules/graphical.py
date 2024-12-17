@@ -150,8 +150,9 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
     mainWindow.texte(1060,50,chaine="<Règles ?> ", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25)
 
     #if isfile("rolit.save"):
-    if saveslist()[0]:
-        date = ctime(getmtime(saveslist()[1][0])).split() #Get latest date and convert from Unix to readable - [1] to take the date and not the true/false return, 0 to take the soonest file
+    saves = saves_list()
+    if len(saves) > 0:
+        date = ctime(getmtime(saves[0])).split() #Get latest date and convert from Unix to readable - [1] to take the date and not the true/false return, 0 to take the soonest file
         mainWindow.rectangle(880, 680, 1190, 780, epaisseur=5, remplissage="#F0F0F0", tag="recall")
         mainWindow.texte(1035, 730, "Reprendre", ancrage="center", police="Cascadia Code", taille=30, tag="recall")
         mainWindow.texte(1035, 765, (date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", police="Cascadia Code", taille=12, tag="recall")
@@ -384,6 +385,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                     SELECTED_COLORS = ALL_COLORS[COLOR_INDEX]
                                 case "save":
                                     mainWindow.efface_tout() #Affichage de la page blanche avec l'input box pour le nom du fichier auquel on rajoutera .save
+                                    mainWindow.texte((GRID+SIDE+SETTINGS)/2, GRID/3-10, "Nom du fichier de sauvegarde", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
                                     mainWindow.rectangle((GRID+SIDE+SETTINGS)/3, GRID/3, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/5, couleur="black", epaisseur=2, tag="box-input")
                                     savename = name_input((GRID+SIDE+SETTINGS)/3+20, GRID/3+30, "w")
                                     saver.save(savename+".save", grid, player_bias, nb_players, nb_ai)
@@ -411,25 +413,33 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
     
     display_end_window(scores_finaux)
 
-#Returns True if there are saves, and returns the saveslist ordered by last modif time
-def saveslist():
+
+def saves_list() -> tuple[bool, list[str]]:
+    """Returns the list of all save files name
+    
+    :return: The list of saves"""
     list = listdir()
     saves = []
 
     for el in list:
         if len(el) > 4:
-            if el[-1]+el[-2]+el[-3]+el[-4] == "evas":
+            if el[-4:] == "save":
                 saves.append(el)
+
     if saves != []:
         saves.sort(reverse=True, key = lambda x: getmtime(x))
         print(saves)
-        return True, saves
-    else:
-        return False, []
+        return saves
 
-#Screen that returns name inputted
-def name_input(x, y, encrage):
+    return []
 
+
+def name_input(x: int, y: int, anchor: str) -> str:
+    """Input handler for the save file name
+    
+    :param x: x coordinate of the input box
+    :param y: y coordinate of the input box
+    :param anchor: anchor point"""
     name = ""
     confirm = False
 
@@ -440,7 +450,7 @@ def name_input(x, y, encrage):
             case "Touche":
                 if len(name) >= 22:
                     mainWindow.efface("input")
-                    mainWindow.texte(x, y, str(name), tag="input", ancrage=encrage, couleur="red")
+                    mainWindow.texte(x, y, str(name), police="Cascadia Code", tag="input", ancrage=anchor, couleur="red")
                     name = name[:-1]
                 else:
                     mainWindow.efface("input")
@@ -451,12 +461,12 @@ def name_input(x, y, encrage):
                     elif key =="BackSpace":
                         if name !="":
                             name=name[:-1]
-                            mainWindow.texte(x, y, str(name), tag="input", ancrage=encrage) 
+                            mainWindow.texte(x, y, str(name), police="Cascadia Code", tag="input", ancrage=anchor) 
                     elif len(key) > 2:
-                        mainWindow.texte(x, y, str(name), tag="input", ancrage=encrage)
+                        mainWindow.texte(x, y, str(name), police="Cascadia Code", tag="input", ancrage=anchor)
                         continue
                     else:
                         name += key
-                        mainWindow.texte(x, y, str(name), tag="input", ancrage=encrage)
+                        mainWindow.texte(x, y, str(name), police="Cascadia Code", tag="input", ancrage=anchor)
             case "Quitte":
                 mainWindow.ferme_fenetre()
