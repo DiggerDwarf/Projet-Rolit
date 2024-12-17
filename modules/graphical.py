@@ -153,9 +153,11 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
     saves = saves_list()
     if len(saves) > 0:
         date = ctime(getmtime(saves[0])).split() #Get latest date and convert from Unix to readable - [1] to take the date and not the true/false return, 0 to take the soonest file
-        mainWindow.rectangle(880, 680, 1190, 780, epaisseur=5, remplissage="#F0F0F0", tag="recall")
-        mainWindow.texte(1035, 730, "Reprendre", ancrage="center", police="Cascadia Code", taille=30, tag="recall")
-        mainWindow.texte(1035, 765, (date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", police="Cascadia Code", taille=12, tag="recall")
+        mainWindow.rectangle(880, 650, 1190, 750, epaisseur=5, remplissage="#F0F0F0", tag="recall")
+        mainWindow.texte(1035, 700, "Reprendre", ancrage="center", police="Cascadia Code", taille=30, tag="recall")
+        mainWindow.texte(1035, 735, (date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", police="Cascadia Code", taille=12, tag="recall")
+        mainWindow.rectangle(942, 780, 1128, 810, epaisseur=3, remplissage="#F0F0F0", tag="select-save")
+        mainWindow.texte(1035, 795, "Choisir sauvegarde", ancrage="center", police="Cascadia Code", taille=12, tag="select-save")
 
     ev = None
     while True:
@@ -174,6 +176,8 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
                     return 4
             elif mainWindow.est_objet_survole("recall"):
                 return 5
+            elif mainWindow.est_objet_survole("select-save"):
+                return 6
         elif ev[0] == "Quitte":
             return -1
 
@@ -280,12 +284,14 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
     :param nb_rounds: number of rounds
     :param ai: if the player wants to play against the AI"""
     global ALL_COLORS, COLOR_INDEX, SELECTED_COLORS
-
+    saves = saves_list()
     # create the game window
     mainWindow.cree_fenetre(GRID+SIDE+SETTINGS, GRID, 60, False)
 
     ok = False # if all choices are done
     skip = False # wether to skip round initialization (only to be set to True when recalling a game)
+    select_save = False
+
     while not ok:
         if nb_players == 0: # if the player didn't choose the number of players, select the number of players
             choice = menu_window_select(("1 Joueur", "2 Joueurs", "3 Joueurs", "4 Joueurs"))
@@ -294,6 +300,9 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             if choice == 5:
                 skip = True
                 break
+            if choice == 6:
+                select_save = True
+                break
             nb_players = choice
         if nb_players != 0: # when player number is selected, select ai number
             choice = menu_window_select(("Aucune IA", "1 IA", "2 IA", "3 IA"))
@@ -301,6 +310,9 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                 return
             if choice == 5:
                 skip = True
+                break
+            if choice == 6:
+                select_save = True
                 break
             if (choice-1) + nb_players > 4:
                 continue
@@ -313,13 +325,20 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             if choice == 5:
                 skip = True
                 break
+            if choice == 6:
+                select_save = True
+                break
             nb_rounds = choice
         ok = True
 
     if skip:
-        gameState = saver.recall("rolit.save")
+        gameState = saver.recall(saves[0])
         grid, player_bias, tour, nb_players, nb_ai = gameState
         nb_rounds = 1
+
+    if select_save:
+        gameState = saver.recall(save_menu(saves))
+        grid, player_bias, tour, nb_players, nb_ai = gameState
         
     scores = [[None] * 4 for _ in range(nb_rounds)]
 
@@ -337,12 +356,6 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             ev = mainWindow.donne_ev()
             if mainWindow.est_objet_survole("settings-icon"):
                 mainWindow.cercle(GRID+SIDE+(SETTINGS-55)/2+25, 48, 32, couleur="black", epaisseur=2)
-                #mainWindow.efface_tout()
-                #mainWindow.rectangle(2*PADDING, 2*PADDING, GRID+SIDE+SETTINGS-2*PADDING, 6*PADDING, couleur="black", epaisseur=2, tag="searchbox")
-                #getdate("rollit_20241223xc.save")
-                #savesmenu()
-                #saveslist()
-                #search_input()
 
             while ev != None:
                 match ev[0]:
@@ -390,7 +403,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                     savename = name_input((GRID+SIDE+SETTINGS)/3+20, GRID/3+30, "w")
                                     saver.save(savename+".save", grid, player_bias, nb_players, nb_ai)
                                 case "recall":
-                                    gameState = saver.recall("rolit.save")
+                                    gameState = saver.recall(saves_list()[1][0])
                                     grid, player_bias, tour, nb_players, nb_ai = gameState
 
                     case "Touche":
@@ -430,7 +443,7 @@ def saves_list() -> tuple[bool, list[str]]:
         saves.sort(reverse=True, key = lambda x: getmtime(x))
         print(saves)
         return saves
-
+    
     return []
 
 
@@ -456,7 +469,6 @@ def name_input(x: int, y: int, anchor: str) -> str:
                     mainWindow.efface("input")
                     key = mainWindow.touche((evName, event))
                     if key=="Return":
-                        print(name)
                         return name
                     elif key =="BackSpace":
                         if name !="":
@@ -470,3 +482,14 @@ def name_input(x: int, y: int, anchor: str) -> str:
                         mainWindow.texte(x, y, str(name), police="Cascadia Code", tag="input", ancrage=anchor)
             case "Quitte":
                 mainWindow.ferme_fenetre()
+
+def save_menu(saves):
+
+    mainWindow.efface_tout()
+    mainWindow.texte((GRID+SIDE+SETTINGS)/2, GRID/3-10, "Rechercher :", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
+    mainWindow.rectangle((GRID+SIDE+SETTINGS)/3, GRID/3, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/5, couleur="#d8dee9", epaisseur=2, tag="box-input")
+    
+    if len(saves)>5:
+        for i in range(5):
+            print("b")
+    savename = name_input((GRID+SIDE+SETTINGS)/3+20, GRID/3+30, "w")
