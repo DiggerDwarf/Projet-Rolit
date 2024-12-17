@@ -42,34 +42,39 @@ else:
     TkEvent = tk.Event
 FltkEvent = Tuple[str, Optional[TkEvent]]
 
+
 __all__ = [
     # gestion de fenêtre
     "cree_fenetre",
     "ferme_fenetre",
     "redimensionne_fenetre",
     "mise_a_jour",
-    # dessin
-    "ligne",
+    # dessiner
+    "arc",
+    "cercle",
     "fleche",
+    "image",
+    "ligne",
+    "ovale",
+    "point",
     "polygone",
     "rectangle",
-    "cercle",
-    "arc",
-    "point",
-    "image",
-    "texte",
     "taille_texte",
-    # effacer
+    "texte",
+    # modif et info objets
     "efface_tout",
     "efface",
+    "modifie",
+    "deplace",
+    "couleur",
+    "remplissage",
+    "type_objet",
+    "recuperer_tags",
     # utilitaires
     "attente",
     "capture_ecran",
     "touche_pressee",
-    "abscisse_souris",
-    "ordonnee_souris",
-    "hauteur_fenetre",
-    "largeur_fenetre",
+    "repere",
     # événements
     "donne_ev",
     "attend_ev",
@@ -79,8 +84,15 @@ __all__ = [
     "abscisse",
     "ordonnee",
     "touche",
+    # info fenetre
+    "abscisse_souris",
+    "ordonnee_souris",
+    "hauteur_fenetre",
+    "largeur_fenetre",
+    "liste_objets_survoles",
+    "objet_survole",
+    "est_objet_survole",
 ]
-
 
 class CustomCanvas:
     """
@@ -107,7 +119,7 @@ class CustomCanvas:
             height: int,
             refresh_rate: int = 100,
             events: Optional[List[str]] = None,
-            resizing: bool = False,
+            resizing: bool = False
     ) -> None:
         # width and height of the canvas
         self.width = width
@@ -197,6 +209,22 @@ class CustomCanvas:
 __canevas: Optional[CustomCanvas] = None
 __img: Dict[Tuple[Path, int, int], PhotoImage] = {}
 
+__trans_object_type = {
+    "arc": "arc",
+    "image": "image",
+    "line": "ligne",
+    "oval": "ovale",
+    "polygon": "polygone",
+    "rectangle": "rectangle",
+    "text": "texte",
+}
+
+__trans_options = {
+    "remplissage": "fill",
+    "couleur": "outline",
+    "epaisseur": "width",
+}
+
 
 #############################################################################
 # Exceptions
@@ -237,7 +265,7 @@ def _fenetre_creee(func: Callable[..., Ret]) -> Callable[..., Ret]:
 
 def cree_fenetre(
         largeur: int, hauteur: int, frequence: int = 100,
-        redimension: bool = False
+        redimension: bool = False, affiche_repere : bool = False
 ) -> None:
     """
     Crée une fenêtre de dimensions ``largeur`` x ``hauteur`` pixels.
@@ -249,6 +277,8 @@ def cree_fenetre(
             'La fenêtre a déjà été crée avec la fonction "cree_fenetre".'
         )
     __canevas = CustomCanvas(largeur, hauteur, frequence, resizing=redimension)
+    if affiche_repere:
+        repere()
 
 
 @_fenetre_creee
@@ -453,6 +483,40 @@ def cercle(
 
 
 @_fenetre_creee
+def ovale(
+        ax: float,
+        ay: float,
+        bx : float,
+        by : float,
+        couleur: str = "black",
+        remplissage: str = "",
+        epaisseur: float = 1,
+        tag: str = "",
+) -> int:
+    """
+    Trace un ovale compris dans le rectangle de coins ``(ax, ay)`` et ``(bx, by)``.
+
+    :param float ax: abscisse du premier coin
+    :param float ay: ordonnée du premier coin
+    :param float bx: abscisse du second coin
+    :param float by: ordonnée du second coin
+    :param str couleur: couleur de trait (défaut 'black')
+    :param str remplissage: couleur de fond (défaut transparent)
+    :param float epaisseur: épaisseur de trait en pixels (défaut 1)
+    :param str tag: étiquette d'objet (défaut : pas d'étiquette)
+    :return: identificateur d'objet
+    """
+    assert __canevas is not None
+    return __canevas.canvas.create_oval(
+        ax, ay, bx, by,
+        outline=couleur,
+        fill=remplissage,
+        width=epaisseur,
+        tags=tag,
+    )
+
+
+@_fenetre_creee
 def arc(
         x: float,
         y: float,
@@ -609,6 +673,7 @@ def texte(
         y: float,
         chaine: str,
         couleur: str = "black",
+        remplissage: str = "black",
         ancrage: Anchor = "nw",
         police: str = "Helvetica",
         taille: int = 24,
@@ -621,7 +686,8 @@ def texte(
     :param float x: abscisse du point d'ancrage
     :param float y: ordonnée du point d'ancrage
     :param str chaine: texte à afficher
-    :param str couleur: couleur de trait (défaut 'black')
+    :param str couleur: couleur de texte (défaut 'black')
+    :param str remplissage: synonyme de `couleur` (défaut 'black')
     :param ancrage: position du point d'ancrage (défaut 'nw')
     :param police: police de caractères (défaut : `Helvetica`)
     :param taille: taille de police (défaut 24)
@@ -629,6 +695,8 @@ def texte(
     :return: identificateur d'objet
     """
     assert __canevas is not None
+    if remplissage and not couleur:
+        couleur = remplissage
     return __canevas.canvas.create_text(
         x, y,
         text=chaine, font=(police, taille),
@@ -654,7 +722,7 @@ def taille_texte(
 
 
 #############################################################################
-# Effacer
+# Utilitaires sur les objets
 #############################################################################
 
 
@@ -677,6 +745,71 @@ def efface(objet_ou_tag: Union[int, str]) -> None:
     """
     assert __canevas is not None
     __canevas.canvas.delete(objet_ou_tag)
+
+
+@_fenetre_creee
+def type_objet(objet: int) -> Optional[str]:
+    assert __canevas is not None
+    tobj: Optional[str] = __canevas.canvas.type(objet)  # type: ignore
+    if tobj is None:
+        return None
+    if tobj == "oval":
+        ax, ay, bx, by = __canevas.canvas.coords(objet)
+        return "cercle" if bx - ax == by - ay else None
+    return __trans_object_type.get(tobj, None)
+
+
+@_fenetre_creee
+def recuperer_tags(identifiant: int) -> Tuple[str, ...]:
+    """
+    Renvoie les tags d'un objet
+    
+    :param identifiant: identifiant de l'objet
+    
+    :return tags: Tuple contenant les tags de l'objet. Peut être vide.
+    """
+    assert __canevas is not None
+    assert isinstance(identifiant, int)
+    return __canevas.canvas.gettags(identifiant)
+
+
+@_fenetre_creee
+def modifie(objet_ou_tag: Union[int, str], **options: Dict[str, str]) -> None:
+    assert __canevas is not None
+    if (type_objet(objet_ou_tag) == "texte"
+            and "couleur" in options
+            and "remplissage" not in options):
+        options["remplissage"] = options["couleur"]
+        del options["couleur"]
+    temp = {}
+    for option, valeur in options.items():
+        if option in __trans_options:
+            temp[__trans_options[option]] = valeur
+    __canevas.canvas.itemconfigure(objet_ou_tag, **temp)
+
+
+@_fenetre_creee
+def deplace(objet_ou_tag: Union[int, str],
+            distance_x: Union[int, float],
+            distance_y: Union[int, float]) -> None:
+    assert __canevas is not None
+    __canevas.canvas.move(objet_ou_tag, distance_x, distance_y)
+
+
+@_fenetre_creee
+def couleur(objet: int) -> Optional[str]:
+    assert __canevas is not None
+    if type_objet(objet) == 'texte':
+        option = "fill"
+    else:
+        option = "outline"
+    return __canevas.canvas.itemcget(objet, option=option)  # type: ignore
+
+
+@_fenetre_creee
+def remplissage(objet: int) -> Optional[str]:
+    assert __canevas is not None
+    return __canevas.canvas.itemcget(objet, option="fill")  # type: ignore
 
 
 #############################################################################
@@ -725,6 +858,44 @@ def touche_pressee(keysym: str) -> bool:
     """
     assert __canevas is not None
     return keysym in __canevas.pressed_keys
+
+
+@_fenetre_creee
+def repere(grad: int = 50,
+           sous_grad : Union[int, None] = 10,
+           valeurs: bool = True,
+           couleur_grad: str = "#a0a0a0",
+           couleur_sous_grad: str = "#bbbbbb") -> None:
+    """affiche une grille sur la fenêtre.
+    :param grad: distance en pixels entre deux graduations majeures
+    :param sous_grad: distance en pixels entre deux graduations mineures, ou None
+    :param valeurs: True (defaut) pour affichage des valeurs, False sinon
+    :param couleur_grad: couleur des graduations majeures et du texte
+    :param couleur_sous_grad: couleur des graduations mineures
+    """
+    assert __canevas is not None
+    offset = 2
+    __canevas.canvas.create_text(offset, offset, text="0", fill=couleur_grad,
+                                 tags='repere', anchor='nw', font=('Helvetica', 8))
+    pas = grad if sous_grad is None else sous_grad
+    xy = pas
+    xmax = __canevas.width
+    ymax = __canevas.height
+    while xy < max(xmax, ymax) :
+        if xy % grad == 0:
+            couleur = couleur_grad
+            dash : Union[str, int] = ""
+            if valeurs:
+                __canevas.canvas.create_text(xy + offset, 0, text=xy, fill=couleur,
+                                 tags='repere', anchor='nw', font=('Helvetica', 8))
+                __canevas.canvas.create_text(0, xy + offset, text=xy, fill=couleur,
+                                 tags='repere', anchor='nw', font=('Helvetica', 8))
+        else:
+            couleur = couleur_sous_grad
+            dash = 2
+        __canevas.canvas.create_line(xy, 0, xy, ymax, fill=couleur, dash=dash, tags='repere')
+        __canevas.canvas.create_line(0, xy, xmax, xy, fill=couleur, dash=dash, tags='repere')
+        xy += pas
 
 
 #############################################################################
@@ -830,6 +1001,11 @@ def attribut(ev: Optional[FltkEvent], nom: str) -> Any:
     return attr if attr != "??" else None
 
 
+#############################################################################
+# Informations sur la fenêtre
+#############################################################################
+
+
 @_fenetre_creee
 def abscisse_souris() -> int:
     assert __canevas is not None
@@ -852,3 +1028,49 @@ def largeur_fenetre() -> int:
 def hauteur_fenetre() -> int:
     assert __canevas is not None
     return __canevas.height
+
+
+@_fenetre_creee
+def liste_objets_survoles() -> Tuple[int, ...]:
+    """
+    Renvoie l'identifiant de tous les objets actuellement survolés
+    """
+    assert __canevas is not None
+    x, y = abscisse_souris(), ordonnee_souris()
+    overlapping = __canevas.canvas.find_overlapping(x, y, x, y)
+    return overlapping
+
+@_fenetre_creee
+def objet_survole() -> Optional[int]:
+    """
+    Renvoie un objet actuellement survolé
+    """
+    assert __canevas is not None
+    overlapping = liste_objets_survoles()
+    if overlapping:
+        return overlapping[0]
+    return None
+
+
+@_fenetre_creee
+def est_objet_survole(objet_ou_tag : Union[int, str, List[str]]) -> bool:
+    """
+    Renvoie si un objet qui vérifie les conditions d'id ou de tags données est survolé.
+    
+    Si objet_ou_tag est un int, check si l'objet avec cet identifiant est survolé.
+    Si c'est un str, check si un objet avec ce tag l'est
+    Si c'est une liste, check si un objet qui remplit toutes ces contraintes l'est
+    
+    :param objet_ou_tag: Contrainte(s) sur les objets
+    """
+    assert __canevas is not None
+    if isinstance(objet_ou_tag, int):
+        return objet_ou_tag in liste_objets_survoles()
+    if isinstance(objet_ou_tag, str):
+        tags = tuple([objet_ou_tag])
+        return any(
+            tag_obj in tags for obj in liste_objets_survoles() for tag_obj in recuperer_tags(obj)
+        )
+    if isinstance(objet_ou_tag, list):
+        return all(est_objet_survole(tag) for tag in objet_ou_tag)
+    raise TypeError("Argument de type incorrect")

@@ -2,9 +2,11 @@
 
 from modules.rolit import *
 from time import sleep
-import modules.fltk_dev as mainWindow
+import modules.fltk as mainWindow
 import modules.saver as saver
-from os.path import isfile
+from os.path import isfile, getmtime
+from os import listdir
+from time import ctime
 
 # graphical display variables
 GRID = 830 # ui elements width
@@ -17,6 +19,7 @@ BASE_BAR_Y = 200
 BAR_HEIGHT = 50 # height of the score bars
 BAR_VERTICAL_SPACING = 10 # spacing between score bars
 MAX_BAR_WIDTH = SIDE-40
+MONTHS = {"Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6, "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12}
 
 ALL_COLORS = [
     {   #Base
@@ -147,8 +150,10 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
     mainWindow.texte(1060,50,chaine="<Règles ?> ", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25)
 
     if isfile("rolit.save"):
+        date = ctime(getmtime("rolit.save")).split()
         mainWindow.rectangle(880, 680, 1190, 780, epaisseur=5, remplissage="#F0F0F0", tag="recall")
         mainWindow.texte(1035, 730, "Reprendre", ancrage="center", police="Cascadia Code", taille=30, tag="recall")
+        mainWindow.texte(1035, 760, (date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", police="Cascadia Code", taille=12, tag="recall")
 
     ev = None
     while True:
@@ -330,7 +335,10 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             ev = mainWindow.donne_ev()
             if mainWindow.est_objet_survole("settings-icon"):
                 mainWindow.cercle(GRID+SIDE+(SETTINGS-55)/2+25, 48, 32, couleur="black", epaisseur=2)
-                
+             #   getdate("20241223xc")
+              #  savesmenu()
+              #  saveslist()
+
             while ev != None:
                 match ev[0]:
                     case "Quitte":
@@ -395,3 +403,53 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
     scores_finaux = [sum(scores[round_id][player_id] for round_id in range(nb_rounds)) for player_id in range(4)]
     
     display_end_window(scores_finaux)
+
+
+def saveslist():
+    
+
+    name = ""
+    confirm = False
+    list = listdir()
+    saves = []
+    for el in list:
+        if len(el) > 4:
+            if el[-1]+el[-2]+el[-3]+el[-4] == "evas":
+                saves.append(el)
+
+    print(saves)
+
+    while not confirm:
+        evName, event = mainWindow.attend_ev() #Get event
+        match evName:
+            case "Touche":
+                mainWindow.efface("input")
+                key = mainWindow.touche((evName, event))
+                if key=="Return":
+                    return name
+                elif key =="BackSpace":
+                    if name !="":
+                        name=name[:-1]
+                        mainWindow.texte(2*PADDING+20, 2*PADDING+40, str(name), tag="input", ancrage="w") 
+                elif len(key) > 2:
+                    mainWindow.texte(2*PADDING+20, 2*PADDING+40, str(name), tag="input", ancrage="w")
+                    continue
+                elif key == "Enter":
+                    print("yo")
+                    sxname = name
+                    print(sxname)
+                    confirm = False
+                else:
+                    name += key
+                    mainWindow.texte(2*PADDING+20, 2*PADDING+40, str(name), tag="input", ancrage="w")
+            case "Quitte":
+                mainWindow.ferme_fenetre()
+
+def savesmenu():
+    mainWindow.efface_tout()
+    mainWindow.rectangle(2*PADDING, 2*PADDING, GRID+SIDE+SETTINGS-2*PADDING, 6*PADDING, couleur="black", epaisseur=2, tag="searchbox")
+    mainWindow.mise_a_jour()
+
+def getdate(savestring):
+    savedate = savestring.split("_")[0]
+    print(savedate)
