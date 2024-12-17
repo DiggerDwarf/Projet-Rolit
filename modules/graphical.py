@@ -149,11 +149,12 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
 
     mainWindow.texte(1060,50,chaine="<Règles ?> ", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25)
 
-    if isfile("rolit.save"):
-        date = ctime(getmtime("rolit.save")).split()
+    #if isfile("rolit.save"):
+    if saveslist()[0]:
+        date = ctime(getmtime(saveslist()[1][0])).split() #Get latest date and convert from Unix to readable - [1] to take the date and not the true/false return, 0 to take the soonest file
         mainWindow.rectangle(880, 680, 1190, 780, epaisseur=5, remplissage="#F0F0F0", tag="recall")
         mainWindow.texte(1035, 730, "Reprendre", ancrage="center", police="Cascadia Code", taille=30, tag="recall")
-        mainWindow.texte(1035, 760, (date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", police="Cascadia Code", taille=12, tag="recall")
+        mainWindow.texte(1035, 765, (date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", police="Cascadia Code", taille=12, tag="recall")
 
     ev = None
     while True:
@@ -382,7 +383,10 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                     COLOR_INDEX = param_out[1]
                                     SELECTED_COLORS = ALL_COLORS[COLOR_INDEX]
                                 case "save":
-                                    saver.save("rolit.save", grid, player_bias, nb_players, nb_ai)
+                                    mainWindow.efface_tout() #Affichage de la page blanche avec l'input box pour le nom du fichier auquel on rajoutera .save
+                                    mainWindow.rectangle((GRID+SIDE+SETTINGS)/3, GRID/3, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/5, couleur="black", epaisseur=2, tag="box-input")
+                                    savename = name_input((GRID+SIDE+SETTINGS)/3+20, GRID/3+30, "w")
+                                    saver.save(savename+".save", grid, player_bias, nb_players, nb_ai)
                                 case "recall":
                                     gameState = saver.recall("rolit.save")
                                     grid, player_bias, tour, nb_players, nb_ai = gameState
@@ -407,52 +411,24 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
     
     display_end_window(scores_finaux)
 
-
+#Returns True if there are saves, and returns the saveslist ordered by last modif time
 def saveslist():
-    
-
-    name = ""
-    confirm = False
     list = listdir()
     saves = []
+
     for el in list:
         if len(el) > 4:
             if el[-1]+el[-2]+el[-3]+el[-4] == "evas":
                 saves.append(el)
+    if saves != []:
+        saves.sort(reverse=True, key = lambda x: getmtime(x))
+        print(saves)
+        return True, saves
+    else:
+        return False, []
 
-    print(saves)
-
-    while not confirm:
-        evName, event = mainWindow.attend_ev() #Get event
-        match evName:
-            case "Touche":
-                mainWindow.efface("input")
-                key = mainWindow.touche((evName, event))
-                if key=="Return":
-                    return name
-                elif key =="BackSpace":
-                    if name !="":
-                        name=name[:-1]
-                        mainWindow.texte(2*PADDING+20, 2*PADDING+40, str(name), tag="input", ancrage="w") 
-                elif len(key) > 2:
-                    mainWindow.texte(2*PADDING+20, 2*PADDING+40, str(name), tag="input", ancrage="w")
-                    continue
-                elif key == "Enter":
-                    print("yo")
-                    sxname = name
-                    print(sxname)
-                    confirm = False
-                else:
-                    name += key
-                    mainWindow.texte(2*PADDING+20, 2*PADDING+40, str(name), tag="input", ancrage="w")
-            case "Quitte":
-                mainWindow.ferme_fenetre()
-
-def savesmenu():
-    mainWindow.efface_tout()
-    mainWindow.rectangle(2*PADDING, 2*PADDING, GRID+SIDE+SETTINGS-2*PADDING, 6*PADDING, couleur="black", epaisseur=2, tag="searchbox")
-    mainWindow.mise_a_jour()
-def search_input():
+#Screen that returns name inputted
+def name_input(x, y, encrage):
 
     name = ""
     confirm = False
@@ -462,25 +438,25 @@ def search_input():
         evName, event = mainWindow.attend_ev() #Get event
         match evName:
             case "Touche":
-                mainWindow.efface("input")
-                key = mainWindow.touche((evName, event))
-                if key=="Return":
-                    return name
-                elif key =="BackSpace":
-                    if name !="":
-                        name=name[:-1]
-                        mainWindow.texte(2*PADDING+20, 2*PADDING+40, str(name), tag="input", ancrage="w") 
-                elif len(key) > 2:
-                    mainWindow.texte(2*PADDING+20, 2*PADDING+40, str(name), tag="input", ancrage="w")
-                    continue
+                if len(name) >= 22:
+                    mainWindow.efface("input")
+                    mainWindow.texte(x, y, str(name), tag="input", ancrage=encrage, couleur="red")
+                    name = name[:-1]
                 else:
-                    name += key
-                    mainWindow.texte(2*PADDING+20, 2*PADDING+40, str(name), tag="input", ancrage="w")
+                    mainWindow.efface("input")
+                    key = mainWindow.touche((evName, event))
+                    if key=="Return":
+                        print(name)
+                        return name
+                    elif key =="BackSpace":
+                        if name !="":
+                            name=name[:-1]
+                            mainWindow.texte(x, y, str(name), tag="input", ancrage=encrage) 
+                    elif len(key) > 2:
+                        mainWindow.texte(x, y, str(name), tag="input", ancrage=encrage)
+                        continue
+                    else:
+                        name += key
+                        mainWindow.texte(x, y, str(name), tag="input", ancrage=encrage)
             case "Quitte":
                 mainWindow.ferme_fenetre()
-
-
-def getdate(savestring):
-    savedate = savestring.split("_")[1]
-    savedate = savedate[:-7]
-    print(savedate)
