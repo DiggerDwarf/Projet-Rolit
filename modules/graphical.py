@@ -82,7 +82,7 @@ def display_grid_window(grid: list[list[int]], player: int | None = None, curren
     # Affichage du header "Scores"
     fltk.texte(GRID+SIDE/2+10,50,chaine="Scores", ancrage="center", police="Cascadia Code", taille=25)
     fltk.texte(GRID+SIDE+(SETTINGS-55)/2+25, 20, chaine="⚙️", taille=40, ancrage="n", tag="settings-icon")
-    # mainWindow.image(GRID+SIDE+(SETTINGS-55)/2, 20, fichier="assets/settings.png", largeur=55, hauteur=55, ancrage="nw", tag="settings-icon")
+    # fltk.image(GRID+SIDE+(SETTINGS-55)/2, 20, fichier="assets/settings.png", largeur=55, hauteur=55, ancrage="nw", tag="settings-icon")
 
     if current_scores:
         max_score = max(current_scores)
@@ -93,7 +93,7 @@ def display_grid_window(grid: list[list[int]], player: int | None = None, curren
             fltk.texte(BASE_BAR_X+10, bar_y, str(current_scores[i]), ancrage="nw", police="Cascadia Code", taille=25)
             if current_scores[i] == max_score:
                 fltk.texte(BASE_BAR_X+MAX_BAR_WIDTH-60, bar_y, "👑", couleur="#FFAF4D", ancrage="nw", police="Cascadia Code", taille=25) # add a crown for the leading player
-                # mainWindow.image(BASE_BAR_X+MAX_BAR_WIDTH-60, bar_y, "assets/crown_perfect_size.png", largeur=50, hauteur=50, ancrage="nw") # add a crown for the leading player
+                # fltk.image(BASE_BAR_X+MAX_BAR_WIDTH-60, bar_y, "assets/crown_perfect_size.png", largeur=50, hauteur=50, ancrage="nw") # add a crown for the leading player
 
 
 def display_end_window(scores: list[int]) -> None:
@@ -113,7 +113,7 @@ def display_end_window(scores: list[int]) -> None:
 
     fltk.PIL_AVAILABLE = False
     fltk.texte(crown_x, crown_y, "👑", couleur="#FFAF4D", ancrage="center", police="Cascadia Code", taille=200)
-    # mainWindow.image(crown_x, crown_y, "assets/crown_perfect_size.png", largeur=415, hauteur=415, ancrage="nw")
+    # fltk.image(crown_x, crown_y, "assets/crown_perfect_size.png", largeur=415, hauteur=415, ancrage="nw")
 
     fltk.texte(207, 207, str(scores[0]), ancrage="center", police="Cascadia Code", taille=128)
     fltk.texte(622, 207, str(scores[1]), ancrage="center", police="Cascadia Code", taille=128)
@@ -156,11 +156,11 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
     saves = saves_list()
     if len(saves) > 0:
         date = ctime(getmtime(saves[0])).split() #Get latest date and convert from Unix to readable - [1] to take the date and not the true/false return, 0 to take the soonest file
-        mainWindow.rectangle(880, 650, 1190, 750, epaisseur=5, remplissage="#F0F0F0", tag="recall")
-        mainWindow.texte(1035, 700, "Reprendre", ancrage="center", police="Cascadia Code", taille=30, tag="recall")
-        mainWindow.texte(1035, 735, (date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", police="Cascadia Code", taille=12, tag="recall")
-        mainWindow.rectangle(942, 780, 1128, 810, epaisseur=3, remplissage="#F0F0F0", tag="select-save")
-        mainWindow.texte(1035, 795, "Choisir sauvegarde", ancrage="center", police="Cascadia Code", taille=12, tag="select-save")
+        fltk.rectangle(880, 650, 1190, 750, epaisseur=5, remplissage="#F0F0F0", tag="recall")
+        fltk.texte(1035, 700, "Reprendre", ancrage="center", police="Cascadia Code", taille=30, tag="recall")
+        fltk.texte(1035, 735, (date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", police="Cascadia Code", taille=12, tag="recall")
+        fltk.rectangle(942, 780, 1128, 810, epaisseur=3, remplissage="#F0F0F0", tag="select-save")
+        fltk.texte(1035, 795, "Choisir sauvegarde", ancrage="center", police="Cascadia Code", taille=12, tag="select-save")
 
     ev = None
     while True:
@@ -179,7 +179,7 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
                     return 4
             elif addons.est_objet_survole("recall"):
                 return 5
-            elif mainWindow.est_objet_survole("select-save"):
+            elif fltk.est_objet_survole("select-save"):
                 return 6
         elif ev[0] == "Quitte":
             return -1
@@ -361,9 +361,9 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             player = (tour + player_bias) % (nb_players + nb_ai) + 1
             display_grid_window(grid, player, calc_score(grid))
             # loop over events
-            ev = mainWindow.donne_ev()
-            if mainWindow.est_objet_survole("settings-icon"):
-                mainWindow.cercle(GRID+SIDE+(SETTINGS-55)/2+25, 48, 32, couleur="black", epaisseur=2)
+            ev = fltk.donne_ev()
+            if fltk.est_objet_survole("settings-icon"):
+                fltk.cercle(GRID+SIDE+(SETTINGS-55)/2+25, 48, 32, couleur="black", epaisseur=2)
 
             while ev != None:
                 match ev[0]:
@@ -493,13 +493,13 @@ def name_input(x: int, y: int, anchor: str) -> str:
                         name += key
                         fltk.texte(x, y, str(name), police="Cascadia Code", tag="input", ancrage=anchor)
             case "Quitte":
-                mainWindow.ferme_fenetre()
+                fltk.ferme_fenetre()
 
 def save_menu(saves):
 
-    mainWindow.efface_tout()
-    mainWindow.texte((GRID+SIDE+SETTINGS)/2, GRID/3-10, "Rechercher :", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
-    mainWindow.rectangle((GRID+SIDE+SETTINGS)/3, GRID/3, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/5, couleur="#d8dee9", epaisseur=2, tag="box-input")
+    fltk.efface_tout()
+    fltk.texte((GRID+SIDE+SETTINGS)/2, GRID/3-10, "Rechercher :", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
+    fltk.rectangle((GRID+SIDE+SETTINGS)/3, GRID/3, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/5, couleur="#d8dee9", epaisseur=2, tag="box-input")
     
     if len(saves)>5:
         for i in range(5):
