@@ -335,9 +335,12 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             ev = mainWindow.donne_ev()
             if mainWindow.est_objet_survole("settings-icon"):
                 mainWindow.cercle(GRID+SIDE+(SETTINGS-55)/2+25, 48, 32, couleur="black", epaisseur=2)
-             #   getdate("20241223xc")
-              #  savesmenu()
-              #  saveslist()
+                #mainWindow.efface_tout()
+                #mainWindow.rectangle(2*PADDING, 2*PADDING, GRID+SIDE+SETTINGS-2*PADDING, 6*PADDING, couleur="black", epaisseur=2, tag="searchbox")
+                #getdate("rollit_20241223xc.save")
+                #savesmenu()
+                #saveslist()
+                #search_input()
 
             while ev != None:
                 match ev[0]:
@@ -449,7 +452,35 @@ def savesmenu():
     mainWindow.efface_tout()
     mainWindow.rectangle(2*PADDING, 2*PADDING, GRID+SIDE+SETTINGS-2*PADDING, 6*PADDING, couleur="black", epaisseur=2, tag="searchbox")
     mainWindow.mise_a_jour()
+def search_input():
+
+    name = ""
+    confirm = False
+
+    mainWindow.efface("input")
+    while not confirm:
+        evName, event = mainWindow.attend_ev() #Get event
+        match evName:
+            case "Touche":
+                mainWindow.efface("input")
+                key = mainWindow.touche((evName, event))
+                if key=="Return":
+                    return name
+                elif key =="BackSpace":
+                    if name !="":
+                        name=name[:-1]
+                        mainWindow.texte(2*PADDING+20, 2*PADDING+40, str(name), tag="input", ancrage="w") 
+                elif len(key) > 2:
+                    mainWindow.texte(2*PADDING+20, 2*PADDING+40, str(name), tag="input", ancrage="w")
+                    continue
+                else:
+                    name += key
+                    mainWindow.texte(2*PADDING+20, 2*PADDING+40, str(name), tag="input", ancrage="w")
+            case "Quitte":
+                mainWindow.ferme_fenetre()
+
 
 def getdate(savestring):
-    savedate = savestring.split("_")[0]
+    savedate = savestring.split("_")[1]
+    savedate = savedate[:-7]
     print(savedate)
