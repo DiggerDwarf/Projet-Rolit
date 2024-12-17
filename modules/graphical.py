@@ -322,14 +322,15 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             nb_rounds = choice
         ok = True
 
+    round_i = 0
+        
     if skip:
         gameState = saver.recall("rolit.save")
-        grid, player_bias, tour, nb_players, nb_ai = gameState
-        nb_rounds = 1
-        
+        grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i = gameState
+
     scores = [[None] * 4 for _ in range(nb_rounds)]
 
-    for round_i in range(nb_rounds):
+    while round_i < nb_rounds:
         if not skip:
             player_bias = randint(0, 4)
             grid = init_grid()
@@ -394,10 +395,11 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                     fltk.texte((GRID+SIDE+SETTINGS)/2, GRID/3-10, "Nom du fichier de sauvegarde", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
                                     fltk.rectangle((GRID+SIDE+SETTINGS)/3, GRID/3, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/5, couleur="black", epaisseur=2, tag="box-input")
                                     savename = name_input((GRID+SIDE+SETTINGS)/3+20, GRID/3+30, "w")
-                                    saver.save(savename+".save", grid, player_bias, nb_players, nb_ai)
+                                    saver.save(savename+".save", grid, player_bias, nb_players, nb_ai, nb_rounds, round_i)
                                 case "recall":
                                     gameState = saver.recall("rolit.save")
-                                    grid, player_bias, tour, nb_players, nb_ai = gameState
+                                    grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i = gameState
+                                    print(nb_rounds, round_i)
 
                     case "Touche":
                         pass
@@ -410,14 +412,18 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
 
         # after the game has ended, calculate the score and print it
         scores[round_i] = calc_score(grid)
+        
+        print(COLOR_NAMES[scores[round_i].index(max(scores[round_i]))+1])
 
         if display_end_window(scores[round_i]) == -1:
             fltk.ferme_fenetre()
             return
+        
+        round_i += 1
     
-    scores_finaux = [sum(scores[round_id][player_id] for round_id in range(nb_rounds)) for player_id in range(4)]
-    
-    display_end_window(scores_finaux)
+    if nb_rounds != 1:
+        scores_finaux = [sum(scores[round_id][player_id] for round_id in range(nb_rounds)) for player_id in range(4)]
+        display_end_window(scores_finaux)
 
 
 def saves_list() -> tuple[bool, list[str]]:
