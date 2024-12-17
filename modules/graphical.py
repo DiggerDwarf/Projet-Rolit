@@ -448,7 +448,7 @@ def saves_list() -> tuple[bool, list[str]]:
 
     for el in list:
         if len(el) > 4:
-            if el[-4:] == "save":
+            if el.endswith("save"):
                 saves.append(el)
 
     if saves != []:
