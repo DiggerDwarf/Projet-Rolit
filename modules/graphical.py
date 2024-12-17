@@ -19,19 +19,33 @@ BAR_VERTICAL_SPACING = 10 # spacing between score bars
 MAX_BAR_WIDTH = SIDE-40
 
 ALL_COLORS = [
-    {
+    {   #Base
         CLEAR: "#AED2FF",
         RED: "#FF004D",
         GREEN: "#00DFA2",
         YELLOW: "#FAEF5D",
         BLUE: "#0079FF"
     },
-    {
+    {   #Dracula
         CLEAR: "#F8F8F2",
         RED: "#FF5555",
         GREEN: "#BD93F9", #Purple
         YELLOW: "#F1FA8C",
         BLUE: "#FF79C6" #Pink
+    },
+    {   #Nord
+        CLEAR: "#d8dee9",
+        RED: "#FF5555",
+        GREEN: "#a3be8c",
+        YELLOW: "#ebcb8b",
+        BLUE: "#5e81ac"
+    },
+    {   #Tropical mdr
+        CLEAR: "#a5c5c2",
+        RED: "#e12729",
+        GREEN: "#72b043",
+        YELLOW: "#ffb629",
+        BLUE: "#75c9e3"
     }
 ]
 COLORS_LIST = ["CLEAR","RED","YELLOW","GREEN","BLUE"]
@@ -174,8 +188,8 @@ def theme_btn(i: int) -> int:
 
     :param i: the index of the theme
     :return: the id of the button"""
-    start_x = QUARTER + PADDING
-    end_x = 2*QUARTER - PADDING
+    start_x = 2*QUARTER + PADDING
+    end_x = 3*QUARTER - PADDING
     out = mainWindow.rectangle(start_x, 150 + i*70, end_x, 200 + i*70, epaisseur=5, remplissage="#123456")
     for j in range(5):
         mainWindow.rectangle(
@@ -215,9 +229,9 @@ def settings_menu() -> tuple[str, int]:
     
     :return: the selected option"""
     mainWindow.efface_tout()
-    submenu_title(PADDING-10, 40, QUARTER-PADDING+10, 100, "Règles")
-    submenu_title(QUARTER+PADDING-10, 40, 2*QUARTER-PADDING+10, 100, "Thèmes")
-    submenu_title(2*QUARTER+PADDING-10, 40, 3*QUARTER-PADDING+10, 100, "Accessibilité")
+    submenu_title(PADDING-10, 40, 2*QUARTER-PADDING+10, 100, "Règles")
+    submenu_title(2*QUARTER+PADDING-10, 40, 3*QUARTER-PADDING+10, 100, "Thèmes")
+    #submenu_title(2*QUARTER+PADDING-10, 40, 3*QUARTER-PADDING+10, 100, "Accessibilité")
     submenu_title(3*QUARTER+PADDING-10, 40, 4*QUARTER-PADDING+10, 100, "Sauvegarde")
     theme_boxes = themes()
     
