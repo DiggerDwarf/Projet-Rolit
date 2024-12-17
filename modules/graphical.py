@@ -288,6 +288,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
 
     # create the game window
     fltk.cree_fenetre(GRID+SIDE+SETTINGS, GRID, 60, False)
+    addons.renomme_fenetre("Rolit")
 
     ok = False # if all choices are done
     skip = False # wether to skip round initialization (only to be set to True when recalling a game)
