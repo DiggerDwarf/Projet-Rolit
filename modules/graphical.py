@@ -321,8 +321,9 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             ev = mainWindow.donne_ev()
             if mainWindow.est_objet_survole("settings-icon"):
                 mainWindow.cercle(GRID+SIDE+(SETTINGS-55)/2+25, 48, 32, couleur="black", epaisseur=2)
-                #savesmenu()
-                #saveslist()
+             #   getdate("20241223xc")
+              #  savesmenu()
+              #  saveslist()
 
             while ev != None:
                 match ev[0]:
@@ -398,10 +399,11 @@ def saveslist():
     list = listdir()
     saves = []
     for el in list:
-        if el[-1]+el[-2]+el[-3] == "eva":
-            saves.append(el)
+        if len(el) > 4:
+            if el[-1]+el[-2]+el[-3]+el[-4] == "evas":
+                saves.append(el)
 
-    
+    print(saves)
 
     while not confirm:
         evName, event = mainWindow.attend_ev() #Get event
@@ -433,3 +435,7 @@ def savesmenu():
     mainWindow.efface_tout()
     mainWindow.rectangle(2*PADDING, 2*PADDING, GRID+SIDE+SETTINGS-2*PADDING, 6*PADDING, couleur="black", epaisseur=2, tag="searchbox")
     mainWindow.mise_a_jour()
+
+def getdate(savestring):
+    savedate = savestring.split("_")[0]
+    print(savedate)
