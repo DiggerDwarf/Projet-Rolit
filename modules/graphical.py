@@ -499,8 +499,9 @@ def save_menu(saves, xsaves):
     confirm = False
     fltk.efface_tout()
     fltk.texte((GRID+SIDE+SETTINGS)/2, GRID/8, "Rechercher :", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
-    fltk.rectangle((GRID+SIDE+SETTINGS)/3, GRID/6, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/8, couleur="#d8dee9", epaisseur=2, tag="box-input")
+    fltk.rectangle((GRID+SIDE+SETTINGS)/3, GRID/6, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/8, couleur="#d8dee9", epaisseur=3, remplissage="white", tag="box-input")
     print(len(xsaves))
+    # Si la liste secondaire est vite, on prend la main, sinon on prend celle-ci
     if len(xsaves)==0:
         xsaves = saves
     if len(xsaves)>=5:
@@ -524,14 +525,16 @@ def save_menu(saves, xsaves):
                 if survol != None:
                     cible = addons.recuperer_tags(survol)[0]
                     print(cible)
+                    #Si le survol finit par save, c'est la save cible et donc on la renvoie pour la charger
                     if cible[-4:] == "save":
                         return cible
+                    #Si le survol finit par bin, on supprime le fichier et // on réactualise la liste
                     if cible[-3:] == "bin":
                         remove(cible[:-3])
                     if cible == "box-input":
                         fltk.efface_tout()
                         fltk.texte((GRID+SIDE+SETTINGS)/2, GRID/8, "Rechercher :", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
-                        fltk.rectangle((GRID+SIDE+SETTINGS)/3, GRID/6, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/8, couleur="black", epaisseur=3, tag="box-input")
+                        fltk.rectangle((GRID+SIDE+SETTINGS)/3, GRID/6, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/8, couleur="black", epaisseur=3, remplissage="white", tag="box-input")
                         search = name_input((GRID+SIDE+SETTINGS)/3+20, GRID/6+30, "w")
                         xsaves = [el for el in xsaves if search in el[:-5]]
                         newsave = save_menu(saves, xsaves)
