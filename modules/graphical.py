@@ -411,7 +411,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                     savename = name_input((GRID+SIDE+SETTINGS)/3+20, GRID/3+30, "w")
                                     saver.save(savename+".save", grid, player_bias, nb_players, nb_ai, nb_rounds, round_i)
                                 case "recall":
-                                    gameState = saver.recall(saves_list()[1][0])
+                                    gameState = saver.recall(save_menu(SAVES, []))
                                     grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i = gameState
 
                     case "Touche":
