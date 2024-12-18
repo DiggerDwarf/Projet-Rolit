@@ -185,7 +185,13 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
             elif addons.est_objet_survole("recall"):
                 return 5
             elif addons.est_objet_survole("select-save"):
-                return 6
+                save = save_menu(SAVES, [])
+                if save == -2:
+                    return -2
+                elif save == -1:
+                    return -1   #Car -1 déjà pris dans les valeurs de mainloop
+                else:
+                    return save   #select_save acivé
         elif ev[0] == "Quitte":
             return -1
 
@@ -306,23 +312,27 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
     while not ok:
         if nb_players == 0: # if the player didn't choose the number of players, select the number of players
             choice = menu_window_select(("1 Joueur", "2 Joueurs", "3 Joueurs", "4 Joueurs"))
+            while choice == -2:
+                choice = menu_window_select(("1 Joueur", "2 Joueurs", "3 Joueurs", "4 Joueurs"))
             if choice == -1:
                 return
             if choice == 5:
                 skip = True
                 break
-            if choice == 6:
+            if isinstance(choice, str): #Si c'est une save renvoyée
                 select_save = True
                 break
             nb_players = choice
         if nb_players != 0: # when player number is selected, select ai number
             choice = menu_window_select(("Aucune IA", "1 IA", "2 IA", "3 IA"))
+            while choice == -2:
+                choice = menu_window_select(("Aucune IA", "1 IA", "2 IA", "3 IA"))
             if choice == -1:
                 return
             if choice == 5:
                 skip = True
                 break
-            if choice == 6:
+            if isinstance(choice, str):
                 select_save = True
                 break
             if (choice-1) + nb_players > 4:
@@ -331,12 +341,14 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             ai = True
         if nb_rounds == 0: # if the player didn't choose the number of rounds, select the number of rounds
             choice = menu_window_select(("1 Manche", "2 Manches", "3 Manches", "4 Manches"))
+            while choice == -2:
+                choice = menu_window_select(("1 Manche", "2 Manches", "3 Manches", "4 Manches"))
             if choice == -1:
                 return
             if choice == 5:
                 skip = True
                 break
-            if choice == 6:
+            if isinstance(choice, str):
                 select_save = True
                 break
             nb_rounds = choice
@@ -349,15 +361,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
         grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i = gameState
 
     if select_save:
-        save = save_menu(SAVES, [])
-        if save == -2:
-            fltk.ferme_fenetre()
-            return
-        elif save == -1:
-            fltk.ferme_fenetre()
-            return
-        else:
-            gameState = saver.recall(save)
+            gameState = saver.recall(choice)
             grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i = gameState
         
     scores = [[None] * 4 for _ in range(nb_rounds)]
