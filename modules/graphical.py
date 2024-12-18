@@ -106,13 +106,19 @@ def display_end_window(scores: list[int]) -> None:
     fltk.rectangle(-5, 415, 415, 835, couleur="black", epaisseur=5, remplissage=SELECTED_COLORS[BLUE])
     fltk.rectangle(415, 415, 835, 835, couleur="black", epaisseur=5, remplissage=SELECTED_COLORS[GREEN])
 
+
+    for i in range(4):
+        if scores[i] == max(scores):
+            crown_x = 415/2 + (415 * (i in (1, 3)))
+            crown_y = 415/2 - 50 + (415 * (i in (2, 3)))
+            fltk.texte(crown_x, crown_y, "👑", couleur="#FFAF4D", ancrage="center", police="Cascadia Code", taille=200)
+
     crown_x = 415/2 + 415 * (max(scores) == scores[1] or max(scores) == scores[3]) # calculate the coordinates of the crown
     crown_y = 415/2 - 50 + 415 * (max(scores) == scores[2] or max(scores) == scores[3])
     # crown_x = 415 * (max(scores) == scores[1] or max(scores) == scores[3]) # crown coordinates (image)
     # crown_y = 415 * (max(scores) == scores[2] or max(scores) == scores[3])
 
-    fltk.PIL_AVAILABLE = False
-    fltk.texte(crown_x, crown_y, "👑", couleur="#FFAF4D", ancrage="center", police="Cascadia Code", taille=200)
+    # fltk.PIL_AVAILABLE = False
     # fltk.image(crown_x, crown_y, "assets/crown_perfect_size.png", largeur=415, hauteur=415, ancrage="nw")
 
     fltk.texte(207, 207, str(scores[0]), ancrage="center", police="Cascadia Code", taille=128)
