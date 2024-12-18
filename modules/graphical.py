@@ -343,13 +343,20 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
         grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i = gameState
 
     if select_save:
-        gameState = saver.recall(save_menu(SAVES, []))
-        grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i = gameState
+        save = save_menu(SAVES, [])
+        if save == -2:
+            print("burh")
+        if save == -1:
+            fltk.ferme_fenetre()
+            return
+        else:
+            gameState = saver.recall(save)
+            grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i = gameState
         
     scores = [[None] * 4 for _ in range(nb_rounds)]
 
     while round_i < nb_rounds:
-        if not skip:
+        if not skip and not select_save:
             player_bias = randint(0, 4)
             grid = init_grid()
             tour = 0
@@ -394,6 +401,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                     fltk.__canevas.ev_queue.clear()
                                     sleep(1)
                         elif addons.est_objet_survole("settings-icon"):
+                            draw_save_btns()
                             param_out = settings_menu()
                             match param_out[0]:
                                 case "quit":
@@ -407,10 +415,25 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                     fltk.texte((GRID+SIDE+SETTINGS)/2, GRID/3-10, "Nom du fichier de sauvegarde", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
                                     fltk.rectangle((GRID+SIDE+SETTINGS)/3, GRID/3, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/5, couleur="black", epaisseur=2, tag="box-input")
                                     savename = name_input((GRID+SIDE+SETTINGS)/3+20, GRID/3+30, "w")
-                                    saver.save(savename+".save", grid, player_bias, nb_players, nb_ai, nb_rounds, round_i)
+                                    if savename == -2:
+                                        continue
+                                    elif savename == -1:
+                                        fltk.ferme_fenetre()
+                                        continue
+                                    else:
+                                        saver.save(savename+".save", grid, player_bias, nb_players, nb_ai, nb_rounds, round_i)
+                                        SAVES = saves_list()
                                 case "recall":
-                                    gameState = saver.recall(save_menu(SAVES, []))
-                                    grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i = gameState
+                                    SAVES = saves_list()
+                                    save = save_menu(SAVES, [])
+                                    if save == -2:
+                                        continue
+                                    elif save == -1:
+                                        fltk.ferme_fenetre()
+                                        return
+                                    else:
+                                        gameState = saver.recall(save)
+                                        grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i = gameState
 
                     case "Touche":
                         pass
@@ -470,13 +493,15 @@ def name_input(x: int, y: int, anchor: str) -> str:
         evName, event = fltk.attend_ev() #Get event
         match evName:
             case "Touche":
-                if len(name) >= 22:
+                key = fltk.touche((evName, event))
+                if key == "Escape":
+                    return -2
+                elif len(name) >= 22:
                     fltk.efface("input")
                     fltk.texte(x, y, str(name), police="Cascadia Code", tag="input", ancrage=anchor, couleur="red")
                     name = name[:-1]
                 else:
                     fltk.efface("input")
-                    key = fltk.touche((evName, event))
                     if key=="Return":
                         return name
                     elif key =="BackSpace":
@@ -490,7 +515,7 @@ def name_input(x: int, y: int, anchor: str) -> str:
                         name += key
                         fltk.texte(x, y, str(name), police="Cascadia Code", tag="input", ancrage=anchor)
             case "Quitte":
-                fltk.ferme_fenetre()
+                return -1
 
 def save_menu(saves, xsaves):
 
@@ -498,9 +523,8 @@ def save_menu(saves, xsaves):
     fltk.efface_tout()
     fltk.texte((GRID+SIDE+SETTINGS)/2, GRID/8, "Rechercher :", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
     fltk.rectangle((GRID+SIDE+SETTINGS)/3, GRID/6, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/8, couleur="#d8dee9", epaisseur=3, remplissage="white", tag="box-input")
-    print(len(xsaves))
     # Si la liste secondaire est vite, on prend la main, sinon on prend celle-ci
-    if len(xsaves)==0:
+    if xsaves == None or len(xsaves)==0:
         xsaves = saves
     if len(xsaves)>=5:
         for i in range(5):
@@ -529,6 +553,14 @@ def save_menu(saves, xsaves):
                     #Si le survol finit par bin, on supprime le fichier et // on réactualise la liste
                     if cible[-3:] == "bin":
                         remove(cible[:-3])
+                        xsaves = xsaves.remove(cible[:-3])
+                        newsave = save_menu(saves, xsaves)
+                        SAVES = saves_list # Mise à jour des saves dans le dossier
+                        if newsave == -1:
+                            fltk.ferme_fenetre()
+                        else:
+                            return newsave
+
                     if cible == "box-input":
                         fltk.efface_tout()
                         fltk.texte((GRID+SIDE+SETTINGS)/2, GRID/8, "Rechercher :", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
@@ -536,12 +568,14 @@ def save_menu(saves, xsaves):
                         search = name_input((GRID+SIDE+SETTINGS)/3+20, GRID/6+30, "w")
                         xsaves = [el for el in xsaves if search in el[:-5]]
                         newsave = save_menu(saves, xsaves)
-                        return newsave
+                        if newsave == -1:
+                            fltk.ferme_fenetre()
+                        else:
+                            return newsave
             case "Touche":
                 key = fltk.touche((evName, event))
                 if key == "Escape":
-                    print("cac")
-                    save_menu(saves, saves)
+                    return -2
             case "Quitte":
-                fltk.ferme_fenetre()
+                return -1
     
