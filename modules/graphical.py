@@ -345,8 +345,9 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
     if select_save:
         save = save_menu(SAVES, [])
         if save == -2:
-            print("burh")
-        if save == -1:
+            fltk.ferme_fenetre()
+            return
+        elif save == -1:
             fltk.ferme_fenetre()
             return
         else:
@@ -419,12 +420,12 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                         continue
                                     elif savename == -1:
                                         fltk.ferme_fenetre()
-                                        continue
+                                        return
                                     else:
                                         saver.save(savename+".save", grid, player_bias, nb_players, nb_ai, nb_rounds, round_i)
                                         SAVES = saves_list()
                                 case "recall":
-                                    SAVES = saves_list()
+                                    SAVES = saves_list() # Mise à jour des saves du dossier
                                     save = save_menu(SAVES, [])
                                     if save == -2:
                                         continue
@@ -480,7 +481,7 @@ def saves_list() -> tuple[bool, list[str]]:
 
 
 def name_input(x: int, y: int, anchor: str) -> str:
-    """Input handler for the save file name
+    """Input handler for the save file name.
     
     :param x: x coordinate of the input box
     :param y: y coordinate of the input box
@@ -518,7 +519,11 @@ def name_input(x: int, y: int, anchor: str) -> str:
                 return -1
 
 def save_menu(saves, xsaves):
-
+    """Menu for choosing, searching and deleting save files.
+    
+    :param saves: saves that are right now in the folder
+    :param xsaves : saves with search filter applied, also = saves if no saves are in the search results
+    :param anchor: anchor point"""
     confirm = False
     fltk.efface_tout()
     fltk.texte((GRID+SIDE+SETTINGS)/2, GRID/8, "Rechercher :", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
@@ -532,12 +537,14 @@ def save_menu(saves, xsaves):
             fltk.rectangle(3*(GRID+SIDE+SETTINGS)/14, (6+3/2*i)*GRID/14, 11*(GRID+SIDE+SETTINGS)/14, (7+3/2*i)*GRID/14, couleur="black", epaisseur=3, tag=xsaves[i])
             fltk.texte((GRID+SIDE+SETTINGS)/2, (6+3/2*i)*GRID/14+30, (xsaves[i])[:-5]+" - "+(date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", tag=xsaves[i])
             fltk.texte(5*(GRID+SIDE+SETTINGS)/6, (6+3/2*i)*GRID/14+10, "🗑️")
+            fltk.mise_a_jour()
     else:
         for i in range(len(xsaves)):
             date = ctime(getmtime(xsaves[i])).split()
             fltk.rectangle(3*(GRID+SIDE+SETTINGS)/14, (6+3/2*i)*GRID/14, 11*(GRID+SIDE+SETTINGS)/14, (7+3/2*i)*GRID/14, couleur="black", epaisseur=3, tag=xsaves[i])
             fltk.texte((GRID+SIDE+SETTINGS)/2, (6+3/2*i)*GRID/14+30, (xsaves[i])[:-5]+" - "+(date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", tag=xsaves[i])
             fltk.texte(5*(GRID+SIDE+SETTINGS)/6, (6+3/2*i)*GRID/14+10, "🗑️", tag=xsaves[i]+"bin")
+            fltk.mise_a_jour()
     
     while not confirm:
         evName, event = fltk.attend_ev() #Get event
@@ -546,7 +553,6 @@ def save_menu(saves, xsaves):
                 survol = addons.objet_survole()
                 if survol != None:
                     cible = addons.recuperer_tags(survol)[0]
-                    print(cible)
                     #Si le survol finit par save, c'est la save cible et donc on la renvoie pour la charger
                     if cible[-4:] == "save":
                         return cible
@@ -565,11 +571,16 @@ def save_menu(saves, xsaves):
                         fltk.efface_tout()
                         fltk.texte((GRID+SIDE+SETTINGS)/2, GRID/8, "Rechercher :", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
                         fltk.rectangle((GRID+SIDE+SETTINGS)/3, GRID/6, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/8, couleur="black", epaisseur=3, remplissage="white", tag="box-input")
+                        #On prend la recherche du user
                         search = name_input((GRID+SIDE+SETTINGS)/3+20, GRID/6+30, "w")
+                        #On crée une liste secondaire ne contenant que les saves contenant l'input
                         xsaves = [el for el in xsaves if search in el[:-5]]
+                        #On imbrique la fonction
                         newsave = save_menu(saves, xsaves)
                         if newsave == -1:
                             fltk.ferme_fenetre()
+                        elif newsave == -2:
+                            return -2
                         else:
                             return newsave
             case "Touche":
