@@ -179,7 +179,7 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
                     return 4
             elif addons.est_objet_survole("recall"):
                 return 5
-            elif fltk.est_objet_survole("select-save"):
+            elif addons.est_objet_survole("select-save"):
                 return 6
         elif ev[0] == "Quitte":
             return -1
@@ -362,7 +362,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             display_grid_window(grid, player, calc_score(grid))
             # loop over events
             ev = fltk.donne_ev()
-            if fltk.est_objet_survole("settings-icon"):
+            if addons.est_objet_survole("settings-icon"):
                 fltk.cercle(GRID+SIDE+(SETTINGS-55)/2+25, 48, 32, couleur="black", epaisseur=2)
 
             while ev != None:
@@ -453,7 +453,6 @@ def saves_list() -> tuple[bool, list[str]]:
 
     if saves != []:
         saves.sort(reverse=True, key = lambda x: getmtime(x))
-        print(saves)
         return saves
     
     return []
@@ -497,11 +496,33 @@ def name_input(x: int, y: int, anchor: str) -> str:
 
 def save_menu(saves):
 
+    confirm = False
     fltk.efface_tout()
-    fltk.texte((GRID+SIDE+SETTINGS)/2, GRID/3-10, "Rechercher :", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
-    fltk.rectangle((GRID+SIDE+SETTINGS)/3, GRID/3, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/5, couleur="#d8dee9", epaisseur=2, tag="box-input")
+    fltk.texte((GRID+SIDE+SETTINGS)/2, GRID/8, "Rechercher :", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
+    fltk.rectangle((GRID+SIDE+SETTINGS)/3, GRID/6, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/8, couleur="#d8dee9", epaisseur=2, tag="box-input")
     
-    if len(saves)>5:
+    if len(saves)>=5:
         for i in range(5):
-            print("b")
-    savename = name_input((GRID+SIDE+SETTINGS)/3+20, GRID/3+30, "w")
+            date = ctime(getmtime(saves[i])).split()
+            fltk.rectangle(3*(GRID+SIDE+SETTINGS)/14, (6+3/2*i)*GRID/14, 11*(GRID+SIDE+SETTINGS)/14, (7+3/2*i)*GRID/14, couleur="black", epaisseur=3, tag=saves[i])
+            fltk.texte((GRID+SIDE+SETTINGS)/2, (6+3/2*i)*GRID/14+30, (saves[i])[:-5]+" - "+(date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", tag=saves[i])
+            fltk.texte(5*(GRID+SIDE+SETTINGS)/6, (6+3/2*i)*GRID/14+10, "🗑️")
+    else:
+        for i in range(len(saves)):
+            date = ctime(getmtime(saves[i])).split()
+            fltk.rectangle(3*(GRID+SIDE+SETTINGS)/14, (6+3/2*i)*GRID/14, 11*(GRID+SIDE+SETTINGS)/14, (7+3/2*i)*GRID/14, couleur="black", epaisseur=3, tag=saves[i])
+            fltk.texte((GRID+SIDE+SETTINGS)/2, (6+3/2*i)*GRID/14+30, (saves[i])[:-5]+" - "+(date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", tag=saves[i])
+            fltk.texte(5*(GRID+SIDE+SETTINGS)/6, (6+3/2*i)*GRID/14+10, "🗑️", tag=saves[i]+"bin")
+    
+    while not confirm:
+        evName, event = fltk.attend_ev() #Get event
+        match evName:
+            case "ClicGauche":
+                cible = addons.recuperer_tags(addons.objet_survole())[0]
+                print(cible)
+                if cible[-4:] == "save":
+                    return cible
+
+            case "Quitte":
+                fltk.ferme_fenetre()
+    savename = name_input((GRID+SIDE+SETTINGS)/3+20, GRID/6+30, "w")
