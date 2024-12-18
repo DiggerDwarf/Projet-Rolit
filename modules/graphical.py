@@ -6,7 +6,7 @@ import modules.fltk as fltk
 import modules.fltk_addons as addons
 import modules.saver as saver
 from os.path import isfile, getmtime
-from os import listdir
+from os import listdir, remove
 from time import ctime
 
 addons.init(fltk)
@@ -345,7 +345,8 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
         nb_rounds = 1
 
     if select_save:
-        gameState = saver.recall(save_menu(saves))
+        
+        gameState = saver.recall(save_menu(saves, []))
         grid, player_bias, tour, nb_players, nb_ai = gameState
         
     scores = [[None] * 4 for _ in range(nb_rounds)]
@@ -494,35 +495,53 @@ def name_input(x: int, y: int, anchor: str) -> str:
             case "Quitte":
                 fltk.ferme_fenetre()
 
-def save_menu(saves):
+def save_menu(saves, xsaves):
 
     confirm = False
     fltk.efface_tout()
     fltk.texte((GRID+SIDE+SETTINGS)/2, GRID/8, "Rechercher :", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
     fltk.rectangle((GRID+SIDE+SETTINGS)/3, GRID/6, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/8, couleur="#d8dee9", epaisseur=2, tag="box-input")
-    
-    if len(saves)>=5:
+    print(len(xsaves))
+    if len(xsaves)==0:
+        xsaves = saves
+    if len(xsaves)>=5:
         for i in range(5):
-            date = ctime(getmtime(saves[i])).split()
-            fltk.rectangle(3*(GRID+SIDE+SETTINGS)/14, (6+3/2*i)*GRID/14, 11*(GRID+SIDE+SETTINGS)/14, (7+3/2*i)*GRID/14, couleur="black", epaisseur=3, tag=saves[i])
-            fltk.texte((GRID+SIDE+SETTINGS)/2, (6+3/2*i)*GRID/14+30, (saves[i])[:-5]+" - "+(date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", tag=saves[i])
+            date = ctime(getmtime(xsaves[i])).split()
+            fltk.rectangle(3*(GRID+SIDE+SETTINGS)/14, (6+3/2*i)*GRID/14, 11*(GRID+SIDE+SETTINGS)/14, (7+3/2*i)*GRID/14, couleur="black", epaisseur=3, tag=xsaves[i])
+            fltk.texte((GRID+SIDE+SETTINGS)/2, (6+3/2*i)*GRID/14+30, (xsaves[i])[:-5]+" - "+(date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", tag=xsaves[i])
             fltk.texte(5*(GRID+SIDE+SETTINGS)/6, (6+3/2*i)*GRID/14+10, "🗑️")
     else:
-        for i in range(len(saves)):
-            date = ctime(getmtime(saves[i])).split()
-            fltk.rectangle(3*(GRID+SIDE+SETTINGS)/14, (6+3/2*i)*GRID/14, 11*(GRID+SIDE+SETTINGS)/14, (7+3/2*i)*GRID/14, couleur="black", epaisseur=3, tag=saves[i])
-            fltk.texte((GRID+SIDE+SETTINGS)/2, (6+3/2*i)*GRID/14+30, (saves[i])[:-5]+" - "+(date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", tag=saves[i])
-            fltk.texte(5*(GRID+SIDE+SETTINGS)/6, (6+3/2*i)*GRID/14+10, "🗑️", tag=saves[i]+"bin")
+        for i in range(len(xsaves)):
+            date = ctime(getmtime(xsaves[i])).split()
+            fltk.rectangle(3*(GRID+SIDE+SETTINGS)/14, (6+3/2*i)*GRID/14, 11*(GRID+SIDE+SETTINGS)/14, (7+3/2*i)*GRID/14, couleur="black", epaisseur=3, tag=xsaves[i])
+            fltk.texte((GRID+SIDE+SETTINGS)/2, (6+3/2*i)*GRID/14+30, (xsaves[i])[:-5]+" - "+(date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", tag=xsaves[i])
+            fltk.texte(5*(GRID+SIDE+SETTINGS)/6, (6+3/2*i)*GRID/14+10, "🗑️", tag=xsaves[i]+"bin")
     
     while not confirm:
         evName, event = fltk.attend_ev() #Get event
         match evName:
             case "ClicGauche":
-                cible = addons.recuperer_tags(addons.objet_survole())[0]
-                print(cible)
-                if cible[-4:] == "save":
-                    return cible
-
+                survol = addons.objet_survole()
+                if survol != None:
+                    cible = addons.recuperer_tags(survol)[0]
+                    print(cible)
+                    if cible[-4:] == "save":
+                        return cible
+                    if cible[-3:] == "bin":
+                        remove(cible[:-3])
+                    if cible == "box-input":
+                        fltk.efface_tout()
+                        fltk.texte((GRID+SIDE+SETTINGS)/2, GRID/8, "Rechercher :", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
+                        fltk.rectangle((GRID+SIDE+SETTINGS)/3, GRID/6, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/8, couleur="black", epaisseur=3, tag="box-input")
+                        search = name_input((GRID+SIDE+SETTINGS)/3+20, GRID/6+30, "w")
+                        xsaves = [el for el in xsaves if search in el[:-5]]
+                        newsave = save_menu(saves, xsaves)
+                        return newsave
+            case "Touche":
+                key = fltk.touche((evName, event))
+                if key == "Escape":
+                    print("cac")
+                    save_menu(saves, saves)
             case "Quitte":
                 fltk.ferme_fenetre()
-    savename = name_input((GRID+SIDE+SETTINGS)/3+20, GRID/6+30, "w")
+    
