@@ -153,9 +153,8 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
     fltk.texte(1060,50,chaine="<Règles ?> ", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25)
 
     #if isfile("rolit.save"):
-    saves = saves_list()
-    if len(saves) > 0:
-        date = ctime(getmtime(saves[0])).split() #Get latest date and convert from Unix to readable - [1] to take the date and not the true/false return, 0 to take the soonest file
+    if len(SAVES) > 0:
+        date = ctime(getmtime(SAVES[0])).split() #Get latest date and convert from Unix to readable - [1] to take the date and not the true/false return, 0 to take the soonest file
         fltk.rectangle(880, 650, 1190, 750, epaisseur=5, remplissage="#F0F0F0", tag="recall")
         fltk.texte(1035, 700, "Reprendre", ancrage="center", police="Cascadia Code", taille=30, tag="recall")
         fltk.texte(1035, 735, (date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", police="Cascadia Code", taille=12, tag="recall")
@@ -233,7 +232,7 @@ def draw_save_btns() -> None:
     end_x = 4*QUARTER - PADDING
     fltk.rectangle(start_x, 150, end_x, 200, epaisseur=5, remplissage="#F0F0F0", tag="save")
     fltk.texte((start_x+end_x)//2, 175, "Sauvegarder", ancrage="center", police="Cascadia Code", taille=17, tag="save")
-    if isfile("rolit.save"):
+    if len(SAVES) > 0:
         fltk.rectangle(start_x, 220, end_x, 270, epaisseur=5, remplissage="#F0F0F0", tag="recall")
         fltk.texte((start_x+end_x)//2, 245, "Charger sauvegarde", ancrage="center", police="Cascadia Code", taille=17, tag="recall")
 
@@ -288,8 +287,8 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
     :param nb_players: number of players
     :param nb_rounds: number of rounds
     :param ai: if the player wants to play against the AI"""
-    global ALL_COLORS, COLOR_INDEX, SELECTED_COLORS
-    saves = saves_list()
+    global ALL_COLORS, COLOR_INDEX, SELECTED_COLORS, SAVES
+    SAVES = saves_list()
     # create the game window
     fltk.cree_fenetre(GRID+SIDE+SETTINGS, GRID, 60, False)
     addons.renomme_fenetre("Rolit")
@@ -340,13 +339,13 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
     round_i = 0
         
     if skip:
-        gameState = saver.recall(saves[0])
+        gameState = saver.recall(SAVES[0])
         grid, player_bias, tour, nb_players, nb_ai = gameState
         nb_rounds = 1
 
     if select_save:
         
-        gameState = saver.recall(save_menu(saves, []))
+        gameState = saver.recall(save_menu(SAVES, []))
         grid, player_bias, tour, nb_players, nb_ai = gameState
         
     scores = [[None] * 4 for _ in range(nb_rounds)]
