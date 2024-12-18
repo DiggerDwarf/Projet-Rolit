@@ -340,13 +340,13 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
         
     if skip:
         gameState = saver.recall(SAVES[0])
-        grid, player_bias, tour, nb_players, nb_ai = gameState
+        grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i = gameState
         nb_rounds = 1
 
     if select_save:
         
         gameState = saver.recall(save_menu(SAVES, []))
-        grid, player_bias, tour, nb_players, nb_ai = gameState
+        grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i = gameState
         
     scores = [[None] * 4 for _ in range(nb_rounds)]
 
@@ -412,7 +412,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                     saver.save(savename+".save", grid, player_bias, nb_players, nb_ai, nb_rounds, round_i)
                                 case "recall":
                                     gameState = saver.recall(saves_list()[1][0])
-                                    grid, player_bias, tour, nb_players, nb_ai = gameState
+                                    grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i = gameState
 
                     case "Touche":
                         pass
