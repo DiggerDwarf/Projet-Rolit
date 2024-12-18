@@ -463,7 +463,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
         round_i += 1
     
     if nb_rounds != 1:
-        scores_finaux = [sum(scores[round_id][player_id] for round_id in range(nb_rounds)) for player_id in range(4)]
+        scores_finaux = [sum(scores[round_id][player_id] == max(scores[round_id]) for round_id in range(nb_rounds)) for player_id in range(4)]
         display_end_window(scores_finaux)
 
 
@@ -500,7 +500,8 @@ def name_input(x: int, y: int, anchor: str) -> str:
         evName, event = fltk.attend_ev() #Get event
         match evName:
             case "Touche":
-                key = fltk.touche((evName, event))
+                key = event.keysym
+                text = event.char
                 if key == "Escape":
                     return -2
                 elif len(name) >= 22:
@@ -515,11 +516,11 @@ def name_input(x: int, y: int, anchor: str) -> str:
                         if name !="":
                             name=name[:-1]
                             fltk.texte(x, y, str(name), police="Cascadia Code", tag="input", ancrage=anchor) 
-                    elif len(key) > 2:
+                    elif not text:
                         fltk.texte(x, y, str(name), police="Cascadia Code", tag="input", ancrage=anchor)
                         continue
                     else:
-                        name += key
+                        name += text
                         fltk.texte(x, y, str(name), police="Cascadia Code", tag="input", ancrage=anchor)
             case "Quitte":
                 return -1
@@ -579,6 +580,8 @@ def save_menu(saves, xsaves):
                         fltk.rectangle((GRID+SIDE+SETTINGS)/3, GRID/6, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/8, couleur="black", epaisseur=3, remplissage="white", tag="box-input")
                         #On prend la recherche du user
                         search = name_input((GRID+SIDE+SETTINGS)/3+20, GRID/6+30, "w")
+                        if search == -1:
+                            return -1
                         #On crée une liste secondaire ne contenant que les saves contenant l'input
                         xsaves = [el for el in xsaves if search in el[:-5]]
                         #On imbrique la fonction
