@@ -123,8 +123,8 @@ def display_end_window(scores: list[int]) -> None:
 
     fltk.texte(207, 207, str(scores[0]), ancrage="center", police="Cascadia Code", taille=128)
     fltk.texte(622, 207, str(scores[1]), ancrage="center", police="Cascadia Code", taille=128)
-    fltk.texte(207, 622, str(scores[2]), ancrage="center", police="Cascadia Code", taille=128)
-    fltk.texte(622, 622, str(scores[3]), ancrage="center", police="Cascadia Code", taille=128)
+    fltk.texte(207, 622, str(scores[3]), ancrage="center", police="Cascadia Code", taille=128)
+    fltk.texte(622, 622, str(scores[2]), ancrage="center", police="Cascadia Code", taille=128)
 
     fltk.texte(1060,50,chaine="<Félicitations ?> ", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25)
     fltk.texte(1060,80,chaine="<Scores de manches ?>", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25)

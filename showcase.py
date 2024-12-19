@@ -120,8 +120,8 @@ def display_end_window(scores: list[int]) -> None:
 
     fltk.texte(207, 207, str(scores[0]), ancrage="center", police="consolas", taille=128)
     fltk.texte(622, 207, str(scores[1]), ancrage="center", police="consolas", taille=128)
-    fltk.texte(207, 622, str(scores[2]), ancrage="center", police="consolas", taille=128)
-    fltk.texte(622, 622, str(scores[3]), ancrage="center", police="consolas", taille=128)
+    fltk.texte(207, 622, str(scores[3]), ancrage="center", police="consolas", taille=128)
+    fltk.texte(622, 622, str(scores[2]), ancrage="center", police="consolas", taille=128)
     
     ev = None
     while True:
@@ -316,8 +316,8 @@ def mainloop_window(nb_players: int, nb_rounds: int, ai: bool) -> None:
     
     scores = [[None] * 4 for _ in range(nb_rounds)]
     
+    player_bias = randint(0, 4)
     for round_i in range(nb_rounds):
-        player_bias = randint(0, 4)
         grid = init_grid()
         tour = 0
         while tour < 60:
