@@ -58,6 +58,13 @@ COLORS_LIST = ["CLEAR","RED","YELLOW","GREEN","BLUE"]
 COLOR_INDEX = 0
 SELECTED_COLORS = ALL_COLORS[COLOR_INDEX]
 
+TURNS = {
+    1: [RED],
+    2: [RED, GREEN],
+    3: [RED, YELLOW, GREEN],
+    4: [RED, YELLOW, GREEN, BLUE]
+}
+
 def display_grid_window(grid: list[list[int]], player: int | None = None, current_scores: list[int] | None = None) -> None:
     """Display the game grid onto the fltk window and side informations
     
@@ -376,6 +383,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
         while tour < 60:
             # simple formula to get player index based on the number of players and the index of the turn
             player = (tour + player_bias) % (nb_players + nb_ai) + 1
+            player = TURNS[nb_players + nb_ai][player - 1]
             display_grid_window(grid, player, calc_score(grid))
             # loop over events
             ev = fltk.donne_ev()
@@ -404,6 +412,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                 for _ in range(nb_ai):
                                     # get current IA player id
                                     player = (tour + player_bias) % (nb_players + nb_ai) + 1
+                                    player = TURNS[nb_players + nb_ai][player - 1]
                                     # make them play
                                     ai_play(grid, player)
                                     tour += 1

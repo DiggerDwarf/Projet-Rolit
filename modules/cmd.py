@@ -1,4 +1,7 @@
-"""Cmd game"""
+"""
+Cmd game
+THIS VERSION IS OUTDATED, PLEASE PLAY USING THE GRAPHICAL MODE
+"""
 
 from modules.rolit import *
 import os
@@ -42,6 +45,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
     :param ai: if the player wants to play against the AI"""
     # setup number of player and initial game state
     clear()
+    print("Cette version est obsolète, veuillez jouer en mode graphique")
     if nb_players == 0:
         while nb_players not in ("2", "3", "4"):
             nb_players = input("Combien de joueurs vont jouer ? [2-4] : ")
