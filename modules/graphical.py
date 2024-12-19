@@ -185,7 +185,7 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
             elif addons.est_objet_survole("recall"):
                 return 5
             elif addons.est_objet_survole("select-save"):
-                save = save_menu(SAVES, [])
+                save = save_menu(SAVES)
                 if save == -2:
                     return -2
                 elif save == -1:
@@ -437,7 +437,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                         SAVES = saves_list()
                                 case "recall":
                                     SAVES = saves_list() # Mise à jour des saves du dossier
-                                    save = save_menu(SAVES, [])
+                                    save = save_menu(SAVES)
                                     if save == -2:
                                         continue
                                     elif save == -1:
@@ -528,11 +528,11 @@ def name_input(x: int, y: int, anchor: str) -> str:
             case "Quitte":
                 return -1
 
-def save_menu(saves, xsaves):
+def save_menu(saves: list[str], xsaves: list[str] | None = None) -> str:
     """Menu for choosing, searching and deleting save files.
     
     :param saves: saves that are right now in the folder
-    :param xsaves : saves with search filter applied, also = saves if no saves are in the search results
+    :param xsaves: saves with search filter applied, also = saves if no saves are in the search results
     :param anchor: anchor point"""
     confirm = False
     fltk.efface_tout()
@@ -571,11 +571,8 @@ def save_menu(saves, xsaves):
                         remove(cible[:-3])
                         xsaves = xsaves.remove(cible[:-3])
                         newsave = save_menu(saves, xsaves)
-                        SAVES = saves_list # Mise à jour des saves dans le dossier
-                        if newsave == -1:
-                            fltk.ferme_fenetre()
-                        else:
-                            return newsave
+                        SAVES = saves_list() # Mise à jour des saves dans le dossier
+                        return newsave
 
                     if cible == "box-input":
                         fltk.efface_tout()
@@ -589,12 +586,7 @@ def save_menu(saves, xsaves):
                         xsaves = [el for el in xsaves if search in el[:-5]]
                         #On imbrique la fonction
                         newsave = save_menu(saves, xsaves)
-                        if newsave == -1:
-                            fltk.ferme_fenetre()
-                        elif newsave == -2:
-                            return -2
-                        else:
-                            return newsave
+                        return newsave
             case "Touche":
                 key = fltk.touche((evName, event))
                 if key == "Escape":
