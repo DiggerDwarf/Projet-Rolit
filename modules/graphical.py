@@ -571,7 +571,7 @@ def save_menu(saves, xsaves):
                         remove(cible[:-3])
                         xsaves = xsaves.remove(cible[:-3])
                         newsave = save_menu(saves, xsaves)
-                        SAVES = saves_list # Mise à jour des saves dans le dossier
+                        SAVES = saves_list() # Mise à jour des saves dans le dossier
                         if newsave == -1:
                             fltk.ferme_fenetre()
                         else:
