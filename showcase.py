@@ -8,7 +8,7 @@ from time import sleep
 WIDTH, HEIGHT = 8, 8
 CLEAR, RED, YELLOW, GREEN, BLUE = 0, 1, 2, 3, 4
 colors = {}
-mainWindow = None
+fltk = None
 
 color_names = {
     RED:    "rouge",
@@ -22,10 +22,10 @@ def init_display(graphical: bool) -> None:
     """Initialize the display mode
     
     :param graphical: if the display is graphical or not"""
-    global colors, mainWindow
+    global colors, fltk
     if graphical:
         # import graphics module and define colors as HEX codes
-        from modules import fltk as mainWindow
+        from modules import fltk as fltk
         colors = {
             CLEAR: "#AED2FF",
             RED: "#FF004D",
@@ -55,16 +55,16 @@ def display_grid_window(grille: list[list[int]], player: int | None = None) -> N
     """Display the game grid onto the fltk window
     
     :param grille: game grid"""
-    mainWindow.efface_tout()
+    fltk.efface_tout()
     # draw black background with an outline set as the current player's color
-    mainWindow.rectangle(0,0,830,830, couleur=colors[player], remplissage="#222831", epaisseur=30)
+    fltk.rectangle(0,0,830,830, couleur=colors[player], remplissage="#222831", epaisseur=30)
     for i_row in range(len(grille)):
         for i_elem in range(len(grille[0])):
             # for each element of the game grid, draw circle of according color
             if grille[i_row][i_elem] == CLEAR and not test_adjacent(grille, i_elem, i_row): # If slot is unused and unreachable, fill in gray
-                mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, "#393E46", remplissage="#393E46")
+                fltk.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, "#393E46", remplissage="#393E46")
             else: # Else, look in color lookup table
-                mainWindow.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, colors[grille[i_row][i_elem]], remplissage=colors[grille[i_row][i_elem]])
+                fltk.cercle(100*i_elem + 50 + 15, 100*i_row + 50 + 15, 40, colors[grille[i_row][i_elem]], remplissage=colors[grille[i_row][i_elem]])
 
 
 def menu_window_select(texts: tuple[str, str, str, str]) -> int:
@@ -72,22 +72,22 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
     
     :param texts: the texts to display on the window
     :return: the selected choice (1-4)"""
-    mainWindow.efface_tout()
-    mainWindow.rectangle(-5, -5, 415, 415, couleur="black", epaisseur=5, remplissage=colors[RED])
-    mainWindow.rectangle(415, -5, 835, 415, couleur="black", epaisseur=5, remplissage=colors[YELLOW])
-    mainWindow.rectangle(-5, 415, 415, 835, couleur="black", epaisseur=5, remplissage=colors[BLUE])
-    mainWindow.rectangle(415, 415, 835, 835, couleur="black", epaisseur=5, remplissage=colors[GREEN])
+    fltk.efface_tout()
+    fltk.rectangle(-5, -5, 415, 415, couleur="black", epaisseur=5, remplissage=colors[RED])
+    fltk.rectangle(415, -5, 835, 415, couleur="black", epaisseur=5, remplissage=colors[YELLOW])
+    fltk.rectangle(-5, 415, 415, 835, couleur="black", epaisseur=5, remplissage=colors[BLUE])
+    fltk.rectangle(415, 415, 835, 835, couleur="black", epaisseur=5, remplissage=colors[GREEN])
     
-    mainWindow.texte(207, 207, texts[0],   ancrage="center", police="consolas", taille=48)
-    mainWindow.texte(622, 207, texts[1], ancrage="center", police="consolas", taille=48)
-    mainWindow.texte(207, 622, texts[2], ancrage="center", police="consolas", taille=48)
-    mainWindow.texte(622, 622, texts[3], ancrage="center", police="consolas", taille=48)
+    fltk.texte(207, 207, texts[0],   ancrage="center", police="consolas", taille=48)
+    fltk.texte(622, 207, texts[1], ancrage="center", police="consolas", taille=48)
+    fltk.texte(207, 622, texts[2], ancrage="center", police="consolas", taille=48)
+    fltk.texte(622, 622, texts[3], ancrage="center", police="consolas", taille=48)
     
     
     ev = None
     while True:
-        mainWindow.mise_a_jour()
-        ev = mainWindow.donne_ev()
+        fltk.mise_a_jour()
+        ev = fltk.donne_ev()
         if ev is None: continue
         if ev[0] == "ClicGauche":
             if ev[1].x <= 415 and ev[1].y <= 415:
@@ -106,27 +106,27 @@ def display_end_window(scores: list[int]) -> None:
     """Display the end window with the final scores
     
     :param scores: the final scores of each player"""
-    mainWindow.efface_tout()
-    mainWindow.rectangle(-5, -5, 415, 415, couleur="black", epaisseur=5, remplissage=colors[RED])
-    mainWindow.rectangle(415, -5, 835, 415, couleur="black", epaisseur=5, remplissage=colors[YELLOW])
-    mainWindow.rectangle(-5, 415, 415, 835, couleur="black", epaisseur=5, remplissage=colors[BLUE])
-    mainWindow.rectangle(415, 415, 835, 835, couleur="black", epaisseur=5, remplissage=colors[GREEN])
+    fltk.efface_tout()
+    fltk.rectangle(-5, -5, 415, 415, couleur="black", epaisseur=5, remplissage=colors[RED])
+    fltk.rectangle(415, -5, 835, 415, couleur="black", epaisseur=5, remplissage=colors[YELLOW])
+    fltk.rectangle(-5, 415, 415, 835, couleur="black", epaisseur=5, remplissage=colors[BLUE])
+    fltk.rectangle(415, 415, 835, 835, couleur="black", epaisseur=5, remplissage=colors[GREEN])
     
-    crown_x = 415 * (max(scores) == scores[1] or max(scores) == scores[3])
-    crown_y = 415 * (max(scores) == scores[2] or max(scores) == scores[3])
-    
-    mainWindow.PIL_AVAILABLE = False
-    mainWindow.image(crown_x, crown_y, "assets/crown_perfect_size.png", largeur=415, hauteur=415, ancrage="nw")
-    
-    mainWindow.texte(207, 207, str(scores[0]), ancrage="center", police="consolas", taille=128)
-    mainWindow.texte(622, 207, str(scores[1]), ancrage="center", police="consolas", taille=128)
-    mainWindow.texte(207, 622, str(scores[2]), ancrage="center", police="consolas", taille=128)
-    mainWindow.texte(622, 622, str(scores[3]), ancrage="center", police="consolas", taille=128)
+    for i in range(4):
+        if scores[i] == max(scores):
+            crown_x = 415/2 + (415 * (i in (1, 3)))
+            crown_y = 415/2 - 50 + (415 * (i in (2, 3)))
+            fltk.texte(crown_x, crown_y, "👑", couleur="#FFAF4D", ancrage="center", police="Cascadia Code", taille=200)
+
+    fltk.texte(207, 207, str(scores[0]), ancrage="center", police="consolas", taille=128)
+    fltk.texte(622, 207, str(scores[1]), ancrage="center", police="consolas", taille=128)
+    fltk.texte(207, 622, str(scores[2]), ancrage="center", police="consolas", taille=128)
+    fltk.texte(622, 622, str(scores[3]), ancrage="center", police="consolas", taille=128)
     
     ev = None
     while True:
-        mainWindow.mise_a_jour()
-        ev = mainWindow.donne_ev()
+        fltk.mise_a_jour()
+        ev = fltk.donne_ev()
         if ev is None: continue
         if ev[0] == "ClicGauche":
             return
@@ -283,14 +283,14 @@ def ai_play(grid: list[list[int]], color: int) -> tuple[int, int]:
     return move
 
 
-def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
+def mainloop_window(nb_players: int, nb_rounds: int, ai: bool) -> None:
     """Main game loop
 
     :param nb_players: number of players
     :param ai: if the player wants to play against the AI"""
     
     # create the game window
-    mainWindow.cree_fenetre(830, 830, 60, False)
+    fltk.cree_fenetre(830, 830, 60, False)
 
     ok = False # if all choices are done
     while not ok:
@@ -299,81 +299,80 @@ def mainloop_window(nb_players: int, nb_manches: int, ai: bool) -> None:
             if choice == -1:
                 return
             nb_players = choice
-        if nb_players == 1: # if the player selected one player, enable AI mode
-            choice = menu_window_select(("RETOUR", "1 IA", "2 IAs", "3 IAs"))
+        if nb_players != 0: # if the player selected one player, enable AI mode
+            choice = menu_window_select(("Aucune IA", "1 IA", "2 IAs", "3 IAs"))
             if choice == -1:
                 return
-            if choice == 1:
-                nb_players = 0
+            if (choice-1) + nb_players > 4:
                 continue
-            nb_players = choice
+            nb_ai = choice - 1
             ai = True
-        if nb_manches == 0: # if the player didn't choose the number of rounds, select the number of rounds
+        if nb_rounds == 0: # if the player didn't choose the number of rounds, select the number of rounds
             choice = menu_window_select(("1 MANCHE", "2 MANCHES", "3 MANCHES", "4 MANCHES"))
             if choice == -1:
                 return
-            nb_manches = choice
+            nb_rounds = choice
         ok = True
     
-    for _ in range(nb_manches):
+    scores = [[None] * 4 for _ in range(nb_rounds)]
+    
+    for round_i in range(nb_rounds):
         player_bias = randint(0, 4)
         grid = init_grid()
         tour = 0
         while tour < 60:
             # simple formula to get player index based on the number of players and the index of the turn
-            player = (tour + player_bias) % nb_players + 1
+            player = (tour + player_bias) % (nb_players + nb_ai) + 1
             display_grid_window(grid, player)
             
             # loop over events
-            ev = mainWindow.donne_ev()
+            ev = fltk.donne_ev()
             while ev != None:
                 match ev[0]:
                     case "Quitte":
                         # Pretty straightforward
-                        mainWindow.ferme_fenetre()
+                        fltk.ferme_fenetre()
                         return
                     case "ClicGauche":
                         # clamping the values to be in [0;800] then dividing by 100 (size of a spot) to get an index
-                        i_column = (min(max(ev[1].x, 15), 815) - 15) // 100
-                        i_row = (min(max(ev[1].y, 15), 815) - 15) // 100
-                        
-                        i_column = min(max(i_column, 0), 7)
-                        i_row = min(max(i_row, 0), 7)
-                        
+                        i_column = (ev[1].x - 15) // 100
+                        i_row = (ev[1].y - 15) // 100
                         
                         # if nothing's there, set the ball and advance to the next turn
-                        if play(grid, i_column, i_row, player):
+                        if 0 <= i_column <= 7 and 0 <= i_row <= 7 and play(grid, i_column, i_row, player):
                             tour += 1
-                            # AI mode is single-player
-                            # so after the player has played, if ai mode is enabled, make them play
-                            if ai:
+                            
+                            if ai and (tour % (nb_players + nb_ai)) == nb_players:
                                 # display player move, update the window and wait before making the IAs play
                                 display_grid_window(grid, player)
-                                mainWindow.mise_a_jour()
+                                fltk.mise_a_jour()
                                 sleep(1)
-                                # there are `nb_players - 1` IAs knowing there's 1 real player
-                                for _ in range(nb_players-1):
+                                for _ in range(nb_ai):
                                     # get current IA player id
-                                    player = (tour + player_bias) % nb_players + 1
+                                    player = (tour + player_bias) % (nb_players + nb_ai) + 1
                                     # make them play
                                     ai_play(grid, player)
                                     tour += 1
                                     # between each IA turn, display and wait
                                     display_grid_window(grid, player)
-                                    mainWindow.mise_a_jour()
-                                    mainWindow.__canevas.ev_queue.clear()
+                                    fltk.mise_a_jour()
+                                    fltk.__canevas.ev_queue.clear()
                                     sleep(1)
                 # grab next event
-                ev = mainWindow.donne_ev()
+                ev = fltk.donne_ev()
             # update the window after event handling
-            mainWindow.mise_a_jour()
+            fltk.mise_a_jour()
 
         # after the game has ended, calculate the score and print it
-        score_rouge, score_jaune, score_vert, score_bleu = calc_score(grid)
+        scores[round_i] = calc_score(grid)
         
-        if display_end_window([score_rouge, score_jaune, score_bleu, score_vert]) == -1:
-            mainWindow.ferme_fenetre()
+        if display_end_window(scores[round_i]) == -1:
+            fltk.ferme_fenetre()
             return
+        
+    if nb_rounds != 1:
+        scores_finaux = [sum(scores[round_id][player_id] == max(scores[round_id]) for round_id in range(nb_rounds)) for player_id in range(4)]
+        display_end_window(scores_finaux)
 
 def mainloop_cmdline(nb_players: int, nb_manches: int, ai: bool) -> None:
     """Main game loop

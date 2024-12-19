@@ -113,8 +113,8 @@ def display_end_window(scores: list[int]) -> None:
             crown_y = 415/2 - 50 + (415 * (i in (2, 3)))
             fltk.texte(crown_x, crown_y, "👑", couleur="#FFAF4D", ancrage="center", police="Cascadia Code", taille=200)
 
-    crown_x = 415/2 + 415 * (max(scores) == scores[1] or max(scores) == scores[3]) # calculate the coordinates of the crown
-    crown_y = 415/2 - 50 + 415 * (max(scores) == scores[2] or max(scores) == scores[3])
+    # crown_x = 415/2 + 415 * (max(scores) == scores[1] or max(scores) == scores[3]) # calculate the coordinates of the crown
+    # crown_y = 415/2 - 50 + 415 * (max(scores) == scores[2] or max(scores) == scores[3])
     # crown_x = 415 * (max(scores) == scores[1] or max(scores) == scores[3]) # crown coordinates (image)
     # crown_y = 415 * (max(scores) == scores[2] or max(scores) == scores[3])
 
