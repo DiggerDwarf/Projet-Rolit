@@ -356,15 +356,16 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
 
     round_i = 0
         
+    scores = [[None] * 4 for _ in range(nb_rounds)]
+    
     if skip:
         gameState = saver.recall(SAVES[0])
-        grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i = gameState
+        grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i, scores = gameState
 
     if select_save:
             gameState = saver.recall(choice)
-            grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i = gameState
+            grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i, scores = gameState
         
-    scores = [[None] * 4 for _ in range(nb_rounds)]
 
     while round_i < nb_rounds:
         if not skip and not select_save:
@@ -432,7 +433,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                         fltk.ferme_fenetre()
                                         return
                                     else:
-                                        saver.save(savename+".save", grid, player_bias, nb_players, nb_ai, nb_rounds, round_i)
+                                        saver.save(savename+".save", grid, player_bias, nb_players, nb_ai, nb_rounds, round_i, scores)
                                         SAVES = saves_list()
                                 case "recall":
                                     SAVES = saves_list() # Mise à jour des saves du dossier
@@ -444,7 +445,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                         return
                                     else:
                                         gameState = saver.recall(save)
-                                        grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i = gameState
+                                        grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i, scores = gameState
 
                     case "Touche":
                         pass
