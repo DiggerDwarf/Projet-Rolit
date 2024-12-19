@@ -459,8 +459,6 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
         # after the game has ended, calculate the score and print it
         scores[round_i] = calc_score(grid)
         
-        print(COLOR_NAMES[scores[round_i].index(max(scores[round_i]))+1])
-
         if display_end_window(scores[round_i]) == -1:
             fltk.ferme_fenetre()
             return
