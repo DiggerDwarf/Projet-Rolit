@@ -367,11 +367,13 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
     
     if skip:
         gameState = saver.recall(SAVES[0])
-        grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i, scores = gameState
+        grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i, scores, COLOR_INDEX = gameState
+        SELECTED_COLORS = ALL_COLORS[COLOR_INDEX]
 
     if select_save:
-            gameState = saver.recall(choice)
-            grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i, scores = gameState
+        gameState = saver.recall(choice)
+        grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i, scores, COLOR_INDEX = gameState
+        SELECTED_COLORS = ALL_COLORS[COLOR_INDEX]
         
 
     while round_i < nb_rounds:
@@ -442,7 +444,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                         fltk.ferme_fenetre()
                                         return
                                     else:
-                                        saver.save(savename+".save", grid, player_bias, nb_players, nb_ai, nb_rounds, round_i, scores)
+                                        saver.save(savename+".save", grid, player_bias, nb_players, nb_ai, nb_rounds, round_i, scores, COLOR_INDEX)
                                         SAVES = saves_list()
                                 case "recall":
                                     SAVES = saves_list() # Mise à jour des saves du dossier
@@ -454,7 +456,8 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                         return
                                     else:
                                         gameState = saver.recall(save)
-                                        grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i, scores = gameState
+                                        grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i, scores, COLOR_INDEX = gameState
+                                        SELECTED_COLORS = ALL_COLORS[COLOR_INDEX]
 
                     case "Touche":
                         pass

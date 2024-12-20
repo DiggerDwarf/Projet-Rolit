@@ -14,7 +14,7 @@ def unpack_grid(packed: bytearray) -> list[list[int]]:
         out[i//4][2*(i%4) + 1] = packed[i]  & 0b1111
     return out
 
-def save(fileName: str, grid: list[list[int]], start_bias: int, nb_players: int, nb_AIs: int, nb_rounds: int, curr_round: int, scores: list[list[int]]) -> None:
+def save(fileName: str, grid: list[list[int]], start_bias: int, nb_players: int, nb_AIs: int, nb_rounds: int, curr_round: int, scores: list[list[int]], theme_id: int = 0) -> None:
     data = pack_grid(grid)
     byte  = (start_bias << 6) & 0b11000000
     byte |= ((nb_players-1) << 4) & 0b110000
@@ -22,6 +22,7 @@ def save(fileName: str, grid: list[list[int]], start_bias: int, nb_players: int,
     byte |= (nb_rounds-1) & 0b11
     data.append(byte)
     byte  = (curr_round << 6) & 0b11000000
+    byte |= (theme_id) & 0b111111
     data.append(byte)
     for round_id in scores:
         for player in round_id:
@@ -41,6 +42,7 @@ def recall(fileName: str) -> tuple[list[list[int]], int, int, int, int, int, int
         nb_AIs =      (byte1 >> 2) & 0b11
         nb_rounds =   ((byte1) & 0b11) + 1
         curr_round =  (byte2 >> 6) & 0b11
+        theme_id =    byte2 & 0b111111
         for i in range(nb_rounds):
             try:
                 round_scores = saveFile.read(4)
@@ -51,4 +53,4 @@ def recall(fileName: str) -> tuple[list[list[int]], int, int, int, int, int, int
                 for j in range(nb_rounds-i):
                     scores.append([None] * 4)
                 break
-    return grid, start_bias, turn, nb_players, nb_AIs, nb_rounds, curr_round, scores
+    return grid, start_bias, turn, nb_players, nb_AIs, nb_rounds, curr_round, scores, theme_id
