@@ -2,20 +2,17 @@
 
 from modules.rolit import *
 from time import sleep
+from time import ctime
+import os
+import os.path
 import modules.fltk as fltk
 import modules.fltk_addons as addons
 import modules.saver as saver
-from os.path import isfile, getmtime
-from os import listdir, remove
-from time import ctime
-
-addons.init(fltk)
 
 # graphical display variables
 GRID = 830 # ui elements width
 SIDE = 330
-SETTINGS = 80
-QUARTER = (GRID+SIDE+SETTINGS)/4
+QUARTER = (GRID+SIDE)/4
 PADDING = 20
 BASE_BAR_X = 860 # base coordinates for the score bars
 BASE_BAR_Y = 200
@@ -65,6 +62,10 @@ TURNS = {
     4: [RED, YELLOW, GREEN, BLUE]
 }
 
+addons.init(fltk) # initialize the fltk_addons module
+if not os.path.exists("saves"): # create the saves directory if it doesn't exist
+    os.makedirs("saves")
+
 def display_grid_window(grid: list[list[int]], player: int | None = None, current_scores: list[int] | None = None) -> None:
     """Display the game grid onto the fltk window and side informations
     
@@ -85,11 +86,12 @@ def display_grid_window(grid: list[list[int]], player: int | None = None, curren
     fltk.rectangle(GRID, 0, GRID+SIDE, GRID, couleur="#F0F0F0", remplissage="#F0F0F0")
 
     # Draw the score header outline
-    fltk.rectangle(BASE_BAR_X-10, 20, BASE_BAR_X+MAX_BAR_WIDTH+10, 810, epaisseur=5)
+    fltk.rectangle(BASE_BAR_X-10, 20, BASE_BAR_X+SIDE-30, 810, epaisseur=5)
     # Affichage du header "Scores"
-    fltk.texte(GRID+SIDE/2+10,50,chaine="Scores", ancrage="center", police="Cascadia Code", taille=25)
-    fltk.texte(GRID+SIDE+(SETTINGS-55)/2+25, 20, chaine="⚙️", taille=40, ancrage="n", tag="settings-icon")
-    # fltk.image(GRID+SIDE+(SETTINGS-55)/2, 20, fichier="assets/settings.png", largeur=55, hauteur=55, ancrage="nw", tag="settings-icon")
+    fltk.texte(GRID+SIDE/2+10, 50, chaine="Scores", ancrage="center", police="Cascadia Code", taille=25)
+    # Settings icon
+    fltk.texte(GRID+SIDE-40/2-20, GRID-40/2-10, chaine="⚙️", taille=40, ancrage="s", tag="settings-icon")
+    # fltk.image(GRID+SIDE-55/2, 20, fichier="assets/settings.png", largeur=55, hauteur=55, ancrage="nw", tag="settings-icon")
 
     if current_scores:
         max_score = max(current_scores)
@@ -113,10 +115,9 @@ def display_end_window(scores: list[int]) -> None:
     fltk.rectangle(-5, 415, 415, 835, couleur="black", epaisseur=5, remplissage=SELECTED_COLORS[BLUE])
     fltk.rectangle(415, 415, 835, 835, couleur="black", epaisseur=5, remplissage=SELECTED_COLORS[GREEN])
 
-
     for i in range(4):
         if scores[i] == max(scores):
-            crown_x = 415/2 + (415 * (i in (1, 3)))
+            crown_x = 415/2 + (415 * (i in (1, 2)))
             crown_y = 415/2 - 50 + (415 * (i in (2, 3)))
             fltk.texte(crown_x, crown_y, "👑", couleur="#FFAF4D", ancrage="center", police="Cascadia Code", taille=200)
 
@@ -163,16 +164,16 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
     fltk.texte(207, 622, texts[2], ancrage="center", police="Cascadia Code", taille=48)
     fltk.texte(622, 622, texts[3], ancrage="center", police="Cascadia Code", taille=48)
 
-    fltk.texte(1060,50,chaine="<Règles ?> ", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25)
+    fltk.texte(GRID+PADDING+SIDE/2, 50, chaine="<Règles ?> ", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25)
 
     #if isfile("rolit.save"):
-    if len(SAVES) > 0:
-        date = ctime(getmtime(SAVES[0])).split() #Get latest date and convert from Unix to readable - [1] to take the date and not the true/false return, 0 to take the soonest file
-        fltk.rectangle(880, 650, 1190, 750, epaisseur=5, remplissage="#F0F0F0", tag="recall")
-        fltk.texte(1035, 700, "Reprendre", ancrage="center", police="Cascadia Code", taille=30, tag="recall")
-        fltk.texte(1035, 735, (date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", police="Cascadia Code", taille=12, tag="recall")
-        fltk.rectangle(942, 780, 1128, 810, epaisseur=3, remplissage="#F0F0F0", tag="select-save")
-        fltk.texte(1035, 795, "Choisir sauvegarde", ancrage="center", police="Cascadia Code", taille=12, tag="select-save")
+    if len(saves) > 0:
+        date = ctime(os.path.getmtime(saves[0])).split() #Get latest date and convert from Unix to readable - [1] to take the date and not the true/false return, 0 to take the soonest file
+        fltk.rectangle(GRID+PADDING, GRID-160, GRID+SIDE, GRID-70, epaisseur=5, remplissage="#F0F0F0", tag="recall")
+        fltk.texte(GRID+(PADDING+SIDE)/2, 700, "Reprendre", ancrage="center", police="Cascadia Code", taille=30, tag="recall")
+        fltk.texte(GRID+(PADDING+SIDE)/2, 735, (date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", police="Cascadia Code", taille=12, tag="recall")
+        fltk.rectangle(GRID+PADDING+SIDE/2-100, 780, GRID+PADDING+SIDE/2+100, 810, epaisseur=3, remplissage="#F0F0F0", tag="select-save")
+        fltk.texte(GRID+PADDING+SIDE/2, 795, "Choisir sauvegarde", ancrage="center", police="Cascadia Code", taille=12, tag="select-save")
 
     ev = None
     while True:
@@ -192,7 +193,7 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
             elif addons.est_objet_survole("recall"):
                 return 5
             elif addons.est_objet_survole("select-save"):
-                save = save_menu(SAVES)
+                save = save_menu(saves)
                 if save == -2:
                     return -2
                 elif save == -1:
@@ -251,7 +252,7 @@ def draw_save_btns() -> None:
     end_x = 4*QUARTER - PADDING
     fltk.rectangle(start_x, 150, end_x, 200, epaisseur=5, remplissage="#F0F0F0", tag="save")
     fltk.texte((start_x+end_x)//2, 175, "Sauvegarder", ancrage="center", police="Cascadia Code", taille=17, tag="save")
-    if len(SAVES) > 0:
+    if len(saves) > 0:
         fltk.rectangle(start_x, 220, end_x, 270, epaisseur=5, remplissage="#F0F0F0", tag="recall")
         fltk.texte((start_x+end_x)//2, 245, "Charger sauvegarde", ancrage="center", police="Cascadia Code", taille=17, tag="recall")
 
@@ -263,18 +264,17 @@ def settings_menu() -> tuple[str, int]:
     fltk.efface_tout()
     submenu_title(PADDING-10, 40, 2*QUARTER-PADDING+10, 100, "Règles")
     submenu_title(2*QUARTER+PADDING-10, 40, 3*QUARTER-PADDING+10, 100, "Thèmes")
-    #submenu_title(2*QUARTER+PADDING-10, 40, 3*QUARTER-PADDING+10, 100, "Accessibilité")
     submenu_title(3*QUARTER+PADDING-10, 40, 4*QUARTER-PADDING+10, 100, "Sauvegarde")
     theme_boxes = themes()
     
     draw_save_btns() # save btns
     # back button
-    fltk.texte(GRID+SIDE+(SETTINGS-55)/2+25, 750, "🔙", ancrage="n", police="Cascadia Code", taille=40, tag="back")
+    fltk.texte(GRID+SIDE-40/2-10, GRID-40/2-10, "🔙", ancrage="s", police="Cascadia Code", taille=40, tag="back")
     
     while True:
         ev = fltk.donne_ev()
         if addons.est_objet_survole("back"):
-            fltk.cercle(GRID+SIDE+(SETTINGS-55)/2+25, 790, 38, couleur="black", epaisseur=2, tag="hover-back")
+            fltk.cercle(GRID+SIDE-40/2-10, GRID-40/2-38, 38, couleur="black", epaisseur=2, tag="hover-back")
         else:
             fltk.efface("hover-back")
 
@@ -288,7 +288,6 @@ def settings_menu() -> tuple[str, int]:
                 case "ClicGauche":
                     for i in range(len(theme_boxes)):
                         if addons.est_objet_survole(theme_boxes[i]):
-                            fltk.rectangle(QUARTER+PADDING, 150 + i*70, 2*QUARTER-PADDING, 200 + i*70, epaisseur=8, couleur=ALL_COLORS[i][GREEN])
                             return ("theme", i)
                     if addons.est_objet_survole("save"):
                         return ("save", None)
@@ -306,10 +305,10 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
     :param nb_players: number of players
     :param nb_rounds: number of rounds
     :param ai: if the player wants to play against the AI"""
-    global ALL_COLORS, COLOR_INDEX, SELECTED_COLORS, SAVES
-    SAVES = saves_list()
+    global ALL_COLORS, COLOR_INDEX, SELECTED_COLORS, saves
+    saves = saves_list()
     # create the game window
-    fltk.cree_fenetre(GRID+SIDE+SETTINGS, GRID, 60, False)
+    fltk.cree_fenetre(GRID+PADDING+SIDE, GRID, 60, False)
     addons.renomme_fenetre("Rolit")
 
     ok = False # if all choices are done
@@ -366,7 +365,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
     scores = [[None] * 4 for _ in range(nb_rounds)]
     
     if skip:
-        gameState = saver.recall(SAVES[0])
+        gameState = saver.recall(saves[0])
         grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i, scores, COLOR_INDEX = gameState
         SELECTED_COLORS = ALL_COLORS[COLOR_INDEX]
 
@@ -374,7 +373,6 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
         gameState = saver.recall(choice)
         grid, player_bias, tour, nb_players, nb_ai, nb_rounds, round_i, scores, COLOR_INDEX = gameState
         SELECTED_COLORS = ALL_COLORS[COLOR_INDEX]
-        
 
     while round_i < nb_rounds:
         if not skip and not select_save:
@@ -390,7 +388,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             # loop over events
             ev = fltk.donne_ev()
             if addons.est_objet_survole("settings-icon"):
-                fltk.cercle(GRID+SIDE+(SETTINGS-55)/2+25, 48, 32, couleur="black", epaisseur=2)
+                fltk.cercle(GRID+SIDE-40/2-20, GRID-40/2-10-32, 32, couleur="black", epaisseur=2)
 
             while ev != None:
                 match ev[0]:
@@ -435,20 +433,20 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                     SELECTED_COLORS = ALL_COLORS[COLOR_INDEX]
                                 case "save":
                                     fltk.efface_tout() #Affichage de la page blanche avec l'input box pour le nom du fichier auquel on rajoutera .save
-                                    fltk.texte((GRID+SIDE+SETTINGS)/2, GRID/3-10, "Nom du fichier de sauvegarde", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
-                                    fltk.rectangle((GRID+SIDE+SETTINGS)/3, GRID/3, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/5, couleur="black", epaisseur=2, tag="box-input")
-                                    savename = name_input((GRID+SIDE+SETTINGS)/3+20, GRID/3+30, "w")
+                                    fltk.texte((GRID+SIDE)/2, GRID/3-10, "Nom du fichier de sauvegarde", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
+                                    fltk.rectangle((GRID+SIDE)/3, GRID/3, 2*(GRID+SIDE)/3, 2*GRID/5, couleur="black", epaisseur=2, tag="box-input")
+                                    savename = name_input((GRID+SIDE)/3+20, GRID/3+30, "w")
                                     if savename == -2:
                                         continue
                                     elif savename == -1:
                                         fltk.ferme_fenetre()
                                         return
                                     else:
-                                        saver.save(savename+".save", grid, player_bias, nb_players, nb_ai, nb_rounds, round_i, scores, COLOR_INDEX)
-                                        SAVES = saves_list()
+                                        saver.save("saves/"+savename+".save", grid, player_bias, nb_players, nb_ai, nb_rounds, round_i, scores, COLOR_INDEX)
+                                        saves = saves_list()
                                 case "recall":
-                                    SAVES = saves_list() # Mise à jour des saves du dossier
-                                    save = save_menu(SAVES)
+                                    saves = saves_list() # Mise à jour des saves du dossier
+                                    save = save_menu(saves)
                                     if save == -2:
                                         continue
                                     elif save == -1:
@@ -486,16 +484,16 @@ def saves_list() -> tuple[bool, list[str]]:
     """Returns the list of all save files name
     
     :return: The list of saves"""
-    list = listdir()
+    list = os.listdir("saves/")
     saves = []
 
     for el in list:
         if len(el) > 4:
             if el.endswith("save"):
-                saves.append(el)
+                saves.append(f"saves/{el}")
 
     if saves != []:
-        saves.sort(reverse=True, key = lambda x: getmtime(x))
+        saves.sort(reverse=True, key = lambda x: os.path.getmtime(x))
         return saves
     
     return []
@@ -548,24 +546,24 @@ def save_menu(saves: list[str], xsaves: list[str] | None = None) -> str:
     :param anchor: anchor point"""
     confirm = False
     fltk.efface_tout()
-    fltk.texte((GRID+SIDE+SETTINGS)/2, GRID/8, "Rechercher :", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
-    fltk.rectangle((GRID+SIDE+SETTINGS)/3, GRID/6, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/8, couleur="#d8dee9", epaisseur=3, remplissage="white", tag="box-input")
+    fltk.texte((GRID+SIDE)/2, GRID/8, "Rechercher :", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
+    fltk.rectangle((GRID+SIDE)/3, GRID/6, 2*(GRID+SIDE)/3, 2*GRID/8, couleur="#d8dee9", epaisseur=3, remplissage="white", tag="box-input")
     # Si la liste secondaire est vite, on prend la main, sinon on prend celle-ci
     if xsaves == None or len(xsaves)==0:
         xsaves = saves
     if len(xsaves)>=5:
         for i in range(5):
-            date = ctime(getmtime(xsaves[i])).split()
-            fltk.rectangle(3*(GRID+SIDE+SETTINGS)/14, (6+3/2*i)*GRID/14, 11*(GRID+SIDE+SETTINGS)/14, (7+3/2*i)*GRID/14, couleur="black", epaisseur=3, tag=xsaves[i])
-            fltk.texte((GRID+SIDE+SETTINGS)/2, (6+3/2*i)*GRID/14+30, (xsaves[i])[:-5]+" - "+(date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", tag=xsaves[i])
-            fltk.texte(5*(GRID+SIDE+SETTINGS)/6, (6+3/2*i)*GRID/14+10, "🗑️")
+            date = ctime(os.path.getmtime(xsaves[i])).split()
+            fltk.rectangle(3*(GRID+SIDE)/14, (6+3/2*i)*GRID/14, 11*(GRID+SIDE)/14, (7+3/2*i)*GRID/14, couleur="black", epaisseur=3, tag=xsaves[i])
+            fltk.texte((GRID+SIDE)/2, (6+3/2*i)*GRID/14+30, (xsaves[i])[:-5]+" - "+(date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", tag=xsaves[i])
+            fltk.texte(5*(GRID+SIDE)/6, (6+3/2*i)*GRID/14+10, "🗑️")
             fltk.mise_a_jour()
     else:
         for i in range(len(xsaves)):
-            date = ctime(getmtime(xsaves[i])).split()
-            fltk.rectangle(3*(GRID+SIDE+SETTINGS)/14, (6+3/2*i)*GRID/14, 11*(GRID+SIDE+SETTINGS)/14, (7+3/2*i)*GRID/14, couleur="black", epaisseur=3, tag=xsaves[i])
-            fltk.texte((GRID+SIDE+SETTINGS)/2, (6+3/2*i)*GRID/14+30, (xsaves[i])[:-5]+" - "+(date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", tag=xsaves[i])
-            fltk.texte(5*(GRID+SIDE+SETTINGS)/6, (6+3/2*i)*GRID/14+10, "🗑️", tag=xsaves[i]+"bin")
+            date = ctime(os.path.getmtime(xsaves[i])).split()
+            fltk.rectangle(3*(GRID+SIDE)/14, (6+3/2*i)*GRID/14, 11*(GRID+SIDE)/14, (7+3/2*i)*GRID/14, couleur="black", epaisseur=3, tag=xsaves[i])
+            fltk.texte((GRID+SIDE)/2, (6+3/2*i)*GRID/14+30, (xsaves[i])[:-5]+" - "+(date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", tag=xsaves[i])
+            fltk.texte(5*(GRID+SIDE)/6, (6+3/2*i)*GRID/14+10, "🗑️", tag=xsaves[i]+"bin")
             fltk.mise_a_jour()
     
     while not confirm:
@@ -580,18 +578,18 @@ def save_menu(saves: list[str], xsaves: list[str] | None = None) -> str:
                         return cible
                     #Si le survol finit par bin, on supprime le fichier et // on réactualise la liste
                     if cible[-3:] == "bin":
-                        remove(cible[:-3])
+                        os.remove(cible[:-3])
                         xsaves = xsaves.remove(cible[:-3])
                         newsave = save_menu(saves, xsaves)
-                        SAVES = saves_list() # Mise à jour des saves dans le dossier
+                        saves = saves_list() # Mise à jour des saves dans le dossier
                         return newsave
 
                     if cible == "box-input":
                         fltk.efface_tout()
-                        fltk.texte((GRID+SIDE+SETTINGS)/2, GRID/8, "Rechercher :", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
-                        fltk.rectangle((GRID+SIDE+SETTINGS)/3, GRID/6, 2*(GRID+SIDE+SETTINGS)/3, 2*GRID/8, couleur="black", epaisseur=3, remplissage="white", tag="box-input")
+                        fltk.texte((GRID+SIDE)/2, GRID/8, "Rechercher :", ancrage="s", police="Cascadia Code", taille=25, tag="box-input")
+                        fltk.rectangle((GRID+SIDE)/3, GRID/6, 2*(GRID+SIDE)/3, 2*GRID/8, couleur="black", epaisseur=3, remplissage="white", tag="box-input")
                         #On prend la recherche du user
-                        search = name_input((GRID+SIDE+SETTINGS)/3+20, GRID/6+30, "w")
+                        search = name_input((GRID+SIDE)/3+20, GRID/6+30, "w")
                         if search == -1:
                             return -1
                         #On crée une liste secondaire ne contenant que les saves contenant l'input
@@ -605,4 +603,3 @@ def save_menu(saves: list[str], xsaves: list[str] | None = None) -> str:
                     return -2
             case "Quitte":
                 return -1
-    
