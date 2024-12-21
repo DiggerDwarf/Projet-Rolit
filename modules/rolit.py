@@ -127,7 +127,7 @@ def ai_play(grid: list[list[int]], color: int) -> tuple[int, int]:
 
 
 def calc_score(grid: list[list[int]]) -> tuple[int, int, int, int]:
-    """Calculate the final score for each players
+    """Calculate the score for each players
 
     :return: The scores, in the order RED, YELLOW, GREEN, BLUE"""
     # here we just sum up the amount of a color in each row, for each color.

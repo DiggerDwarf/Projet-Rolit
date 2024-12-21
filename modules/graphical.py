@@ -15,7 +15,7 @@ SIDE = 330
 QUARTER = (GRID+SIDE)/4
 PADDING = 20
 BASE_BAR_X = 860 # base coordinates for the score bars
-BASE_BAR_Y = 200
+BASE_BAR_Y = 100
 BAR_HEIGHT = 50 # height of the score bars
 BAR_VERTICAL_SPACING = 10 # spacing between score bars
 MAX_BAR_WIDTH = SIDE-40
@@ -49,7 +49,28 @@ ALL_COLORS = [
         GREEN: "#72b043",
         YELLOW: "#ffb629",
         BLUE: "#75c9e3"
-    }
+    },
+    {   #Protanopia
+        CLEAR: "#dddffd",
+        RED: "#867f6e",
+        GREEN: "#d1c395",
+        YELLOW: "#ffea94",
+        BLUE: "#0079fc"
+    },
+    {   #Deuteranopia
+        CLEAR: "#e7dcff",
+        RED: "#9f793f",
+        GREEN: "#dfbcac",
+        YELLOW: "#ffe6ca",
+        BLUE: "#0080da"
+    },
+    {   #Tritanopia
+        CLEAR: "#cce5f7",
+        RED: "#fe201b",
+        GREEN: "#4fd5e6",
+        YELLOW: "#ffe3ee",
+        BLUE: "#008b93"
+    },
 ]
 COLORS_LIST = ["CLEAR","RED","YELLOW","GREEN","BLUE"]
 COLOR_INDEX = 0
@@ -62,16 +83,47 @@ TURNS = {
     4: [RED, YELLOW, GREEN, BLUE]
 }
 
+DESC = "Le but du jeu est d'avoir\nle plus de boule de sa\ncouleur sur le plateau.\n\nLe jeu se joue en manches.\n\nLe gagnant est le joueur\nqui a gagné le plus de\nmanches !"
+RULES = """Début de partie:
+    - Chaque joueur choisit une couleur
+    - Une boule de chaque couleur est placée au
+    centre du plateau
+    - Le joueur qui commence est choisi
+    aléatoirement
+Déroulement d'un tour:
+    - Le joueur doit placer une boule de sa couleur
+    adjacente à une boule déjà présente
+    - Les boules adverses prises en "sandwich" entre
+    une boule venant d'être placée et une boule de
+    la couleur du joueur sont dites "capturées" et
+    deviennent de la couleur du joueur
+Fin d'une manche:
+    - La manche se termine lorsque le plateau est
+    plein
+    - Le joueur ayant le plus de boules de sa
+    couleur gagne la manche
+    - En cas d'égalité, les joueurs concernés
+    gagnent la manche
+Fin de la partie:
+    - La partie se termine après un nombre de
+    manches défini préalablement
+    - Le joueur ayant gagné le plus de manches
+    remporte la partie
+    - En cas d'égalité, les joueurs concernés
+    gagnent la partie
+"""
+
 addons.init(fltk) # initialize the fltk_addons module
 if not os.path.exists("saves"): # create the saves directory if it doesn't exist
     os.makedirs("saves")
 
-def display_grid_window(grid: list[list[int]], player: int | None = None, current_scores: list[int] | None = None) -> None:
+def display_grid_window(grid: list[list[int]], player: int, current_round: int, scores: list[list[int]] | None = None) -> None:
     """Display the game grid onto the fltk window and side informations
     
     :param grid: game grid
     :param player: the current player
-    :param current_scores: the current scores of each player"""
+    :param current_round: the current round
+    :param scores: scores of the players by round"""
     fltk.efface_tout()
     # draw black background with an outline set as the current player's color
     fltk.rectangle(0,0,830,830, couleur=SELECTED_COLORS[player], remplissage="#222831", epaisseur=30)
@@ -85,30 +137,40 @@ def display_grid_window(grid: list[list[int]], player: int | None = None, curren
     # Re draw background for side view
     fltk.rectangle(GRID, 0, GRID+SIDE, GRID, couleur="#F0F0F0", remplissage="#F0F0F0")
 
-    # Draw the score header outline
-    fltk.rectangle(BASE_BAR_X-10, 20, BASE_BAR_X+SIDE-30, 810, epaisseur=5)
-    # Affichage du header "Scores"
-    fltk.texte(GRID+SIDE/2+10, 50, chaine="Scores", ancrage="center", police="Cascadia Code", taille=25)
+    # Draw the outline of the side view
+    fltk.rectangle(GRID+PADDING, 20, GRID+SIDE, 810, epaisseur=5)
     # Settings icon
     fltk.texte(GRID+SIDE-40/2-20, GRID-40/2-10, chaine="⚙️", taille=40, ancrage="s", tag="settings-icon")
-    # fltk.image(GRID+SIDE-55/2, 20, fichier="assets/settings.png", largeur=55, hauteur=55, ancrage="nw", tag="settings-icon")
 
-    if current_scores:
+    # Affichage du header "Scores"
+    fltk.texte(GRID+(PADDING+SIDE)/2, 50, chaine="Scores", ancrage="center", police="Cascadia Code", taille=25)
+    if scores[current_round]:
+        current_scores = scores[current_round]
         max_score = max(current_scores)
-        for i in range(max(len(current_scores), 4)):
+        for i in range(4):
             bar_y = BASE_BAR_Y + (BAR_HEIGHT + BAR_VERTICAL_SPACING) * i # calculate the y coordinate of the bar
             bar_width = max((current_scores[i] / max_score)*MAX_BAR_WIDTH, 40) # calculate the width of the bar
             fltk.rectangle(BASE_BAR_X, bar_y, BASE_BAR_X + bar_width, bar_y + BAR_HEIGHT, epaisseur=5, remplissage=SELECTED_COLORS[i+1])
             fltk.texte(BASE_BAR_X+10, bar_y, str(current_scores[i]), ancrage="nw", police="Cascadia Code", taille=25)
-            if current_scores[i] == max_score:
+            if current_scores[i] == max_score and max_score != 0:
                 fltk.texte(BASE_BAR_X+MAX_BAR_WIDTH-60, bar_y, "👑", couleur="#FFAF4D", ancrage="nw", police="Cascadia Code", taille=25) # add a crown for the leading player
-                # fltk.image(BASE_BAR_X+MAX_BAR_WIDTH-60, bar_y, "assets/crown_perfect_size.png", largeur=50, hauteur=50, ancrage="nw") # add a crown for the leading player
 
+    fltk.texte(GRID+(PADDING+SIDE)/2, 400, chaine="Manches gagnées", ancrage="center", police="Cascadia Code", taille=25) # display the total score
+    if scores:
+        rounds_won = [sum(scores[round_id][player_id] == max(scores[round_id]) for round_id in range(current_round)) for player_id in range(4)]
+        for i in range(4):
+            bar_y = 450 + (BAR_HEIGHT + BAR_VERTICAL_SPACING) * i # calculate the y coordinate of the bar
+            bar_width = max((rounds_won[i] / max(*rounds_won, 1))*MAX_BAR_WIDTH, 40) # calculate the width of the bar
+            fltk.rectangle(BASE_BAR_X, bar_y, BASE_BAR_X + bar_width, bar_y + BAR_HEIGHT, epaisseur=5, remplissage=SELECTED_COLORS[i+1])
+            fltk.texte(BASE_BAR_X+10, bar_y, str(rounds_won[i]), ancrage="nw", police="Cascadia Code", taille=25)
+            if rounds_won[i] == max(rounds_won) and rounds_won[i] != 0:
+                fltk.texte(BASE_BAR_X+MAX_BAR_WIDTH-60, bar_y, "👑", couleur="#FFAF4D", ancrage="nw", police="Cascadia Code", taille=25) # add a crown for the leading player
 
-def display_end_window(scores: list[int]) -> None:
+def display_end_window(scores: list[int], text: str) -> None:
     """Display the end window with the final scores
 
-    :param scores: the final scores of each player"""
+    :param scores: the final scores of each player
+    :param text: the text to display in the side view"""
     fltk.efface_tout()
     fltk.rectangle(-5, -5, 415, 415, couleur="black", epaisseur=5, remplissage=SELECTED_COLORS[RED])
     fltk.rectangle(415, -5, 835, 415, couleur="black", epaisseur=5, remplissage=SELECTED_COLORS[YELLOW])
@@ -121,21 +183,12 @@ def display_end_window(scores: list[int]) -> None:
             crown_y = 415/2 - 50 + (415 * (i in (2, 3)))
             fltk.texte(crown_x, crown_y, "👑", couleur="#FFAF4D", ancrage="center", police="Cascadia Code", taille=200)
 
-    # crown_x = 415/2 + 415 * (max(scores) == scores[1] or max(scores) == scores[3]) # calculate the coordinates of the crown
-    # crown_y = 415/2 - 50 + 415 * (max(scores) == scores[2] or max(scores) == scores[3])
-    # crown_x = 415 * (max(scores) == scores[1] or max(scores) == scores[3]) # crown coordinates (image)
-    # crown_y = 415 * (max(scores) == scores[2] or max(scores) == scores[3])
-
-    # fltk.PIL_AVAILABLE = False
-    # fltk.image(crown_x, crown_y, "assets/crown_perfect_size.png", largeur=415, hauteur=415, ancrage="nw")
-
     fltk.texte(207, 207, str(scores[0]), ancrage="center", police="Cascadia Code", taille=128)
     fltk.texte(622, 207, str(scores[1]), ancrage="center", police="Cascadia Code", taille=128)
     fltk.texte(207, 622, str(scores[3]), ancrage="center", police="Cascadia Code", taille=128)
     fltk.texte(622, 622, str(scores[2]), ancrage="center", police="Cascadia Code", taille=128)
 
-    fltk.texte(1060,50,chaine="<Félicitations ?> ", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25)
-    fltk.texte(1060,80,chaine="<Scores de manches ?>", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25)
+    fltk.texte(GRID+(PADDING+SIDE)/2, 50, chaine=text, couleur="black", ancrage="n", police="Cascadia Code", taille=25)
 
     ev = None
     while True:
@@ -164,16 +217,17 @@ def menu_window_select(texts: tuple[str, str, str, str]) -> int:
     fltk.texte(207, 622, texts[2], ancrage="center", police="Cascadia Code", taille=48)
     fltk.texte(622, 622, texts[3], ancrage="center", police="Cascadia Code", taille=48)
 
-    fltk.texte(GRID+PADDING+SIDE/2, 50, chaine="<Règles ?> ", couleur="#393E46", ancrage="center", police="Cascadia Code", taille=25)
+    fltk.texte(GRID+(PADDING+SIDE)/2, 50, chaine="Rolit", couleur="black", ancrage="center", police="Cascadia Code", taille=25)
+    fltk.texte(GRID+(PADDING+SIDE)/2, 80, chaine=DESC, couleur="black", ancrage="n", police="Cascadia Code", taille=16)
+    fltk.texte(GRID+(PADDING+SIDE)/2, 400, chaine="A vos boules !", couleur="black", ancrage="center", police="Cascadia Code", taille=25)
 
-    #if isfile("rolit.save"):
     if len(saves) > 0:
         date = ctime(os.path.getmtime(saves[0])).split() #Get latest date and convert from Unix to readable - [1] to take the date and not the true/false return, 0 to take the soonest file
         fltk.rectangle(GRID+PADDING, GRID-160, GRID+SIDE, GRID-70, epaisseur=5, remplissage="#F0F0F0", tag="recall")
         fltk.texte(GRID+(PADDING+SIDE)/2, 700, "Reprendre", ancrage="center", police="Cascadia Code", taille=30, tag="recall")
         fltk.texte(GRID+(PADDING+SIDE)/2, 735, (date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", police="Cascadia Code", taille=12, tag="recall")
-        fltk.rectangle(GRID+PADDING+SIDE/2-100, 780, GRID+PADDING+SIDE/2+100, 810, epaisseur=3, remplissage="#F0F0F0", tag="select-save")
-        fltk.texte(GRID+PADDING+SIDE/2, 795, "Choisir sauvegarde", ancrage="center", police="Cascadia Code", taille=12, tag="select-save")
+        fltk.rectangle(GRID+(PADDING+SIDE)/2-100, 780, GRID+(PADDING+SIDE)/2+100, 810, epaisseur=3, remplissage="#F0F0F0", tag="select-save")
+        fltk.texte(GRID+(PADDING+SIDE)/2, 795, "Choisir sauvegarde", ancrage="center", police="Cascadia Code", taille=12, tag="select-save")
 
     ev = None
     while True:
@@ -223,13 +277,13 @@ def theme_btn(i: int) -> int:
     :return: the id of the button"""
     start_x = 2*QUARTER + PADDING
     end_x = 3*QUARTER - PADDING
-    out = fltk.rectangle(start_x, 150 + i*70, end_x, 200 + i*70, epaisseur=5, remplissage="#123456")
+    out = fltk.rectangle(start_x, 130 + i*60, end_x, 180 + i*60, epaisseur=5, remplissage="#123456")
     for j in range(5):
         fltk.rectangle(
             ax = (start_x + 2.5) + j*(end_x - start_x - 5)/5,
-            ay = 150 + i*70 + 2.5,
+            ay = 130 + i*60 + 2.5,
             bx = (start_x + 2.5) + (j + 1)*(end_x - start_x - 5)/5,
-            by = 200 + i*70 - 2.5,
+            by = 180 + i*60 - 2.5,
             couleur = ALL_COLORS[i][j],
             remplissage = ALL_COLORS[i][j],
             epaisseur = 0
@@ -250,11 +304,11 @@ def themes() -> list[int]:
 def draw_save_btns() -> None:
     start_x = 3*QUARTER + PADDING
     end_x = 4*QUARTER - PADDING
-    fltk.rectangle(start_x, 150, end_x, 200, epaisseur=5, remplissage="#F0F0F0", tag="save")
-    fltk.texte((start_x+end_x)//2, 175, "Sauvegarder", ancrage="center", police="Cascadia Code", taille=17, tag="save")
+    fltk.rectangle(start_x, 130, end_x, 180, epaisseur=5, remplissage="#F0F0F0", tag="save")
+    fltk.texte((start_x+end_x)//2, 155, "Sauvegarder", ancrage="center", police="Cascadia Code", taille=17, tag="save")
     if len(saves) > 0:
-        fltk.rectangle(start_x, 220, end_x, 270, epaisseur=5, remplissage="#F0F0F0", tag="recall")
-        fltk.texte((start_x+end_x)//2, 245, "Charger sauvegarde", ancrage="center", police="Cascadia Code", taille=17, tag="recall")
+        fltk.rectangle(start_x, 190, end_x, 240, epaisseur=5, remplissage="#F0F0F0", tag="recall")
+        fltk.texte((start_x+end_x)//2, 215, "Charger sauvegarde", ancrage="center", police="Cascadia Code", taille=17, tag="recall")
 
 
 def settings_menu() -> tuple[str, int]:
@@ -266,11 +320,12 @@ def settings_menu() -> tuple[str, int]:
     submenu_title(2*QUARTER+PADDING-10, 40, 3*QUARTER-PADDING+10, 100, "Thèmes")
     submenu_title(3*QUARTER+PADDING-10, 40, 4*QUARTER-PADDING+10, 100, "Sauvegarde")
     theme_boxes = themes()
-    
+
+    fltk.texte(10, 130, chaine=RULES, ancrage="nw", police="Cascadia Code", taille=14)
     draw_save_btns() # save btns
     # back button
     fltk.texte(GRID+SIDE-40/2-10, GRID-40/2-10, "🔙", ancrage="s", police="Cascadia Code", taille=40, tag="back")
-    
+
     while True:
         ev = fltk.donne_ev()
         if addons.est_objet_survole("back"):
@@ -384,7 +439,8 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             # simple formula to get player index based on the number of players and the index of the turn
             player = (tour + player_bias) % (nb_players + nb_ai) + 1
             player = TURNS[nb_players + nb_ai][player - 1]
-            display_grid_window(grid, player, calc_score(grid))
+            scores[round_i] = calc_score(grid)
+            display_grid_window(grid, player, round_i, scores)
             # loop over events
             ev = fltk.donne_ev()
             if addons.est_objet_survole("settings-icon"):
@@ -406,7 +462,8 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                             tour += 1
                             if ai and (tour % (nb_players + nb_ai)) == nb_players:
                                 # display player move, update the window and wait before making the IAs play
-                                display_grid_window(grid, player, calc_score(grid))
+                                scores[round_i] = calc_score(grid)
+                                display_grid_window(grid, player, round_i, scores)
                                 fltk.mise_a_jour()
                                 sleep(1)
                                 for _ in range(nb_ai):
@@ -417,7 +474,8 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                     ai_play(grid, player)
                                     tour += 1
                                     # between each IA turn, display and wait
-                                    display_grid_window(grid, player, calc_score(grid))
+                                    scores[round_i] = calc_score(grid)
+                                    display_grid_window(grid, player, round_i, scores)
                                     fltk.mise_a_jour()
                                     fltk.__canevas.ev_queue.clear()
                                     sleep(1)
@@ -468,16 +526,16 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
 
         # after the game has ended, calculate the score and print it
         scores[round_i] = calc_score(grid)
-        
-        if display_end_window(scores[round_i]) == -1:
+
+        if display_end_window(scores[round_i], "Score de fin\nde manche") == -1:
             fltk.ferme_fenetre()
             return
-        
+
         round_i += 1
     
     if nb_rounds != 1:
         scores_finaux = [sum(scores[round_id][player_id] == max(scores[round_id]) for round_id in range(nb_rounds)) for player_id in range(4)]
-        display_end_window(scores_finaux)
+        display_end_window(scores_finaux, "Manches gagnées")
 
 
 def saves_list() -> tuple[bool, list[str]]:
@@ -551,21 +609,14 @@ def save_menu(saves: list[str], xsaves: list[str] | None = None) -> str:
     # Si la liste secondaire est vite, on prend la main, sinon on prend celle-ci
     if xsaves == None or len(xsaves)==0:
         xsaves = saves
-    if len(xsaves)>=5:
-        for i in range(5):
-            date = ctime(os.path.getmtime(xsaves[i])).split()
-            fltk.rectangle(3*(GRID+SIDE)/14, (6+3/2*i)*GRID/14, 11*(GRID+SIDE)/14, (7+3/2*i)*GRID/14, couleur="black", epaisseur=3, tag=xsaves[i])
-            fltk.texte((GRID+SIDE)/2, (6+3/2*i)*GRID/14+30, (xsaves[i])[:-5]+" - "+(date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", tag=xsaves[i])
-            fltk.texte(5*(GRID+SIDE)/6, (6+3/2*i)*GRID/14+10, "🗑️")
-            fltk.mise_a_jour()
-    else:
-        for i in range(len(xsaves)):
-            date = ctime(os.path.getmtime(xsaves[i])).split()
-            fltk.rectangle(3*(GRID+SIDE)/14, (6+3/2*i)*GRID/14, 11*(GRID+SIDE)/14, (7+3/2*i)*GRID/14, couleur="black", epaisseur=3, tag=xsaves[i])
-            fltk.texte((GRID+SIDE)/2, (6+3/2*i)*GRID/14+30, (xsaves[i])[:-5]+" - "+(date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", tag=xsaves[i])
-            fltk.texte(5*(GRID+SIDE)/6, (6+3/2*i)*GRID/14+10, "🗑️", tag=xsaves[i]+"bin")
-            fltk.mise_a_jour()
-    
+
+    for i in range(min(len(xsaves), 5)): # On affiche uniquement les 5 premiers résultats (len(xsaves) si < 5 sinon 5)
+        date = ctime(os.path.getmtime(xsaves[i])).split()
+        fltk.rectangle(3*(GRID+SIDE)/14, (6+3/2*i)*GRID/14, 11*(GRID+SIDE)/14, (7+3/2*i)*GRID/14, couleur="black", epaisseur=3, tag=xsaves[i])
+        fltk.texte((GRID+SIDE)/2, (6+3/2*i)*GRID/14+30, (xsaves[i])[:-5]+" - "+(date[2]+"/"+str(MONTHS[date[1]])+" "+date[3]), ancrage="center", tag=xsaves[i])
+        fltk.texte(5*(GRID+SIDE)/6, (6+3/2*i)*GRID/14+10, "🗑️", tag=xsaves[i]+"bin")
+        fltk.mise_a_jour()
+
     while not confirm:
         evName, event = fltk.attend_ev() #Get event
         match evName:
@@ -592,9 +643,10 @@ def save_menu(saves: list[str], xsaves: list[str] | None = None) -> str:
                         search = name_input((GRID+SIDE)/3+20, GRID/6+30, "w")
                         if search == -1:
                             return -1
-                        #On crée une liste secondaire ne contenant que les saves contenant l'input
-                        xsaves = [el for el in xsaves if search in el[:-5]]
-                        #On imbrique la fonction
+                        elif search != -2:
+                            #On crée une liste secondaire ne contenant que les saves contenant l'input
+                            xsaves = [el for el in xsaves if search in el[:-5]]
+                            #On imbrique la fonction
                         newsave = save_menu(saves, xsaves)
                         return newsave
             case "Touche":
