@@ -535,7 +535,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
     
     if nb_rounds != 1:
         scores_finaux = [sum(scores[round_id][player_id] == max(scores[round_id]) for round_id in range(nb_rounds)) for player_id in range(4)]
-        display_end_window(scores_finaux, "Manches gagnées")
+        display_end_window(scores_finaux, "Fin de partie\nScore final")
 
 
 def saves_list() -> tuple[bool, list[str]]:
