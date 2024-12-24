@@ -546,9 +546,8 @@ def saves_list() -> tuple[bool, list[str]]:
     saves = []
 
     for el in list:
-        if len(el) > 4:
-            if el.endswith("save"):
-                saves.append(f"saves/{el}")
+        if el.endswith("save"):
+            saves.append(f"saves/{el}")
 
     if saves != []:
         saves.sort(reverse=True, key = lambda x: os.path.getmtime(x))
