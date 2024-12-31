@@ -21,7 +21,7 @@ def clear() -> None:
     os.system("cls" if os.name == "nt" else "clear")
 
 
-def display_grid_cmdline(grid: list[list[int]]) -> None:
+def display_grid(grid: list[list[int]]) -> None:
     """Display the game grid onto the terminal
 
     :param grid: game grid"""
@@ -96,7 +96,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
         grid = init_grid() #init grid for each rounds   
 
         clear()
-        display_grid_cmdline(grid)
+        display_grid(grid)
 
         x_axis, y_axis = ("1","2","3","4","5","6","7","8"), ("a","b","c","d","e","f","g","h")
         for turn in range(60):
@@ -122,12 +122,12 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                 else:
                     move = ai_play(grid, player)
                     clear()
-                    display_grid_cmdline(grid)
+                    display_grid(grid)
                     print(f"L'IA a joué en {chr(ord('a') + move[1])}{move[0] + 1}")
                     os.system("pause")
                     played = True
             clear()
-            display_grid_cmdline(grid)
+            display_grid(grid)
 
         # after the game ends, calculate scores and print them
         score_round = calc_score(grid)

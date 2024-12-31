@@ -117,7 +117,7 @@ addons.init(fltk) # initialize the fltk_addons module
 if not os.path.exists("saves"): # create the saves directory if it doesn't exist
     os.makedirs("saves")
 
-def display_grid_window(grid: list[list[int]], player: int, current_round: int, scores: list[list[int]] | None = None) -> None:
+def display_grid(grid: list[list[int]], player: int, current_round: int, scores: list[list[int]] | None = None) -> None:
     """Display the game grid onto the fltk window and side informations
     
     :param grid: game grid
@@ -440,7 +440,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
             player = (tour + player_bias) % (nb_players + nb_ai) + 1
             player = TURNS[nb_players + nb_ai][player - 1]
             scores[round_i] = calc_score(grid)
-            display_grid_window(grid, player, round_i, scores)
+            display_grid(grid, player, round_i, scores)
             # loop over events
             ev = fltk.donne_ev()
             if addons.est_objet_survole("settings-icon"):
@@ -463,7 +463,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                             if ai and (tour % (nb_players + nb_ai)) == nb_players:
                                 # display player move, update the window and wait before making the IAs play
                                 scores[round_i] = calc_score(grid)
-                                display_grid_window(grid, player, round_i, scores)
+                                display_grid(grid, player, round_i, scores)
                                 fltk.mise_a_jour()
                                 sleep(1)
                                 for _ in range(nb_ai):
@@ -475,7 +475,7 @@ def mainloop(nb_players: int, nb_rounds: int, ai: bool) -> None:
                                     tour += 1
                                     # between each IA turn, display and wait
                                     scores[round_i] = calc_score(grid)
-                                    display_grid_window(grid, player, round_i, scores)
+                                    display_grid(grid, player, round_i, scores)
                                     fltk.mise_a_jour()
                                     fltk.__canevas.ev_queue.clear()
                                     sleep(1)
